@@ -1,0 +1,20 @@
+<RCC>
+    <qresource prefix="/icons">
+        <file>icons/connection.png</file>
+        <file>icons/query.png</file>
+        <file>icons/table.png</file>
+        <file>icons/view.png</file>
+        <file>icons/function.png</file>
+        <file>icons/user.png</file>
+        <file>icons/backup.png</file>
+        <file>icons/autorun.png</file>
+        <file>icons/model.png</file>
+        <file>icons/report.png</file>
+        <file>icons/database.png</file>
+        <file>icons/server.png</file>
+        <file>icons/folder.png</file>
+    </qresource>
+    <qresource prefix="/styles">
+        <file>styles/catyas.qss</file>
+    </qresource>
+</RCC>

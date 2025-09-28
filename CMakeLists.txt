@@ -1,18 +1,18 @@
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.16)
 
-project(DBNavigator VERSION 1.0.0 LANGUAGES CXX)
+project(catyas VERSION 1.0.0 LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Conan 2.0 integration - dependencies already installed via conan install
 
-# Find Qt6 components
-find_package(Qt6 REQUIRED COMPONENTS Core Widgets Sql Network)
+# Find Qt5 components (fallback to Qt5 if Qt6 not available)
+find_package(Qt5 REQUIRED COMPONENTS Core Widgets Sql Network)
 
-# Find other dependencies
-find_package(Boost REQUIRED)
-find_package(nlohmann_json REQUIRED)
+# Find other dependencies (optional for now)
+find_package(Boost)
+# find_package(nlohmann_json REQUIRED)
 
 # Set Qt specific settings
 set(CMAKE_AUTOMOC ON)
@@ -54,13 +54,16 @@ add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${UI_FILES} ${QRC_FILES})
 
 # Link libraries
 target_link_libraries(${PROJECT_NAME}
-    Qt6::Core
-    Qt6::Widgets
-    Qt6::Sql
-    Qt6::Network
-    Boost::boost
-    nlohmann_json::nlohmann_json
+    Qt5::Core
+    Qt5::Widgets
+    Qt5::Sql
+    Qt5::Network
 )
+
+# Link optional libraries if found
+if(Boost_FOUND)
+    target_link_libraries(${PROJECT_NAME} Boost::boost)
+endif()
 
 # Set target properties
 set_target_properties(${PROJECT_NAME} PROPERTIES
@@ -71,11 +74,11 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 # Find Qt deployment tool
 if(WIN32)
     find_program(DEPLOYQT_EXECUTABLE_DEBUG NAMES windeployqt
-        HINTS ${Qt6_DIR}/../../../bin ${Qt6Core_DIR}/../../../bin
+        HINTS ${Qt5_DIR}/../../../bin ${Qt5Core_DIR}/../../../bin
         PATHS ${CMAKE_PREFIX_PATH}/bin
         NO_CMAKE_PATH)
     find_program(DEPLOYQT_EXECUTABLE_RELEASE NAMES windeployqt
-        HINTS ${Qt6_DIR}/../../../bin ${Qt6Core_DIR}/../../../bin
+        HINTS ${Qt5_DIR}/../../../bin ${Qt5Core_DIR}/../../../bin
         PATHS ${CMAKE_PREFIX_PATH}/bin
         NO_CMAKE_PATH)
 
@@ -89,10 +92,10 @@ if(WIN32)
     endif()
 elseif(APPLE)
     find_program(DEPLOYQT_EXECUTABLE_DEBUG NAMES macdeployqt
-        HINTS ${Qt6_DIR}/../../../bin ${Qt6Core_DIR}/../../../bin
+        HINTS ${Qt5_DIR}/../../../bin ${Qt5Core_DIR}/../../../bin
         NO_CMAKE_PATH)
     find_program(DEPLOYQT_EXECUTABLE_RELEASE NAMES macdeployqt
-        HINTS ${Qt6_DIR}/../../../bin ${Qt6Core_DIR}/../../../bin
+        HINTS ${Qt5_DIR}/../../../bin ${Qt5Core_DIR}/../../../bin
         NO_CMAKE_PATH)
 endif()
 

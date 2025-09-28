@@ -111,3 +111,6 @@ Thumbs.db
 config.ini
 settings.ini
 *.conf
+
+node_modules/
+dist/

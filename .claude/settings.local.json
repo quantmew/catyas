@@ -4,7 +4,9 @@
       "Bash(cmake:*)",
       "Bash(mkdir:*)",
       "Bash(conan install:*)",
-      "Bash(conan remote:*)"
+      "Bash(conan remote:*)",
+      "WebFetch(domain:www.svgrepo.com)",
+      "mcp__playwright__browser_navigate"
     ],
     "deny": [],
     "ask": []

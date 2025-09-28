@@ -4,15 +4,15 @@ boost/1.82.0
 nlohmann_json/3.11.3
 
 [generators]
-cmake_find_package
-cmake_paths
+CMakeDeps
+CMakeToolchain
 
 [options]
-qt:shared=True
-qt:qttools=True
-qt:qtsql=True
-qt:qtnetwork=True
-boost:shared=False
+qt/*:shared=True
+qt/*:qttools=True
+qt/*:qtsql=True
+qt/*:qtnetwork=True
+boost/*:shared=False
 
 [imports]
 bin, *.dll -> ./bin # Copies all dll files from packages bin folder to my bin folder

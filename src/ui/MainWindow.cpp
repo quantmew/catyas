@@ -126,7 +126,7 @@ void MainWindow::setupCentralArea()
     connect(tableListWidget, &TableListWidget::tableSelected,
             this, &MainWindow::onTableSelected);
     connect(tableListWidget, &TableListWidget::openTable,
-            this, &MainWindow::onOpenTable);
+            this, &MainWindow::onOpenTableFromList);
     connect(tableDataWidget, &TableDataWidget::dataChanged,
             this, &MainWindow::onTableDataChanged);
 
@@ -415,6 +415,14 @@ void MainWindow::onOpenTable(const QString &databaseName, const QString &tableNa
     centralTabs->setCurrentWidget(tableDataWidget);
     statusLabel->setText(QString("表: %1").arg(tableName));
     connectionStatusLabel->setText(QString("latyas    %1.%2").arg(databaseName, tableName));
+}
+
+void MainWindow::onOpenTableFromList(const QString &tableName)
+{
+    // When opening from table list, we need to get the current database
+    // For now, use a placeholder database name - this should be improved to track current database
+    QString currentDatabase = "currentdb"; // TODO: Track actual current database
+    onOpenTable(currentDatabase, tableName);
 }
 
 void MainWindow::onTableSelected(const QString &tableName)

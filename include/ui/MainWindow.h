@@ -52,6 +52,7 @@ private slots:
     // New modular component slots
     void onDatabaseTreeSelectionChanged(const QString &itemType, const QString &itemName, const QString &parentName);
     void onOpenTable(const QString &databaseName, const QString &tableName);
+    void onOpenTableFromList(const QString &tableName);
     void onTableSelected(const QString &tableName);
     void onTableDataChanged();
 

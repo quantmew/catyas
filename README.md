@@ -1,4 +1,4 @@
-# DB Navigator
+# catyas
 
 A database connection and management tool similar to Navicat, built with Qt6 and C++.
 

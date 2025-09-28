@@ -14,9 +14,9 @@
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
-    app.setApplicationName("DB Navigator");
+    app.setApplicationName("catyas");
     app.setApplicationVersion("1.0.0");
-    app.setOrganizationName("DB Navigator Team");
+    app.setOrganizationName("catyas Team");
 
     MainWindow window;
     window.show();

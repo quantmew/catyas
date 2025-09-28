@@ -60,6 +60,7 @@ protected:
     void contextMenuEvent(QContextMenuEvent *event) override;
 
 private slots:
+    void onItemChanged(QTableWidgetItem *item);
     void onCellChanged(int row, int column);
     void onCellDoubleClicked(int row, int column);
     void onRefreshClicked();

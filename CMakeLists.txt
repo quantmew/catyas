@@ -7,8 +7,14 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Conan 2.0 integration - dependencies already installed via conan install
 
-# Find Qt5 components (fallback to Qt5 if Qt6 not available)
-find_package(Qt5 REQUIRED COMPONENTS Core Widgets Sql Network)
+# Find Qt6 components (with Qt5 fallback)
+find_package(Qt6 COMPONENTS Core Widgets Sql Network)
+if(NOT Qt6_FOUND)
+    find_package(Qt5 REQUIRED COMPONENTS Core Widgets Sql Network)
+    set(QT_VERSION_MAJOR 5)
+else()
+    set(QT_VERSION_MAJOR 6)
+endif()
 
 # Find other dependencies (optional for now)
 find_package(Boost)
@@ -54,10 +60,10 @@ add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${UI_FILES} ${QRC_FILES})
 
 # Link libraries
 target_link_libraries(${PROJECT_NAME}
-    Qt5::Core
-    Qt5::Widgets
-    Qt5::Sql
-    Qt5::Network
+    Qt${QT_VERSION_MAJOR}::Core
+    Qt${QT_VERSION_MAJOR}::Widgets
+    Qt${QT_VERSION_MAJOR}::Sql
+    Qt${QT_VERSION_MAJOR}::Network
 )
 
 # Link optional libraries if found
@@ -73,14 +79,25 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 
 # Find Qt deployment tool
 if(WIN32)
-    find_program(DEPLOYQT_EXECUTABLE_DEBUG NAMES windeployqt
-        HINTS ${Qt5_DIR}/../../../bin ${Qt5Core_DIR}/../../../bin
-        PATHS ${CMAKE_PREFIX_PATH}/bin
-        NO_CMAKE_PATH)
-    find_program(DEPLOYQT_EXECUTABLE_RELEASE NAMES windeployqt
-        HINTS ${Qt5_DIR}/../../../bin ${Qt5Core_DIR}/../../../bin
-        PATHS ${CMAKE_PREFIX_PATH}/bin
-        NO_CMAKE_PATH)
+    if(QT_VERSION_MAJOR EQUAL 6)
+        find_program(DEPLOYQT_EXECUTABLE_DEBUG NAMES windeployqt
+            HINTS ${Qt6_DIR}/../../../bin ${Qt6Core_DIR}/../../../bin
+            PATHS ${CMAKE_PREFIX_PATH}/bin
+            NO_CMAKE_PATH)
+        find_program(DEPLOYQT_EXECUTABLE_RELEASE NAMES windeployqt
+            HINTS ${Qt6_DIR}/../../../bin ${Qt6Core_DIR}/../../../bin
+            PATHS ${CMAKE_PREFIX_PATH}/bin
+            NO_CMAKE_PATH)
+    else()
+        find_program(DEPLOYQT_EXECUTABLE_DEBUG NAMES windeployqt
+            HINTS ${Qt5_DIR}/../../../bin ${Qt5Core_DIR}/../../../bin
+            PATHS ${CMAKE_PREFIX_PATH}/bin
+            NO_CMAKE_PATH)
+        find_program(DEPLOYQT_EXECUTABLE_RELEASE NAMES windeployqt
+            HINTS ${Qt5_DIR}/../../../bin ${Qt5Core_DIR}/../../../bin
+            PATHS ${CMAKE_PREFIX_PATH}/bin
+            NO_CMAKE_PATH)
+    endif()
 
     # Try to find windeployqt in Conan package paths as well
     if(NOT DEPLOYQT_EXECUTABLE_RELEASE)
@@ -91,12 +108,21 @@ if(WIN32)
         endif()
     endif()
 elseif(APPLE)
-    find_program(DEPLOYQT_EXECUTABLE_DEBUG NAMES macdeployqt
-        HINTS ${Qt5_DIR}/../../../bin ${Qt5Core_DIR}/../../../bin
-        NO_CMAKE_PATH)
-    find_program(DEPLOYQT_EXECUTABLE_RELEASE NAMES macdeployqt
-        HINTS ${Qt5_DIR}/../../../bin ${Qt5Core_DIR}/../../../bin
-        NO_CMAKE_PATH)
+    if(QT_VERSION_MAJOR EQUAL 6)
+        find_program(DEPLOYQT_EXECUTABLE_DEBUG NAMES macdeployqt
+            HINTS ${Qt6_DIR}/../../../bin ${Qt6Core_DIR}/../../../bin
+            NO_CMAKE_PATH)
+        find_program(DEPLOYQT_EXECUTABLE_RELEASE NAMES macdeployqt
+            HINTS ${Qt6_DIR}/../../../bin ${Qt6Core_DIR}/../../../bin
+            NO_CMAKE_PATH)
+    else()
+        find_program(DEPLOYQT_EXECUTABLE_DEBUG NAMES macdeployqt
+            HINTS ${Qt5_DIR}/../../../bin ${Qt5Core_DIR}/../../../bin
+            NO_CMAKE_PATH)
+        find_program(DEPLOYQT_EXECUTABLE_RELEASE NAMES macdeployqt
+            HINTS ${Qt5_DIR}/../../../bin ${Qt5Core_DIR}/../../../bin
+            NO_CMAKE_PATH)
+    endif()
 endif()
 
 # Add post-build step to deploy Qt dependencies

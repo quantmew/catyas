@@ -186,7 +186,7 @@ void TableDataWidget::setupDataTable()
 
     mainLayout->addWidget(dataTable);
 
-    connect(dataTable, &QTableWidget::itemChanged, this, &TableDataWidget::onCellChanged);
+    connect(dataTable, &QTableWidget::itemChanged, this, &TableDataWidget::onItemChanged);
     connect(dataTable, &QTableWidget::cellDoubleClicked, this, &TableDataWidget::onCellDoubleClicked);
 }
 
@@ -452,6 +452,17 @@ void TableDataWidget::updatePaginationInfo()
 
     pageSpinBox->setMaximum(totalPages);
     pageSpinBox->setValue(tableData.currentPage);
+}
+
+void TableDataWidget::onItemChanged(QTableWidgetItem *item)
+{
+    if (!isReadOnly && item) {
+        hasChanges = true;
+        saveBtn->setEnabled(true);
+        discardBtn->setEnabled(true);
+        statusLabel->setText("Data modified - unsaved changes");
+        emit dataChanged();
+    }
 }
 
 void TableDataWidget::onCellChanged(int row, int column)

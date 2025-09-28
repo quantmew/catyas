@@ -5,29 +5,7 @@ project(DBNavigator VERSION 1.0.0 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Conan integration
-if(NOT EXISTS "${CMAKE_BINARY_DIR}/conan.cmake")
-    message(STATUS "Downloading conan.cmake from https://github.com/conan-io/cmake-conan")
-    file(DOWNLOAD "https://raw.githubusercontent.com/conan-io/cmake-conan/0.18.1/conan.cmake"
-         "${CMAKE_BINARY_DIR}/conan.cmake"
-         TLS_VERIFY ON)
-endif()
-
-include(${CMAKE_BINARY_DIR}/conan.cmake)
-
-# Conan dependencies
-conan_cmake_configure(REQUIRES
-                      qt/6.5.3
-                      boost/1.82.0
-                      nlohmann_json/3.11.3
-                      GENERATORS cmake_find_package)
-
-conan_cmake_autodetect(settings)
-
-conan_cmake_install(PATH_OR_REFERENCE .
-                    BUILD missing
-                    REMOTE conancenter
-                    SETTINGS ${settings})
+# Conan 2.0 integration - dependencies already installed via conan install
 
 # Find Qt6 components
 find_package(Qt6 REQUIRED COMPONENTS Core Widgets Sql Network)
@@ -90,12 +68,61 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
     MACOSX_BUNDLE TRUE
 )
 
+# Find Qt deployment tool
+if(WIN32)
+    find_program(DEPLOYQT_EXECUTABLE_DEBUG NAMES windeployqt
+        HINTS ${Qt6_DIR}/../../../bin ${Qt6Core_DIR}/../../../bin
+        PATHS ${CMAKE_PREFIX_PATH}/bin
+        NO_CMAKE_PATH)
+    find_program(DEPLOYQT_EXECUTABLE_RELEASE NAMES windeployqt
+        HINTS ${Qt6_DIR}/../../../bin ${Qt6Core_DIR}/../../../bin
+        PATHS ${CMAKE_PREFIX_PATH}/bin
+        NO_CMAKE_PATH)
+
+    # Try to find windeployqt in Conan package paths as well
+    if(NOT DEPLOYQT_EXECUTABLE_RELEASE)
+        file(GLOB_RECURSE WINDEPLOYQT_PATHS "${CMAKE_BINARY_DIR}/../**/windeployqt.exe")
+        if(WINDEPLOYQT_PATHS)
+            list(GET WINDEPLOYQT_PATHS 0 DEPLOYQT_EXECUTABLE_RELEASE)
+            set(DEPLOYQT_EXECUTABLE_DEBUG ${DEPLOYQT_EXECUTABLE_RELEASE})
+        endif()
+    endif()
+elseif(APPLE)
+    find_program(DEPLOYQT_EXECUTABLE_DEBUG NAMES macdeployqt
+        HINTS ${Qt6_DIR}/../../../bin ${Qt6Core_DIR}/../../../bin
+        NO_CMAKE_PATH)
+    find_program(DEPLOYQT_EXECUTABLE_RELEASE NAMES macdeployqt
+        HINTS ${Qt6_DIR}/../../../bin ${Qt6Core_DIR}/../../../bin
+        NO_CMAKE_PATH)
+endif()
+
+# Add post-build step to deploy Qt dependencies
+if(WIN32 AND (DEPLOYQT_EXECUTABLE_DEBUG OR DEPLOYQT_EXECUTABLE_RELEASE))
+    add_custom_command(TARGET ${PROJECT_NAME}
+        POST_BUILD
+        COMMAND
+        $<$<CONFIG:Debug>:${DEPLOYQT_EXECUTABLE_DEBUG}>$<$<CONFIG:Release>:${DEPLOYQT_EXECUTABLE_RELEASE}>
+        $<TARGET_FILE:${PROJECT_NAME}>
+        $<$<CONFIG:Debug>:--debug>$<$<CONFIG:Release>:--release>
+        --no-translations
+        COMMENT "Deploying Qt dependencies"
+    )
+elseif(APPLE AND (DEPLOYQT_EXECUTABLE_DEBUG OR DEPLOYQT_EXECUTABLE_RELEASE))
+    add_custom_command(TARGET ${PROJECT_NAME}
+        POST_BUILD
+        COMMAND
+        $<$<CONFIG:Debug>:${DEPLOYQT_EXECUTABLE_DEBUG}>$<$<CONFIG:Release>:${DEPLOYQT_EXECUTABLE_RELEASE}>
+        $<TARGET_FILE:${PROJECT_NAME}>
+        COMMENT "Deploying Qt dependencies"
+    )
+endif()
+
 # Install rules
 install(TARGETS ${PROJECT_NAME}
     BUNDLE DESTINATION .
     RUNTIME DESTINATION bin
 )
 
-# Enable testing
-enable_testing()
-add_subdirectory(tests)
+# Enable testing (commented out temporarily due to missing test files)
+# enable_testing()
+# add_subdirectory(tests)

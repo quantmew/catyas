@@ -14,10 +14,6 @@
 #include <QAction>
 #include <QLabel>
 
-class ConnectionTreeWidget;
-class QueryTabWidget;
-class DatabaseTableWidget;
-
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -43,13 +39,13 @@ private:
     QSplitter *rightSplitter;
 
     // Left panel - Connection tree
-    ConnectionTreeWidget *connectionTree;
+    QTreeWidget *connectionTree;
 
     // Right top - Query editor tabs
-    QueryTabWidget *queryTabs;
+    QTabWidget *queryTabs;
 
     // Right bottom - Result tables
-    DatabaseTableWidget *resultTable;
+    QTableWidget *resultTable;
 
     // Menus
     QMenu *fileMenu;

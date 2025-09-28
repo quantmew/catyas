@@ -10,6 +10,29 @@ conaninfo.txt
 conanbuildinfo.*
 conan.lock
 test_package/build/
+# Conan 2.0 generated files
+conan_toolchain.cmake
+conanrun.bat
+conanbuild.bat
+conanrunenv-*.bat
+conanbuildenv-*.bat
+deactivate_conanrun.bat
+deactivate_conanbuild.bat
+deactivate_conanrunenv-*.bat
+deactivate_conanbuildenv-*.bat
+CMakePresets.json
+cmakedeps_macros.cmake
+conandeps_legacy.cmake
+# Conan-generated CMake files
+*Config.cmake
+*ConfigVersion.cmake
+*Targets.cmake
+*-release-x86_64-data.cmake
+*-Target-release.cmake
+*-debug-x86_64-data.cmake
+*-Target-debug.cmake
+module-*.cmake
+Find*.cmake
 
 # Qt specific
 *.pro.user

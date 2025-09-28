@@ -6,15 +6,8 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Conan 2.0 integration - dependencies already installed via conan install
-
-# Find Qt6 components (with Qt5 fallback)
-find_package(Qt6 COMPONENTS Core Widgets Sql Network)
-if(NOT Qt6_FOUND)
-    find_package(Qt5 REQUIRED COMPONENTS Core Widgets Sql Network)
-    set(QT_VERSION_MAJOR 5)
-else()
-    set(QT_VERSION_MAJOR 6)
-endif()
+find_package(Qt6 REQUIRED COMPONENTS Core Widgets Sql Network)
+set(QT_VERSION_MAJOR 6)
 
 # Find other dependencies (optional for now)
 find_package(Boost)
@@ -107,6 +100,16 @@ if(WIN32)
             set(DEPLOYQT_EXECUTABLE_DEBUG ${DEPLOYQT_EXECUTABLE_RELEASE})
         endif()
     endif()
+
+    # Also search in Conan cache
+    if(NOT DEPLOYQT_EXECUTABLE_RELEASE)
+        file(GLOB_RECURSE CONAN_WINDEPLOYQT_PATHS "$ENV{USERPROFILE}/.conan2/**/windeployqt.exe")
+        if(CONAN_WINDEPLOYQT_PATHS)
+            list(GET CONAN_WINDEPLOYQT_PATHS 0 DEPLOYQT_EXECUTABLE_RELEASE)
+            set(DEPLOYQT_EXECUTABLE_DEBUG ${DEPLOYQT_EXECUTABLE_RELEASE})
+            message(STATUS "Found windeployqt in Conan cache: ${DEPLOYQT_EXECUTABLE_RELEASE}")
+        endif()
+    endif()
 elseif(APPLE)
     if(QT_VERSION_MAJOR EQUAL 6)
         find_program(DEPLOYQT_EXECUTABLE_DEBUG NAMES macdeployqt
@@ -129,12 +132,16 @@ endif()
 if(WIN32 AND (DEPLOYQT_EXECUTABLE_DEBUG OR DEPLOYQT_EXECUTABLE_RELEASE))
     add_custom_command(TARGET ${PROJECT_NAME}
         POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E echo "Deploying Qt dependencies..."
         COMMAND
         $<$<CONFIG:Debug>:${DEPLOYQT_EXECUTABLE_DEBUG}>$<$<CONFIG:Release>:${DEPLOYQT_EXECUTABLE_RELEASE}>
         $<TARGET_FILE:${PROJECT_NAME}>
         $<$<CONFIG:Debug>:--debug>$<$<CONFIG:Release>:--release>
         --no-translations
+        --no-system-d3d-compiler
+        --no-opengl-sw
         COMMENT "Deploying Qt dependencies"
+        VERBATIM
     )
 elseif(APPLE AND (DEPLOYQT_EXECUTABLE_DEBUG OR DEPLOYQT_EXECUTABLE_RELEASE))
     add_custom_command(TARGET ${PROJECT_NAME}
@@ -143,6 +150,7 @@ elseif(APPLE AND (DEPLOYQT_EXECUTABLE_DEBUG OR DEPLOYQT_EXECUTABLE_RELEASE))
         $<$<CONFIG:Debug>:${DEPLOYQT_EXECUTABLE_DEBUG}>$<$<CONFIG:Release>:${DEPLOYQT_EXECUTABLE_RELEASE}>
         $<TARGET_FILE:${PROJECT_NAME}>
         COMMENT "Deploying Qt dependencies"
+        VERBATIM
     )
 endif()
 

@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Conan 2.0 integration - dependencies already installed via conan install
-find_package(Qt6 REQUIRED COMPONENTS Core Widgets Sql Network)
+find_package(Qt6 REQUIRED COMPONENTS Core Widgets Sql Network LinguistTools)
 set(QT_VERSION_MAJOR 6)
 
 # Find other dependencies (optional for now)
@@ -47,6 +47,18 @@ file(GLOB_RECURSE UI_FILES
 file(GLOB_RECURSE QRC_FILES
     "resources/*.qrc"
 )
+
+# Translation files
+set(TS_FILES
+    translations/catyas_en.ts
+    translations/catyas_zh_CN.ts
+)
+
+# Create translations directory if it doesn't exist
+file(MAKE_DIRECTORY ${CMAKE_SOURCE_DIR}/translations)
+
+# Setup Qt translations
+qt6_add_translation(QM_FILES ${TS_FILES})
 
 # Create executable
 add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${UI_FILES} ${QRC_FILES})
@@ -153,6 +165,9 @@ elseif(APPLE AND (DEPLOYQT_EXECUTABLE_DEBUG OR DEPLOYQT_EXECUTABLE_RELEASE))
         VERBATIM
     )
 endif()
+
+# Create custom target for updating translations
+qt6_add_lupdate(${PROJECT_NAME} TS_FILES ${TS_FILES})
 
 # Install rules
 install(TARGETS ${PROJECT_NAME}

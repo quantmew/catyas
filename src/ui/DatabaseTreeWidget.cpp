@@ -5,7 +5,7 @@
 DatabaseTreeWidget::DatabaseTreeWidget(QWidget *parent)
     : QTreeWidget(parent)
 {
-    setHeaderLabel("Database Connections");
+    setHeaderLabel(tr("Database Connections"));
     setMinimumWidth(250);
     setMaximumWidth(350);
 
@@ -110,7 +110,7 @@ void DatabaseTreeWidget::addDatabaseStructure(QTreeWidgetItem *dbItem)
 {
     // Add tables folder
     QTreeWidgetItem *tablesFolder = new QTreeWidgetItem(dbItem);
-    tablesFolder->setText(0, "表");
+    tablesFolder->setText(0, tr("Tables"));
     tablesFolder->setData(0, Qt::UserRole, "tables_folder");
     tablesFolder->setIcon(0, QIcon());
 
@@ -131,19 +131,19 @@ void DatabaseTreeWidget::addDatabaseStructure(QTreeWidgetItem *dbItem)
 
     // Add views folder
     QTreeWidgetItem *viewsFolder = new QTreeWidgetItem(dbItem);
-    viewsFolder->setText(0, "视图");
+    viewsFolder->setText(0, tr("Views"));
     viewsFolder->setData(0, Qt::UserRole, "views_folder");
     viewsFolder->setIcon(0, QIcon());
 
     // Add functions folder
     QTreeWidgetItem *functionsFolder = new QTreeWidgetItem(dbItem);
-    functionsFolder->setText(0, "函数");
+    functionsFolder->setText(0, tr("Functions"));
     functionsFolder->setData(0, Qt::UserRole, "functions_folder");
     functionsFolder->setIcon(0, QIcon());
 
     // Add backup folder
     QTreeWidgetItem *backupFolder = new QTreeWidgetItem(dbItem);
-    backupFolder->setText(0, "备份");
+    backupFolder->setText(0, tr("Backup"));
     backupFolder->setData(0, Qt::UserRole, "backup_folder");
     backupFolder->setIcon(0, QIcon());
 }
@@ -152,20 +152,20 @@ void DatabaseTreeWidget::setupContextMenu()
 {
     // Connection context menu
     connectionMenu = new QMenu(this);
-    refreshAction = connectionMenu->addAction("刷新");
-    disconnectAction = connectionMenu->addAction("断开连接");
+    refreshAction = connectionMenu->addAction(tr("Refresh"));
+    disconnectAction = connectionMenu->addAction(tr("Disconnect"));
 
     // Database context menu
     databaseMenu = new QMenu(this);
-    newTableAction = databaseMenu->addAction("新建表");
-    newViewAction = databaseMenu->addAction("新建视图");
+    newTableAction = databaseMenu->addAction(tr("New Table"));
+    newViewAction = databaseMenu->addAction(tr("New View"));
     databaseMenu->addSeparator();
-    dropDatabaseAction = databaseMenu->addAction("删除数据库");
+    dropDatabaseAction = databaseMenu->addAction(tr("Drop Database"));
 
     // Table context menu
     tableMenu = new QMenu(this);
-    openTableAction = tableMenu->addAction("打开表");
-    designTableAction = tableMenu->addAction("设计表");
+    openTableAction = tableMenu->addAction(tr("Open Table"));
+    designTableAction = tableMenu->addAction(tr("Design Table"));
 
     // Connect actions
     connect(refreshAction, &QAction::triggered, this, &DatabaseTreeWidget::onRefreshDatabase);

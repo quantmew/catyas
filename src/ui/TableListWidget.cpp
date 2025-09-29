@@ -70,8 +70,8 @@ void TableListWidget::setupToolbar()
 
     // Create toolbar buttons
     openTableBtn = new QToolButton();
-    openTableBtn->setText("打开表");
-    openTableBtn->setToolTip("打开选中的表");
+    openTableBtn->setText(tr("Open Table"));
+    openTableBtn->setToolTip(tr("Open selected table"));
     openTableBtn->setStyleSheet(
         "QToolButton { "
         "   background: transparent; "
@@ -89,38 +89,38 @@ void TableListWidget::setupToolbar()
     );
 
     designTableBtn = new QToolButton();
-    designTableBtn->setText("设计表");
-    designTableBtn->setToolTip("设计选中的表");
+    designTableBtn->setText(tr("Design Table"));
+    designTableBtn->setToolTip(tr("Design selected table"));
     designTableBtn->setStyleSheet(openTableBtn->styleSheet());
 
     newTableBtn = new QToolButton();
-    newTableBtn->setText("新建表");
-    newTableBtn->setToolTip("创建新表");
+    newTableBtn->setText(tr("New Table"));
+    newTableBtn->setToolTip(tr("Create new table"));
     newTableBtn->setStyleSheet(openTableBtn->styleSheet());
 
     dropTableBtn = new QToolButton();
-    dropTableBtn->setText("删除表");
-    dropTableBtn->setToolTip("删除选中的表");
+    dropTableBtn->setText(tr("Drop Table"));
+    dropTableBtn->setToolTip(tr("Drop selected table"));
     dropTableBtn->setStyleSheet(openTableBtn->styleSheet());
 
     importBtn = new QToolButton();
-    importBtn->setText("导入向导");
-    importBtn->setToolTip("导入数据向导");
+    importBtn->setText(tr("Import Wizard"));
+    importBtn->setToolTip(tr("Import data wizard"));
     importBtn->setStyleSheet(openTableBtn->styleSheet());
 
     exportBtn = new QToolButton();
-    exportBtn->setText("导出向导");
-    exportBtn->setToolTip("导出数据向导");
+    exportBtn->setText(tr("Export Wizard"));
+    exportBtn->setToolTip(tr("Export data wizard"));
     exportBtn->setStyleSheet(openTableBtn->styleSheet());
 
     refreshBtn = new QToolButton();
-    refreshBtn->setText("刷新");
-    refreshBtn->setToolTip("刷新表列表");
+    refreshBtn->setText(tr("Refresh"));
+    refreshBtn->setToolTip(tr("Refresh table list"));
     refreshBtn->setStyleSheet(openTableBtn->styleSheet());
 
     // Search box
     searchEdit = new QLineEdit();
-    searchEdit->setPlaceholderText("搜索表...");
+    searchEdit->setPlaceholderText(tr("Search tables..."));
     searchEdit->setMaximumWidth(200);
     searchEdit->setStyleSheet(
         "QLineEdit { "
@@ -164,7 +164,7 @@ void TableListWidget::setupTableView()
     tableWidget->setColumnCount(7);
 
     QStringList headers;
-    headers << "名" << "自动编..." << "修改日期" << "数据长度" << "引擎" << "行" << "注释";
+    headers << tr("Name") << tr("Auto Inc") << tr("Modify Date") << tr("Data Length") << tr("Engine") << tr("Rows") << tr("Comment");
     tableWidget->setHorizontalHeaderLabels(headers);
 
     // Configure table properties
@@ -197,12 +197,12 @@ void TableListWidget::setupContextMenu()
 {
     contextMenu = new QMenu(this);
 
-    openAction = contextMenu->addAction("打开表");
-    designAction = contextMenu->addAction("设计表");
+    openAction = contextMenu->addAction(tr("Open Table"));
+    designAction = contextMenu->addAction(tr("Design Table"));
     contextMenu->addSeparator();
-    copyNameAction = contextMenu->addAction("复制表名");
+    copyNameAction = contextMenu->addAction(tr("Copy Table Name"));
     contextMenu->addSeparator();
-    dropAction = contextMenu->addAction("删除表");
+    dropAction = contextMenu->addAction(tr("Drop Table"));
 
     connect(openAction, &QAction::triggered, this, &TableListWidget::onOpenTableClicked);
     connect(designAction, &QAction::triggered, this, &TableListWidget::onDesignTableClicked);
@@ -335,7 +335,7 @@ void TableListWidget::onDesignTableClicked()
 void TableListWidget::onNewTableClicked()
 {
     // Will be implemented later
-    QMessageBox::information(this, "新建表", "新建表功能将在后续实现");
+    QMessageBox::information(this, tr("New Table"), tr("New table functionality will be implemented later"));
 }
 
 void TableListWidget::onDropTableClicked()
@@ -353,12 +353,12 @@ void TableListWidget::onRefreshClicked()
 
 void TableListWidget::onImportClicked()
 {
-    QMessageBox::information(this, "导入", "导入功能将在后续实现");
+    QMessageBox::information(this, tr("Import"), tr("Import functionality will be implemented later"));
 }
 
 void TableListWidget::onExportClicked()
 {
-    QMessageBox::information(this, "导出", "导出功能将在后续实现");
+    QMessageBox::information(this, tr("Export"), tr("Export functionality will be implemented later"));
 }
 
 void TableListWidget::filterTables(const QString &searchText)

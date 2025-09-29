@@ -22,10 +22,13 @@
 #include <QTextEdit>
 #include <QFrame>
 #include <QGridLayout>
+#include <QTranslator>
+#include <QActionGroup>
 
 #include "ui/DatabaseTreeWidget.h"
 #include "ui/TableListWidget.h"
 #include "ui/TableDataWidget.h"
+#include "ui/NewConnectionDialog.h"
 
 class MainWindow : public QMainWindow
 {
@@ -42,9 +45,12 @@ private slots:
     void onNewView();
     void onNewFunction();
     void onNewUser();
+    void onNewOther();
+    void onNewQuery();
     void onNewBackup();
     void onAutoRun();
     void onModel();
+    void onNewChartWorkspace();
     void onAbout();
     void onConnectionTreeItemClicked(QTreeWidgetItem *item, int column);
     void onQueryTabChanged(int index);
@@ -55,6 +61,21 @@ private slots:
     void onOpenTableFromList(const QString &tableName);
     void onTableSelected(const QString &tableName);
     void onTableDataChanged();
+
+    // Language switching slots
+    void switchToEnglish();
+    void switchToChinese();
+
+    // Edit menu slots
+    void onUndo();
+    void onRedo();
+    void onCut();
+    void onCopy();
+    void onPaste();
+    void onSelectAll();
+    void onFind();
+    void onReplace();
+    void onGoToLine();
 
 private:
     void setupUI();
@@ -99,6 +120,7 @@ private:
     QMenu *viewMenu;
     QMenu *toolsMenu;
     QMenu *helpMenu;
+    QMenu *languageMenu;
 
     // Main toolbar actions
     QAction *newConnectionAction;
@@ -118,6 +140,25 @@ private:
     QAction *saveQueryAction;
     QAction *exitAction;
     QAction *aboutAction;
+
+    // Edit menu actions
+    QAction *undoAction;
+    QAction *redoAction;
+    QAction *cutAction;
+    QAction *copyAction;
+    QAction *pasteAction;
+    QAction *selectAllAction;
+    QAction *findAction;
+    QAction *replaceAction;
+    QAction *goToLineAction;
+
+    // Language actions
+    QAction *englishAction;
+    QAction *chineseAction;
+    QActionGroup *languageActionGroup;
+
+    // Translation support
+    QTranslator *currentTranslator;
 
     // Toolbar widgets
     QLineEdit *searchBox;

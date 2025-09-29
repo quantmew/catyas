@@ -21,13 +21,15 @@ MainWindow::MainWindow(QWidget *parent)
     , propertiesWidget(nullptr)
     , statusLabel(nullptr)
     , connectionStatusLabel(nullptr)
+    , currentTranslator(nullptr)
+    , languageActionGroup(nullptr)
 {
     setupUI();
     createMenus();
     createToolBars();
     createStatusBar();
 
-    setWindowTitle("catyas - Database Management Tool");
+    setWindowTitle(tr("catyas - Database Management Tool"));
     setMinimumSize(1000, 700);
     resize(1400, 900);
 
@@ -116,11 +118,11 @@ void MainWindow::setupCentralArea()
 
     // Create table list widget
     tableListWidget = new TableListWidget();
-    centralTabs->addTab(tableListWidget, "表列表");
+    centralTabs->addTab(tableListWidget, tr("Table List"));
 
     // Create table data widget
     tableDataWidget = new TableDataWidget();
-    centralTabs->addTab(tableDataWidget, "表数据");
+    centralTabs->addTab(tableDataWidget, tr("Table Data"));
 
     // Connect signals
     connect(tableListWidget, &TableListWidget::tableSelected,
@@ -136,7 +138,7 @@ void MainWindow::setupCentralArea()
 
 void MainWindow::setupPropertiesPanel()
 {
-    propertiesDock = new QDockWidget("属性", this);
+    propertiesDock = new QDockWidget(tr("Properties"), this);
     propertiesDock->setMinimumWidth(200);
     propertiesDock->setMaximumWidth(300);
 
@@ -144,27 +146,27 @@ void MainWindow::setupPropertiesPanel()
     propertiesLayout = new QVBoxLayout(propertiesWidget);
 
     // Object info group
-    objectInfoGroup = new QGroupBox("bond");
+    objectInfoGroup = new QGroupBox(tr("Object Info"));
     objectInfoGroup->setStyleSheet(
         "QGroupBox { font-weight: bold; color: #0078d4; }"
         "QGroupBox::title { subcontrol-origin: margin; padding: 0 5px; }"
     );
     QVBoxLayout *infoLayout = new QVBoxLayout(objectInfoGroup);
 
-    objectNameLabel = new QLabel("数据库");
+    objectNameLabel = new QLabel(tr("Database"));
     objectTypeLabel = new QLabel("");
 
     infoLayout->addWidget(objectNameLabel);
     infoLayout->addWidget(objectTypeLabel);
 
     // Details group
-    detailsGroup = new QGroupBox("字符集");
+    detailsGroup = new QGroupBox(tr("Character Set"));
     QVBoxLayout *detailsLayout = new QVBoxLayout(detailsGroup);
 
     charsetLabel = new QLabel("utf8mb4");
     detailsLayout->addWidget(charsetLabel);
 
-    QGroupBox *collationGroup = new QGroupBox("排序规则");
+    QGroupBox *collationGroup = new QGroupBox(tr("Collation"));
     QVBoxLayout *collationLayout = new QVBoxLayout(collationGroup);
     collationLabel = new QLabel("utf8mb4_unicode_ci");
     collationLayout->addWidget(collationLabel);
@@ -183,53 +185,217 @@ void MainWindow::setupPropertiesPanel()
 
 void MainWindow::createMenus()
 {
-    // Chinese menu names to match Navicat style
-    fileMenu = menuBar()->addMenu("文件(&F)");
-    editMenu = menuBar()->addMenu("编辑(&E)");
-    viewMenu = menuBar()->addMenu("查看(&V)");
-    QMenu *collectMenu = menuBar()->addMenu("收藏夹(&C)");
-    toolsMenu = menuBar()->addMenu("工具(&T)");
-    QMenu *windowMenu = menuBar()->addMenu("窗口(&W)");
-    helpMenu = menuBar()->addMenu("帮助(&H)");
+    // Create menus
+    fileMenu = menuBar()->addMenu(tr("&File"));
+    editMenu = menuBar()->addMenu(tr("&Edit"));
+    viewMenu = menuBar()->addMenu(tr("&View"));
+    QMenu *collectMenu = menuBar()->addMenu(tr("&Favorites"));
+    toolsMenu = menuBar()->addMenu(tr("&Tools"));
+    QMenu *windowMenu = menuBar()->addMenu(tr("&Window"));
+    languageMenu = menuBar()->addMenu(tr("&Language"));
+    helpMenu = menuBar()->addMenu(tr("&Help"));
 
     // File menu actions
-    newConnectionAction = new QAction("新建连接(&N)...", this);
+    QAction *newProjectAction = new QAction(tr("New &Project"), this);
+    newProjectAction->setStatusTip(tr("Create a new project"));
+
+    newConnectionAction = new QAction(tr("New &Connection..."), this);
     newConnectionAction->setShortcut(QKeySequence::New);
-    newConnectionAction->setStatusTip("创建新的数据库连接");
+    newConnectionAction->setStatusTip(tr("Create a new database connection"));
     connect(newConnectionAction, &QAction::triggered, this, &MainWindow::onNewConnection);
 
-    openQueryAction = new QAction("打开查询(&O)...", this);
-    openQueryAction->setShortcut(QKeySequence::Open);
-    openQueryAction->setStatusTip("打开查询文件");
-    connect(openQueryAction, &QAction::triggered, this, &MainWindow::onOpenQuery);
+    // Create "New" submenu
+    QMenu *newMenu = new QMenu(tr("&New"), this);
 
-    saveQueryAction = new QAction("保存查询(&S)", this);
-    saveQueryAction->setShortcut(QKeySequence::Save);
-    saveQueryAction->setStatusTip("保存当前查询");
+    // New submenu actions
+    QAction *newTableAction = new QAction(tr("&Table(V)..."), this);
+    newTableAction->setStatusTip(tr("Create new table"));
+    connect(newTableAction, &QAction::triggered, this, &MainWindow::onNewTable);
 
-    exitAction = new QAction("退出(&X)", this);
+    QAction *newViewAction = new QAction(tr("&View(W)..."), this);
+    newViewAction->setStatusTip(tr("Create new view"));
+    connect(newViewAction, &QAction::triggered, this, &MainWindow::onNewView);
+
+    QAction *newFunctionAction = new QAction(tr("&Function(X)..."), this);
+    newFunctionAction->setStatusTip(tr("Create new function"));
+    connect(newFunctionAction, &QAction::triggered, this, &MainWindow::onNewFunction);
+
+    QAction *newUserAction = new QAction(tr("&User(Y)..."), this);
+    newUserAction->setStatusTip(tr("Create new user"));
+    connect(newUserAction, &QAction::triggered, this, &MainWindow::onNewUser);
+
+    QAction *newOtherAction = new QAction(tr("&Other(Z)"), this);
+    newOtherAction->setStatusTip(tr("Create other database object"));
+    connect(newOtherAction, &QAction::triggered, this, &MainWindow::onNewOther);
+
+    QAction *newQueryAction = new QAction(tr("&Query..."), this);
+    newQueryAction->setStatusTip(tr("Create new query"));
+    connect(newQueryAction, &QAction::triggered, this, &MainWindow::onNewQuery);
+
+    QAction *newBackupAction = new QAction(tr("&Backup..."), this);
+    newBackupAction->setStatusTip(tr("Create new backup"));
+    connect(newBackupAction, &QAction::triggered, this, &MainWindow::onNewBackup);
+
+    QAction *newAutoRunAction = new QAction(tr("&Auto Run..."), this);
+    newAutoRunAction->setStatusTip(tr("Create new auto run task"));
+    connect(newAutoRunAction, &QAction::triggered, this, &MainWindow::onAutoRun);
+
+    QAction *newModelAction = new QAction(tr("&Model..."), this);
+    newModelAction->setStatusTip(tr("Create new model"));
+    connect(newModelAction, &QAction::triggered, this, &MainWindow::onModel);
+
+    QAction *newChartWorkspaceAction = new QAction(tr("&Chart Workspace..."), this);
+    newChartWorkspaceAction->setStatusTip(tr("Create new chart workspace"));
+    connect(newChartWorkspaceAction, &QAction::triggered, this, &MainWindow::onNewChartWorkspace);
+
+    // Add actions to new submenu
+    newMenu->addAction(newTableAction);
+    newMenu->addAction(newViewAction);
+    newMenu->addAction(newFunctionAction);
+    newMenu->addAction(newUserAction);
+    newMenu->addAction(newOtherAction);
+    newMenu->addSeparator();
+    newMenu->addAction(newQueryAction);
+    newMenu->addAction(newBackupAction);
+    newMenu->addAction(newAutoRunAction);
+    newMenu->addAction(newModelAction);
+    newMenu->addAction(newChartWorkspaceAction);
+
+    QAction *openExternalFileAction = new QAction(tr("Open &External File..."), this);
+    openExternalFileAction->setShortcut(QKeySequence::Open);
+    openExternalFileAction->setStatusTip(tr("Open external file"));
+
+    QAction *openRecentlyUsedAction = new QAction(tr("Open &Recently Used"), this);
+    openRecentlyUsedAction->setStatusTip(tr("Open recently used files"));
+
+    QAction *closeConnectionAction = new QAction(tr("&Close Connection"), this);
+    closeConnectionAction->setStatusTip(tr("Close current connection"));
+
+    QAction *importConnectionAction = new QAction(tr("&Import Connection..."), this);
+    importConnectionAction->setStatusTip(tr("Import connection settings"));
+
+    QAction *exportConnectionAction = new QAction(tr("&Export Connection..."), this);
+    exportConnectionAction->setStatusTip(tr("Export connection settings"));
+
+    QAction *closeWindowAction = new QAction(tr("Close &Window"), this);
+    closeWindowAction->setShortcut(QKeySequence::Close);
+    closeWindowAction->setStatusTip(tr("Close current window"));
+
+    QAction *closeTabAction = new QAction(tr("Close &Tab"), this);
+    closeTabAction->setShortcut(QKeySequence("Ctrl+W"));
+    closeTabAction->setStatusTip(tr("Close current tab"));
+
+    exitAction = new QAction(tr("E&xit Catyas"), this);
     exitAction->setShortcut(QKeySequence::Quit);
-    exitAction->setStatusTip("退出应用程序");
+    exitAction->setStatusTip(tr("Exit the application"));
     connect(exitAction, &QAction::triggered, this, &QWidget::close);
 
+    // Add actions to file menu
+    fileMenu->addAction(newProjectAction);
     fileMenu->addAction(newConnectionAction);
+    fileMenu->addMenu(newMenu);
     fileMenu->addSeparator();
-    fileMenu->addAction(openQueryAction);
-    fileMenu->addAction(saveQueryAction);
+    fileMenu->addAction(openExternalFileAction);
+    fileMenu->addAction(openRecentlyUsedAction);
+    fileMenu->addSeparator();
+    fileMenu->addAction(closeConnectionAction);
+    fileMenu->addSeparator();
+    fileMenu->addAction(importConnectionAction);
+    fileMenu->addAction(exportConnectionAction);
+    fileMenu->addSeparator();
+    fileMenu->addAction(closeWindowAction);
+    fileMenu->addAction(closeTabAction);
     fileMenu->addSeparator();
     fileMenu->addAction(exitAction);
 
     // Help menu
-    aboutAction = new QAction("关于 catyas(&A)", this);
-    aboutAction->setStatusTip("显示关于对话框");
+    aboutAction = new QAction(tr("&About catyas"), this);
+    aboutAction->setStatusTip(tr("Show about dialog"));
     connect(aboutAction, &QAction::triggered, this, &MainWindow::onAbout);
+
+    // Language menu
+    languageActionGroup = new QActionGroup(this);
+
+    englishAction = new QAction(tr("English"), this);
+    englishAction->setCheckable(true);
+    englishAction->setActionGroup(languageActionGroup);
+    connect(englishAction, &QAction::triggered, this, &MainWindow::switchToEnglish);
+
+    chineseAction = new QAction(tr("中文"), this);
+    chineseAction->setCheckable(true);
+    chineseAction->setActionGroup(languageActionGroup);
+    chineseAction->setChecked(true); // Default to Chinese
+    connect(chineseAction, &QAction::triggered, this, &MainWindow::switchToChinese);
+
+    languageMenu->addAction(englishAction);
+    languageMenu->addAction(chineseAction);
+
+    // Edit menu actions
+    undoAction = new QAction(tr("&Undo"), this);
+    undoAction->setShortcut(QKeySequence::Undo);
+    undoAction->setStatusTip(tr("Undo the last operation"));
+    connect(undoAction, &QAction::triggered, this, &MainWindow::onUndo);
+
+    redoAction = new QAction(tr("&Redo"), this);
+    redoAction->setShortcut(QKeySequence::Redo);
+    redoAction->setStatusTip(tr("Redo the last operation"));
+    connect(redoAction, &QAction::triggered, this, &MainWindow::onRedo);
+
+    cutAction = new QAction(tr("Cu&t"), this);
+    cutAction->setShortcut(QKeySequence::Cut);
+    cutAction->setStatusTip(tr("Cut the current selection"));
+    connect(cutAction, &QAction::triggered, this, &MainWindow::onCut);
+
+    copyAction = new QAction(tr("&Copy"), this);
+    copyAction->setShortcut(QKeySequence::Copy);
+    copyAction->setStatusTip(tr("Copy the current selection"));
+    connect(copyAction, &QAction::triggered, this, &MainWindow::onCopy);
+
+    pasteAction = new QAction(tr("&Paste"), this);
+    pasteAction->setShortcut(QKeySequence::Paste);
+    pasteAction->setStatusTip(tr("Paste the clipboard content"));
+    connect(pasteAction, &QAction::triggered, this, &MainWindow::onPaste);
+
+    selectAllAction = new QAction(tr("Select &All"), this);
+    selectAllAction->setShortcut(QKeySequence::SelectAll);
+    selectAllAction->setStatusTip(tr("Select all text"));
+    connect(selectAllAction, &QAction::triggered, this, &MainWindow::onSelectAll);
+
+    findAction = new QAction(tr("&Find..."), this);
+    findAction->setShortcut(QKeySequence::Find);
+    findAction->setStatusTip(tr("Find text"));
+    connect(findAction, &QAction::triggered, this, &MainWindow::onFind);
+
+    replaceAction = new QAction(tr("&Replace..."), this);
+    replaceAction->setShortcut(QKeySequence::Replace);
+    replaceAction->setStatusTip(tr("Replace text"));
+    connect(replaceAction, &QAction::triggered, this, &MainWindow::onReplace);
+
+    goToLineAction = new QAction(tr("&Go to Line..."), this);
+    goToLineAction->setShortcut(QKeySequence("Ctrl+G"));
+    goToLineAction->setStatusTip(tr("Go to specific line"));
+    connect(goToLineAction, &QAction::triggered, this, &MainWindow::onGoToLine);
+
+    // Add actions to edit menu
+    editMenu->addAction(undoAction);
+    editMenu->addAction(redoAction);
+    editMenu->addSeparator();
+    editMenu->addAction(cutAction);
+    editMenu->addAction(copyAction);
+    editMenu->addAction(pasteAction);
+    editMenu->addSeparator();
+    editMenu->addAction(selectAllAction);
+    editMenu->addSeparator();
+    editMenu->addAction(findAction);
+    editMenu->addAction(replaceAction);
+    editMenu->addAction(goToLineAction);
 
     helpMenu->addAction(aboutAction);
 }
 
 void MainWindow::createToolBars()
 {
-    QToolBar *mainToolBar = addToolBar("主工具栏");
+    QToolBar *mainToolBar = addToolBar(tr("Main Toolbar"));
     mainToolBar->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     mainToolBar->setIconSize(QSize(32, 32));
     mainToolBar->setStyleSheet(
@@ -240,47 +406,47 @@ void MainWindow::createToolBars()
     );
 
     // Create toolbar actions with icons and text
-    newConnectionAction = new QAction(QIcon(), "连接", this);
-    newConnectionAction->setStatusTip("新建数据库连接");
+    newConnectionAction = new QAction(QIcon(), tr("Connection"), this);
+    newConnectionAction->setStatusTip(tr("New database connection"));
     connect(newConnectionAction, &QAction::triggered, this, &MainWindow::onNewConnection);
 
-    newQueryAction = new QAction(QIcon(), "新建查询", this);
-    newQueryAction->setStatusTip("新建查询");
+    newQueryAction = new QAction(QIcon(), tr("New Query"), this);
+    newQueryAction->setStatusTip(tr("New query"));
     connect(newQueryAction, &QAction::triggered, this, &MainWindow::onOpenQuery);
 
-    newTableAction = new QAction(QIcon(), "表", this);
-    newTableAction->setStatusTip("新建表");
+    newTableAction = new QAction(QIcon(), tr("Table"), this);
+    newTableAction->setStatusTip(tr("New table"));
     connect(newTableAction, &QAction::triggered, this, &MainWindow::onNewTable);
 
-    newViewAction = new QAction(QIcon(), "视图", this);
-    newViewAction->setStatusTip("新建视图");
+    newViewAction = new QAction(QIcon(), tr("View"), this);
+    newViewAction->setStatusTip(tr("New view"));
     connect(newViewAction, &QAction::triggered, this, &MainWindow::onNewView);
 
-    newFunctionAction = new QAction(QIcon(), "函数", this);
-    newFunctionAction->setStatusTip("新建函数");
+    newFunctionAction = new QAction(QIcon(), tr("Function"), this);
+    newFunctionAction->setStatusTip(tr("New function"));
     connect(newFunctionAction, &QAction::triggered, this, &MainWindow::onNewFunction);
 
-    newUserAction = new QAction(QIcon(), "用户", this);
-    newUserAction->setStatusTip("新建用户");
+    newUserAction = new QAction(QIcon(), tr("User"), this);
+    newUserAction->setStatusTip(tr("New user"));
     connect(newUserAction, &QAction::triggered, this, &MainWindow::onNewUser);
 
-    queryAction = new QAction(QIcon(), "查询", this);
-    queryAction->setStatusTip("查询");
+    queryAction = new QAction(QIcon(), tr("Query"), this);
+    queryAction->setStatusTip(tr("Query"));
 
-    backupAction = new QAction(QIcon(), "备份", this);
-    backupAction->setStatusTip("备份");
+    backupAction = new QAction(QIcon(), tr("Backup"), this);
+    backupAction->setStatusTip(tr("Backup"));
     connect(backupAction, &QAction::triggered, this, &MainWindow::onNewBackup);
 
-    autoRunAction = new QAction(QIcon(), "自动运行", this);
-    autoRunAction->setStatusTip("自动运行");
+    autoRunAction = new QAction(QIcon(), tr("Auto Run"), this);
+    autoRunAction->setStatusTip(tr("Auto run"));
     connect(autoRunAction, &QAction::triggered, this, &MainWindow::onAutoRun);
 
-    modelAction = new QAction(QIcon(), "模型", this);
-    modelAction->setStatusTip("模型");
+    modelAction = new QAction(QIcon(), tr("Model"), this);
+    modelAction->setStatusTip(tr("Model"));
     connect(modelAction, &QAction::triggered, this, &MainWindow::onModel);
 
-    reportAction = new QAction(QIcon(), "报表", this);
-    reportAction->setStatusTip("报表");
+    reportAction = new QAction(QIcon(), tr("Report"), this);
+    reportAction->setStatusTip(tr("Report"));
 
     // Add actions to toolbar
     mainToolBar->addAction(newConnectionAction);
@@ -299,8 +465,8 @@ void MainWindow::createToolBars()
 
 void MainWindow::createStatusBar()
 {
-    statusLabel = new QLabel("表", this);
-    connectionStatusLabel = new QLabel("latyas    bond", this);
+    statusLabel = new QLabel(tr("Table"), this);
+    connectionStatusLabel = new QLabel("catyas    bond", this);
 
     // Status bar styling
     statusBar()->setStyleSheet(
@@ -314,47 +480,77 @@ void MainWindow::createStatusBar()
 
 void MainWindow::onNewConnection()
 {
-    QMessageBox::information(this, "新建连接", "新建连接对话框将在此实现。");
+    NewConnectionDialog dialog(this);
+    if (dialog.exec() == QDialog::Accepted) {
+        ConnectionSettings settings = dialog.getConnectionSettings();
+
+        // TODO: Save connection settings and add to database tree
+        QString message = tr("Connection '%1' created successfully!\n\nType: %2\nHost: %3\nPort: %4")
+                         .arg(settings.connectionName)
+                         .arg(static_cast<int>(settings.type))
+                         .arg(settings.hostname)
+                         .arg(settings.port);
+
+        QMessageBox::information(this, tr("Connection Created"), message);
+
+        // Add connection to database tree (placeholder)
+        databaseTree->addConnection(settings.connectionName);
+    }
 }
 
 void MainWindow::onOpenQuery()
 {
-    QMessageBox::information(this, "打开查询", "打开查询对话框将在此实现。");
+    QMessageBox::information(this, tr("Open Query"), tr("Open query dialog will be implemented here."));
 }
 
 void MainWindow::onNewTable()
 {
-    QMessageBox::information(this, "新建表", "新建表对话框将在此实现。");
+    QMessageBox::information(this, tr("New Table"), tr("New table dialog will be implemented here."));
 }
 
 void MainWindow::onNewView()
 {
-    QMessageBox::information(this, "新建视图", "新建视图对话框将在此实现。");
+    QMessageBox::information(this, tr("New View"), tr("New view dialog will be implemented here."));
 }
 
 void MainWindow::onNewFunction()
 {
-    QMessageBox::information(this, "新建函数", "新建函数对话框将在此实现。");
+    QMessageBox::information(this, tr("New Function"), tr("New function dialog will be implemented here."));
 }
 
 void MainWindow::onNewUser()
 {
-    QMessageBox::information(this, "新建用户", "新建用户对话框将在此实现。");
+    QMessageBox::information(this, tr("New User"), tr("New user dialog will be implemented here."));
+}
+
+void MainWindow::onNewOther()
+{
+    QMessageBox::information(this, tr("New Other"), tr("New other object dialog will be implemented here."));
+}
+
+void MainWindow::onNewQuery()
+{
+    QMessageBox::information(this, tr("New Query"), tr("New query dialog will be implemented here."));
+}
+
+void MainWindow::onNewChartWorkspace()
+{
+    QMessageBox::information(this, tr("New Chart Workspace"), tr("New chart workspace dialog will be implemented here."));
 }
 
 void MainWindow::onNewBackup()
 {
-    QMessageBox::information(this, "备份", "备份对话框将在此实现。");
+    QMessageBox::information(this, tr("Backup"), tr("Backup dialog will be implemented here."));
 }
 
 void MainWindow::onAutoRun()
 {
-    QMessageBox::information(this, "自动运行", "自动运行功能将在此实现。");
+    QMessageBox::information(this, tr("Auto Run"), tr("Auto run functionality will be implemented here."));
 }
 
 void MainWindow::onModel()
 {
-    QMessageBox::information(this, "模型", "模型功能将在此实现。");
+    QMessageBox::information(this, tr("Model"), tr("Model functionality will be implemented here."));
 }
 
 void MainWindow::onConnectionTreeItemClicked(QTreeWidgetItem *item, int column)
@@ -379,10 +575,10 @@ void MainWindow::onQueryTabChanged(int index)
 
 void MainWindow::onAbout()
 {
-    QMessageBox::about(this, "关于 catyas",
-                       "catyas 1.0.0\n\n"
-                       "一个类似 Navicat 的数据库连接和管理工具\n\n"
-                       "使用 Qt6 和 C++ 构建。");
+    QMessageBox::about(this, tr("About catyas"),
+                       tr("catyas 1.0.0\n\n"
+                          "A Navicat-like database connection and management tool\n\n"
+                          "Built with Qt6 and C++."));
 }
 
 void MainWindow::onDatabaseTreeSelectionChanged(const QString &itemType, const QString &itemName, const QString &parentName)
@@ -398,13 +594,13 @@ void MainWindow::onDatabaseTreeSelectionChanged(const QString &itemType, const Q
     if (itemType == "database") {
         tableListWidget->setDatabase(itemName);
         centralTabs->setCurrentWidget(tableListWidget);
-        connectionStatusLabel->setText(QString("latyas    %1").arg(itemName));
+        connectionStatusLabel->setText(QString("catyas    %1").arg(itemName));
     }
     // If tables folder is selected, show table list
     else if (itemType == "tables_folder" && !parentName.isEmpty()) {
         tableListWidget->setDatabase(parentName);
         centralTabs->setCurrentWidget(tableListWidget);
-        connectionStatusLabel->setText(QString("latyas    %1").arg(parentName));
+        connectionStatusLabel->setText(QString("catyas    %1").arg(parentName));
     }
 }
 
@@ -413,8 +609,8 @@ void MainWindow::onOpenTable(const QString &databaseName, const QString &tableNa
     // Open table data view
     tableDataWidget->setTable(databaseName, tableName);
     centralTabs->setCurrentWidget(tableDataWidget);
-    statusLabel->setText(QString("表: %1").arg(tableName));
-    connectionStatusLabel->setText(QString("latyas    %1.%2").arg(databaseName, tableName));
+    statusLabel->setText(QString(tr("Table: %1")).arg(tableName));
+    connectionStatusLabel->setText(QString("catyas    %1.%2").arg(databaseName, tableName));
 }
 
 void MainWindow::onOpenTableFromList(const QString &tableName)
@@ -427,10 +623,155 @@ void MainWindow::onOpenTableFromList(const QString &tableName)
 
 void MainWindow::onTableSelected(const QString &tableName)
 {
-    statusLabel->setText(QString("选中表: %1").arg(tableName));
+    statusLabel->setText(QString(tr("Selected table: %1")).arg(tableName));
 }
 
 void MainWindow::onTableDataChanged()
 {
-    statusLabel->setText("数据已修改");
+    statusLabel->setText(tr("Data modified"));
+}
+
+void MainWindow::switchToEnglish()
+{
+    if (currentTranslator) {
+        qApp->removeTranslator(currentTranslator);
+        delete currentTranslator;
+        currentTranslator = nullptr;
+    }
+
+    currentTranslator = new QTranslator(this);
+    if (currentTranslator->load(":/translations/catyas_en") ||
+        currentTranslator->load("catyas_en", "translations")) {
+        qApp->installTranslator(currentTranslator);
+    }
+
+    // Force UI refresh to apply new translations
+    close();
+    show();
+}
+
+void MainWindow::switchToChinese()
+{
+    if (currentTranslator) {
+        qApp->removeTranslator(currentTranslator);
+        delete currentTranslator;
+        currentTranslator = nullptr;
+    }
+
+    currentTranslator = new QTranslator(this);
+    if (currentTranslator->load(":/translations/catyas_zh_CN") ||
+        currentTranslator->load("catyas_zh_CN", "translations")) {
+        qApp->installTranslator(currentTranslator);
+    }
+
+    // Force UI refresh to apply new translations
+    close();
+    show();
+}
+
+void MainWindow::onUndo()
+{
+    QWidget *focused = QApplication::focusWidget();
+    if (focused) {
+        // Try to send undo to the focused widget
+        if (qobject_cast<QLineEdit*>(focused) || qobject_cast<QTextEdit*>(focused)) {
+            QKeyEvent event(QEvent::KeyPress, Qt::Key_Z, Qt::ControlModifier);
+            QApplication::sendEvent(focused, &event);
+        }
+    }
+    statusLabel->setText(tr("Undo"));
+}
+
+void MainWindow::onRedo()
+{
+    QWidget *focused = QApplication::focusWidget();
+    if (focused) {
+        // Try to send redo to the focused widget
+        if (qobject_cast<QLineEdit*>(focused) || qobject_cast<QTextEdit*>(focused)) {
+            QKeyEvent event(QEvent::KeyPress, Qt::Key_Y, Qt::ControlModifier);
+            QApplication::sendEvent(focused, &event);
+        }
+    }
+    statusLabel->setText(tr("Redo"));
+}
+
+void MainWindow::onCut()
+{
+    QWidget *focused = QApplication::focusWidget();
+    if (focused) {
+        if (QLineEdit *lineEdit = qobject_cast<QLineEdit*>(focused)) {
+            lineEdit->cut();
+        } else if (QTextEdit *textEdit = qobject_cast<QTextEdit*>(focused)) {
+            textEdit->cut();
+        }
+    }
+    statusLabel->setText(tr("Cut"));
+}
+
+void MainWindow::onCopy()
+{
+    QWidget *focused = QApplication::focusWidget();
+    if (focused) {
+        if (QLineEdit *lineEdit = qobject_cast<QLineEdit*>(focused)) {
+            lineEdit->copy();
+        } else if (QTextEdit *textEdit = qobject_cast<QTextEdit*>(focused)) {
+            textEdit->copy();
+        } else if (QTableWidget *tableWidget = qobject_cast<QTableWidget*>(focused)) {
+            // Handle table widget copy
+            QList<QTableWidgetItem*> selectedItems = tableWidget->selectedItems();
+            if (!selectedItems.isEmpty()) {
+                QString copyText;
+                for (QTableWidgetItem *item : selectedItems) {
+                    if (item) {
+                        copyText += item->text() + "\t";
+                    }
+                }
+                QApplication::clipboard()->setText(copyText);
+            }
+        }
+    }
+    statusLabel->setText(tr("Copy"));
+}
+
+void MainWindow::onPaste()
+{
+    QWidget *focused = QApplication::focusWidget();
+    if (focused) {
+        if (QLineEdit *lineEdit = qobject_cast<QLineEdit*>(focused)) {
+            lineEdit->paste();
+        } else if (QTextEdit *textEdit = qobject_cast<QTextEdit*>(focused)) {
+            textEdit->paste();
+        }
+    }
+    statusLabel->setText(tr("Paste"));
+}
+
+void MainWindow::onSelectAll()
+{
+    QWidget *focused = QApplication::focusWidget();
+    if (focused) {
+        if (QLineEdit *lineEdit = qobject_cast<QLineEdit*>(focused)) {
+            lineEdit->selectAll();
+        } else if (QTextEdit *textEdit = qobject_cast<QTextEdit*>(focused)) {
+            textEdit->selectAll();
+        } else if (QTableWidget *tableWidget = qobject_cast<QTableWidget*>(focused)) {
+            tableWidget->selectAll();
+        }
+    }
+    statusLabel->setText(tr("Select All"));
+}
+
+void MainWindow::onFind()
+{
+    QMessageBox::information(this, tr("Find"), tr("Find dialog will be implemented here."));
+}
+
+void MainWindow::onReplace()
+{
+    QMessageBox::information(this, tr("Replace"), tr("Replace dialog will be implemented here."));
+}
+
+void MainWindow::onGoToLine()
+{
+    QMessageBox::information(this, tr("Go to Line"), tr("Go to Line dialog will be implemented here."));
 }

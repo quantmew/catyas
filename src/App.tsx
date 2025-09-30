@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import Sidebar from './components/Sidebar'
 import MainContent from './components/MainContent'
+import TopRibbon from './components/TopRibbon'
 import { Connection } from './types'
 
 function App() {
@@ -9,7 +10,9 @@ function App() {
   const [selectedTable, setSelectedTable] = useState<string | null>(null)
 
   return (
-    <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="flex flex-col h-screen bg-gray-50 dark:bg-gray-900">
+      <TopRibbon />
+      <div className="flex flex-1 min-h-0">
       <Sidebar
         connections={connections}
         selectedConnection={selectedConnection}
@@ -21,6 +24,7 @@ function App() {
         selectedTable={selectedTable}
         onSelectTable={setSelectedTable}
       />
+      </div>
     </div>
   )
 }

@@ -20,7 +20,7 @@ export default function TableView({ connection, tableName }: TableViewProps) {
   ]
 
   return (
-    <div className="flex-1 flex flex-col bg-white dark:bg-gray-800">
+    <div className="flex-1 flex flex-col bg-white dark:bg-gray-800 min-w-0">
       {/* Toolbar */}
       <div className="h-12 border-b border-gray-200 dark:border-gray-700 flex items-center gap-2 px-4">
         <button className="flex items-center gap-1 px-3 py-1.5 text-sm bg-blue-500 hover:bg-blue-600 text-white rounded transition-colors">

@@ -1,6 +1,7 @@
 import { Connection } from '../types'
 import TableList from './TableList'
 import TableView from './TableView'
+import RightInfo from './RightInfo'
 
 interface MainContentProps {
   connection: Connection | null
@@ -29,7 +30,7 @@ export default function MainContent({
   }
 
   return (
-    <div className="flex-1 flex">
+    <div className="flex-1 flex min-h-0">
       <TableList
         connection={connection}
         selectedTable={selectedTable}
@@ -44,6 +45,7 @@ export default function MainContent({
           </p>
         </div>
       )}
+      <RightInfo tableName={selectedTable} />
     </div>
   )
 }

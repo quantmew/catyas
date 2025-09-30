@@ -36,7 +36,7 @@ export default defineConfig({
               fileName: () => 'preload.js'
             },
             rollupOptions: {
-              external: ['electron', 'custom-electron-titlebar']
+              external: ['electron']
             }
           }
         }

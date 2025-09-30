@@ -70,3 +70,12 @@
   height: 100vh;
   overflow: hidden;
 }
+
+/* Custom titlebar styles */
+.app-drag-region {
+  -webkit-app-region: drag;
+}
+
+.app-no-drag {
+  -webkit-app-region: no-drag;
+}

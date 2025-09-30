@@ -1,5 +1,4 @@
-import { app, BrowserWindow } from 'electron'
-import { setupTitlebar, attachTitlebarToWindow } from 'custom-electron-titlebar/main'
+import { app, BrowserWindow, ipcMain } from 'electron'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
@@ -8,18 +7,13 @@ const __dirname = path.dirname(__filename)
 
 let mainWindow: BrowserWindow | null = null
 
-// setup titlebar on main
-setupTitlebar()
-
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1400,
     height: 900,
     minWidth: 1200,
     minHeight: 700,
-    // frame: false, // not needed on Electron >=14
-    titleBarStyle: 'hidden',
-    titleBarOverlay: true,
+    frame: false,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: false,
@@ -43,13 +37,27 @@ function createWindow() {
     mainWindow.loadFile(path.join(__dirname, '../dist/index.html'))
   }
 
-  // attach listeners for fullscreen/focus to keep titlebar synced
-  attachTitlebarToWindow(mainWindow)
-
   mainWindow.on('closed', () => {
     mainWindow = null
   })
 }
+
+// Window control handlers
+ipcMain.handle('window:minimize', () => {
+  mainWindow?.minimize()
+})
+
+ipcMain.handle('window:maximize', () => {
+  if (mainWindow?.isMaximized()) {
+    mainWindow?.unmaximize()
+  } else {
+    mainWindow?.maximize()
+  }
+})
+
+ipcMain.handle('window:close', () => {
+  mainWindow?.close()
+})
 
 app.whenReady().then(() => {
   createWindow()

@@ -1,5 +1,4 @@
 import { contextBridge, ipcRenderer } from 'electron'
-import { Titlebar, Color } from 'custom-electron-titlebar'
 
 contextBridge.exposeInMainWorld('electronAPI', {
   // Database operations
@@ -13,13 +12,11 @@ contextBridge.exposeInMainWorld('electronAPI', {
   saveConnection: (config: any) => ipcRenderer.invoke('connection:save', config),
   getConnections: () => ipcRenderer.invoke('connection:get-all'),
   deleteConnection: (id: string) => ipcRenderer.invoke('connection:delete', id),
-})
 
-// Title bar implementation (v4 guidance)
-window.addEventListener('DOMContentLoaded', () => {
-  const isDark = document.documentElement.classList.contains('dark')
-  new Titlebar({
-    backgroundColor: Color.fromHex(isDark ? '#1f2937' : '#e5e7eb'),
-    titleHorizontalAlignment: 'left'
-  })
+  // Window controls
+  windowControl: {
+    minimize: () => ipcRenderer.invoke('window:minimize'),
+    maximize: () => ipcRenderer.invoke('window:maximize'),
+    close: () => ipcRenderer.invoke('window:close'),
+  },
 })

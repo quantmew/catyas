@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from 'electron'
-import { Titlebar } from 'custom-electron-titlebar'
+import { Titlebar, Color } from 'custom-electron-titlebar'
 
 contextBridge.exposeInMainWorld('electronAPI', {
   // Database operations
@@ -17,5 +17,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
 // Title bar implementation (v4 guidance)
 window.addEventListener('DOMContentLoaded', () => {
-  new Titlebar()
+  const isDark = document.documentElement.classList.contains('dark')
+  new Titlebar({
+    backgroundColor: Color.fromHex(isDark ? '#1f2937' : '#e5e7eb'),
+    titleHorizontalAlignment: 'left'
+  })
 })

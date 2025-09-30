@@ -1,4 +1,5 @@
 import { contextBridge, ipcRenderer } from 'electron'
+import { Titlebar } from 'custom-electron-titlebar'
 
 contextBridge.exposeInMainWorld('electronAPI', {
   // Database operations
@@ -12,4 +13,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
   saveConnection: (config: any) => ipcRenderer.invoke('connection:save', config),
   getConnections: () => ipcRenderer.invoke('connection:get-all'),
   deleteConnection: (id: string) => ipcRenderer.invoke('connection:delete', id),
+})
+
+// Title bar implementation (v4 guidance)
+window.addEventListener('DOMContentLoaded', () => {
+  new Titlebar()
 })

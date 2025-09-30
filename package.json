@@ -1,0 +1,92 @@
+{
+  "name": "catyas",
+  "version": "1.0.0",
+  "description": "A database management tool similar to Navicat, supporting MySQL, PostgreSQL, Oracle, SQLite, SQL Server, MariaDB, MongoDB and Redis",
+  "main": "dist/main/main.js",
+  "homepage": "./",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:vite\" \"npm run dev:electron\"",
+    "dev:vite": "vite",
+    "dev:electron": "wait-on http://localhost:5173 && electron .",
+    "build": "npm run build:vite && npm run build:electron",
+    "build:vite": "vite build",
+    "build:electron": "tsc -p tsconfig.main.json",
+    "dist": "npm run build && electron-builder",
+    "lint": "eslint src --ext .ts,.tsx,.js,.jsx",
+    "lint:fix": "eslint src --ext .ts,.tsx,.js,.jsx --fix",
+    "type-check": "tsc --noEmit"
+  },
+  "keywords": [
+    "database",
+    "mysql",
+    "postgresql",
+    "sqlite",
+    "mongodb",
+    "redis",
+    "electron",
+    "react",
+    "vite"
+  ],
+  "author": "Catyas Team",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "@types/uuid": "^9.0.0",
+    "@types/pg": "^8.10.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "@vitejs/plugin-react": "^4.0.0",
+    "concurrently": "^8.2.0",
+    "electron": "^26.0.0",
+    "electron-builder": "^24.6.0",
+    "eslint": "^8.45.0",
+    "eslint-plugin-react": "^7.33.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "typescript": "^5.1.0",
+    "vite": "^4.4.0",
+    "wait-on": "^7.0.1"
+  },
+  "dependencies": {
+    "@ant-design/icons": "^5.2.0",
+    "antd": "^5.8.0",
+    "mysql2": "^3.6.0",
+    "pg": "^8.11.0",
+    "sqlite3": "^5.1.6",
+    "mongodb": "^5.7.0",
+    "redis": "^4.6.0",
+    "oracledb": "^6.0.0",
+    "tedious": "^16.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.15.0",
+    "zustand": "^4.4.0",
+    "react-query": "^3.39.0",
+    "styled-components": "^6.0.0",
+    "uuid": "^9.0.0",
+    "react-i18next": "^13.2.0",
+    "i18next": "^23.5.0",
+    "i18next-browser-languagedetector": "^7.1.0"
+  },
+  "build": {
+    "appId": "com.catyas.app",
+    "productName": "Catyas",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "node_modules/**/*"
+    ],
+    "mac": {
+      "category": "public.app-category.developer-tools"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "linux": {
+      "target": "AppImage"
+    }
+  }
+}

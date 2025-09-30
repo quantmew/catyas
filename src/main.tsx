@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom/client'
 import App from './App'
 import './index.css'
 import { Titlebar, Color } from 'custom-electron-titlebar'
-import 'custom-electron-titlebar/lib/titlebar.css'
 
 // Initialize custom titlebar
 const isDark = document.documentElement.classList.contains('dark')

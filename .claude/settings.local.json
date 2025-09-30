@@ -6,7 +6,9 @@
       "Bash(conan install:*)",
       "Bash(conan remote:*)",
       "WebFetch(domain:www.svgrepo.com)",
-      "mcp__playwright__browser_navigate"
+      "mcp__playwright__browser_navigate",
+      "Bash(cat:*)",
+      "Bash(npm install:*)"
     ],
     "deny": [],
     "ask": []

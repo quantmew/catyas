@@ -116,6 +116,16 @@
     "rows": "Rows",
     "noData": "No data available"
   },
+  "ribbon": {
+    "newConnection": "New Connection",
+    "new": "New",
+    "refresh": "Refresh",
+    "table": "Table",
+    "users": "Users",
+    "query": "Query",
+    "import": "Import",
+    "settings": "Settings"
+  },
   "common": {
     "search": "Search",
     "filter": "Filter",

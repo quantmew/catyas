@@ -22,7 +22,11 @@ function App() {
     <div className="flex flex-col h-screen bg-gray-50 dark:bg-gray-900">
       <Titlebar />
       <div className="flex flex-col flex-1 min-h-0" style={{ marginTop: '32px' }}>
-        <TopRibbon />
+        <TopRibbon onNewConnection={(dbType: string) => {
+          if (dbType === 'mysql') {
+            setShowMySQLDialog(true)
+          }
+        }} />
         <div className="flex flex-1 min-h-0">
       <Sidebar
         connections={connections}

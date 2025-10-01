@@ -1,94 +1,95 @@
-import { Database, Table2, Users, Settings, Play, FolderPlus, FileUp, RefreshCw } from 'lucide-react'
 import * as Menubar from '@radix-ui/react-menubar'
 import { useTranslation } from 'react-i18next'
 import LanguageSwitcher from './LanguageSwitcher'
-import menuConfig from '../config/menuConfig.json'
-import { MenuConfig, isSeparator, MenuItem } from '../types/menu'
+import { createMenuBarConfig, createRibbonConfig, MenuBarActions, MenuItem, MenuSeparator, RibbonButton as RibbonButtonConfig } from './topBarConfig'
+import { useMemo } from 'react'
 
-const config = menuConfig as MenuConfig
+const isSeparator = (item: MenuItem | MenuSeparator): item is MenuSeparator => {
+  return 'type' in item && item.type === 'separator'
+}
 
-function RibbonButton({ icon: Icon, label }: { icon: any; label: string }) {
+function RibbonButton({ config }: { config: RibbonButtonConfig }) {
+  const { t } = useTranslation()
+  const Icon = config.icon
+
   return (
     <button
+      onClick={config.action}
       className="flex flex-col items-center justify-center w-16 h-14 mx-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200"
-      title={label}
+      title={t(`ribbon.${config.id}`)}
     >
       <Icon className="w-5 h-5 mb-0.5" />
-      <span className="text-[11px] leading-none">{label}</span>
+      <span className="text-[11px] leading-none">{t(`ribbon.${config.id}`)}</span>
     </button>
   )
 }
 
-export default function TopRibbon() {
+interface TopRibbonProps {
+  onNewConnection?: (dbType: string) => void
+}
+
+export default function TopRibbon({ onNewConnection }: TopRibbonProps) {
   const { t } = useTranslation()
 
-  const handleCommand = (action: string) => {
-    // Handle new connection with database type
-    if (action.startsWith('newConnection:')) {
-      const dbType = action.split(':')[1]
+  const actions: MenuBarActions = useMemo(() => ({
+    // File
+    newProject: () => {
+      console.log('[Ribbon] New Connection')
+      onNewConnection?.('mysql')
+    },
+    newConnection: (dbType: string) => {
       console.log('[Menu] New Connection -', dbType.toUpperCase())
-      return
-    }
+      onNewConnection?.(dbType)
+    },
+    new: () => console.log('[Ribbon] New'),
+    openExternal: () => console.log('[Menu] Open External'),
+    openRecent: () => console.log('[Menu] Open Recent'),
+    closeConnection: () => console.log('[Menu] Close Connection'),
+    closeWindow: () => console.log('[Menu] Close Window'),
+    closeTab: () => console.log('[Menu] Close Tab'),
+    importConnection: () => console.log('[Menu] Import Connection'),
+    exportConnection: () => console.log('[Menu] Export Connection'),
+    exitCatyas: () => window.electronAPI?.windowControl?.close?.(),
 
-    switch (action) {
-      // File
-      case 'newProject':
-      case 'new':
-      case 'openExternal':
-      case 'openRecent':
-      case 'closeConnection':
-      case 'importConnection':
-      case 'exportConnection':
-      case 'closeWindow':
-      case 'closeTab':
-        console.log('[Menu]', action)
-        break
-      case 'exitCatyas':
-        window.electronAPI?.windowControl?.close?.()
-        break
+    // Edit
+    undo: () => console.log('[Edit] Undo'),
+    redo: () => console.log('[Edit] Redo'),
+    cut: () => console.log('[Edit] Cut'),
+    copy: () => console.log('[Edit] Copy'),
+    paste: () => console.log('[Edit] Paste'),
+    selectAll: () => console.log('[Edit] Select All'),
 
-      // Edit
-      case 'undo':
-      case 'redo':
-      case 'cut':
-      case 'copy':
-      case 'paste':
-      case 'selectAll':
-        console.log('[Edit]', action)
-        break
+    // Favorites
+    addToFavorites: () => console.log('[Favorites] Add to Favorites'),
+    manageFavorites: () => console.log('[Favorites] Manage Favorites'),
 
-      // Favorites/Tools
-      case 'addToFavorites':
-      case 'manageFavorites':
-      case 'structureSync':
-      case 'dataTransfer':
-      case 'backup':
-      case 'scheduledTasks':
-        console.log('[Tools]', action)
-        break
+    // Tools
+    structureSync: () => console.log('[Tools] Structure Sync'),
+    dataTransfer: () => console.log('[Tools] Data Transfer'),
+    backup: () => console.log('[Tools] Backup'),
+    scheduledTasks: () => console.log('[Tools] Scheduled Tasks'),
 
-      // Window
-      case 'minimize':
-        window.electronAPI?.windowControl?.minimize?.()
-        break
-      case 'maximize':
-        window.electronAPI?.windowControl?.maximize?.()
-        break
-      case 'alwaysOnTop':
-        console.log('[Window] Always on Top (placeholder)')
-        break
+    // Window
+    minimize: () => window.electronAPI?.windowControl?.minimize?.(),
+    maximize: () => window.electronAPI?.windowControl?.maximize?.(),
+    alwaysOnTop: () => console.log('[Window] Always on Top'),
 
-      // Help
-      case 'viewHelp':
-      case 'checkUpdates':
-      case 'about':
-        console.log('[Help]', action)
-        break
+    // Help
+    viewHelp: () => console.log('[Help] View Help'),
+    checkUpdates: () => console.log('[Help] Check Updates'),
+    about: () => console.log('[Help] About'),
 
-      default:
-        console.log('[Unhandled command]', action)
-    }
-  }
+    // Ribbon buttons
+    refresh: () => console.log('[Ribbon] Refresh'),
+    table: () => console.log('[Ribbon] Table'),
+    users: () => console.log('[Ribbon] Users'),
+    query: () => console.log('[Ribbon] Query'),
+    import: () => console.log('[Ribbon] Import'),
+    settings: () => console.log('[Ribbon] Settings')
+  }), [onNewConnection])
+
+  const menuBarConfig = useMemo(() => createMenuBarConfig(actions), [actions])
+  const ribbonConfig = useMemo(() => createRibbonConfig(actions), [actions])
 
   const renderMenuItem = (item: MenuItem): JSX.Element => {
     // If item has children, render as submenu
@@ -122,7 +123,7 @@ export default function TopRibbon() {
     return (
       <Menubar.Item
         key={item.id}
-        onSelect={() => item.action && handleCommand(item.action)}
+        onSelect={() => item.action?.()}
         disabled={item.disabled}
         className="outline-none w-full text-left px-3 py-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-default data-[disabled]:opacity-50 data-[disabled]:cursor-not-allowed flex items-center justify-between"
       >
@@ -137,7 +138,7 @@ export default function TopRibbon() {
   return (
     <div className="border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 select-none app-no-drag">
       <Menubar.Root className="h-8 px-1 flex items-center text-[13px] text-gray-800 dark:text-gray-200 space-x-1">
-        {config.menubar.map((menuGroup) => (
+        {menuBarConfig.map((menuGroup) => (
           <Menubar.Menu key={menuGroup.id}>
             <Menubar.Trigger className="px-2.5 h-8 rounded data-[state=open]:bg-gray-200 dark:data-[state=open]:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700">
               {t(`menu.${menuGroup.id}`)}
@@ -163,20 +164,16 @@ export default function TopRibbon() {
 
       <div className="h-12 px-2 flex items-center justify-between overflow-x-auto border-t border-gray-100 dark:border-gray-700">
         <div className="flex items-center">
-          <div className="flex items-center pr-3 mr-3 border-r border-gray-200 dark:border-gray-700">
-            <RibbonButton icon={Database} label="新建连接" />
-            <RibbonButton icon={FolderPlus} label="新建" />
-            <RibbonButton icon={RefreshCw} label="刷新" />
-          </div>
-          <div className="flex items-center pr-3 mr-3 border-r border-gray-200 dark:border-gray-700">
-            <RibbonButton icon={Table2} label="表" />
-            <RibbonButton icon={Users} label="用户" />
-            <RibbonButton icon={Play} label="查询" />
-          </div>
-          <div className="flex items-center">
-            <RibbonButton icon={FileUp} label="导入" />
-            <RibbonButton icon={Settings} label="设置" />
-          </div>
+          {ribbonConfig.map((group: import('./topBarConfig').RibbonGroup, groupIndex: number) => (
+            <div
+              key={groupIndex}
+              className={`flex items-center ${groupIndex < ribbonConfig.length - 1 ? 'pr-3 mr-3 border-r border-gray-200 dark:border-gray-700' : ''}`}
+            >
+              {group.buttons.map((button: RibbonButtonConfig) => (
+                <RibbonButton key={button.id} config={button} />
+              ))}
+            </div>
+          ))}
         </div>
         <div className="mr-2">
           <LanguageSwitcher />

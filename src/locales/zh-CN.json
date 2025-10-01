@@ -116,6 +116,16 @@
     "rows": "行数",
     "noData": "暂无数据"
   },
+  "ribbon": {
+    "newConnection": "新建连接",
+    "new": "新建",
+    "refresh": "刷新",
+    "table": "表",
+    "users": "用户",
+    "query": "查询",
+    "import": "导入",
+    "settings": "设置"
+  },
   "common": {
     "search": "搜索",
     "filter": "筛选",

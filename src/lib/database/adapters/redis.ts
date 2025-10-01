@@ -85,7 +85,7 @@ export class RedisAdapter implements DatabaseAdapter {
     }))
   }
 
-  async getTableStructure(tableName: string): Promise<Column[]> {
+  async getTableStructure(_tableName: string): Promise<Column[]> {
     return [
       {
         name: 'key',
@@ -100,7 +100,7 @@ export class RedisAdapter implements DatabaseAdapter {
     ]
   }
 
-  async getTableData(tableName: string, limit: number, offset: number): Promise<QueryResult> {
+  async getTableData(_tableName: string, limit: number, offset: number): Promise<QueryResult> {
     if (!this.client) throw new Error('Not connected')
     const startTime = Date.now()
     const keys = await this.client.keys('*')

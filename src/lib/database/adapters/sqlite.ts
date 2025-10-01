@@ -37,7 +37,7 @@ export class SQLiteAdapter implements DatabaseAdapter {
       const rows = stmt.all()
       const executionTime = Date.now() - startTime
 
-      const columns = rows.length > 0 ? Object.keys(rows[0]) : []
+      const columns = rows.length > 0 ? Object.keys(rows[0] as object) : []
 
       return {
         columns,

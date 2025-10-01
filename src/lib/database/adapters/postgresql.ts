@@ -43,7 +43,7 @@ export class PostgreSQLAdapter implements DatabaseAdapter {
     const executionTime = Date.now() - startTime
 
     return {
-      columns: result.fields.map(f => f.name),
+      columns: result.fields.map((f: any) => f.name),
       rows: result.rows,
       rowCount: result.rowCount || 0,
       executionTime,

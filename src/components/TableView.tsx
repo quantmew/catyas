@@ -8,7 +8,7 @@ interface TableViewProps {
   tableName: string
 }
 
-export default function TableView({ connection, tableName }: TableViewProps) {
+export default function TableView({ connection: _connection, tableName }: TableViewProps) {
   const [activeTab, setActiveTab] = useState('data')
 
   // Mock data

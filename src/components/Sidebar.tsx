@@ -27,7 +27,7 @@ export default function Sidebar({
     setExpandedConnections(newExpanded)
   }
 
-  const getDatabaseIcon = (type: string) => {
+  const getDatabaseIcon = (_type: string) => {
     return <Database className="w-4 h-4" />
   }
 

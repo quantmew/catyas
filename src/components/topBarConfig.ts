@@ -1,4 +1,4 @@
-import { LucideIcon } from 'lucide-react'
+import { LucideIcon, Database, FolderPlus, RefreshCw, Table2, Users, Play, FileUp, Settings } from 'lucide-react'
 
 export interface MenuSeparator {
   type: 'separator'
@@ -295,9 +295,6 @@ export const createMenuBarConfig = (actions: MenuBarActions): MenuGroup[] => [
 ]
 
 export const createRibbonConfig = (actions: MenuBarActions): RibbonGroup[] => {
-  // Import icons here to avoid circular dependencies
-  const { Database, FolderPlus, RefreshCw, Table2, Users, Play, FileUp, Settings } = require('lucide-react')
-
   return [
     {
       buttons: [

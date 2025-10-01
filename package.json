@@ -69,7 +69,8 @@
       "category": "public.app-category.developer-tools"
     },
     "win": {
-      "target": "nsis"
+      "target": "nsis",
+      "sign": false
     },
     "linux": {
       "target": "AppImage"

@@ -1,7 +1,7 @@
 import { app, BrowserWindow, ipcMain } from 'electron'
 import path from 'path'
 import { fileURLToPath } from 'url'
-import './windows/mysqlConnectionDialog.js'
+import { registerMySQLDialogHandlers } from './mysqlDialog.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -24,6 +24,9 @@ ipcMain.handle('window:maximize', () => {
 ipcMain.handle('window:close', () => {
   mainWindow?.close()
 })
+
+// Register MySQL dialog handlers
+registerMySQLDialogHandlers(__dirname)
 
 function createWindow() {
   mainWindow = new BrowserWindow({

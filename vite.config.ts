@@ -10,14 +10,17 @@ export default defineConfig({
     electron([
       {
         entry: 'electron/main.ts',
-        onstart(options) {
-          options.startup()
+        onstart(args) {
+          // Kill existing electron process before starting new one
+          if (args.startup) {
+            args.startup()
+          }
         },
         vite: {
           build: {
             outDir: 'dist-electron',
             rollupOptions: {
-              external: ['electron'],
+              external: ['electron', 'mysql2', 'pg', 'mongodb', 'redis', 'tedious', 'oracledb', 'better-sqlite3', 'mariadb'],
               input: {
                 main: 'electron/main.ts'
               }
@@ -27,8 +30,9 @@ export default defineConfig({
       },
       {
         entry: 'electron/preload.cjs',
-        onstart(options) {
-          options.reload()
+        onstart(args) {
+          // Reload renderer after preload changes
+          args.reload()
         },
         vite: {
           build: {

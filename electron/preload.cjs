@@ -6,8 +6,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
   // Database operations
   testConnection: (config) => ipcRenderer.invoke('db:test-connection', config),
+  getDatabases: (config) => ipcRenderer.invoke('db:get-databases', config),
+  getTables: (config, database) => ipcRenderer.invoke('db:get-tables', config, database),
   executeQuery: (config, query) => ipcRenderer.invoke('db:execute-query', config, query),
-  getTables: (config) => ipcRenderer.invoke('db:get-tables', config),
   getTableStructure: (config, tableName) => ipcRenderer.invoke('db:get-table-structure', config, tableName),
   getTableData: (config, tableName, limit, offset) => ipcRenderer.invoke('db:get-table-data', config, tableName, limit, offset),
 

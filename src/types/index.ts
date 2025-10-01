@@ -8,6 +8,12 @@ export type DatabaseType =
   | 'mongodb'
   | 'redis'
 
+export interface Database {
+  name: string
+  tables?: Table[]
+  expanded?: boolean
+}
+
 export interface Connection {
   id: string
   name: string
@@ -18,6 +24,8 @@ export interface Connection {
   password?: string
   database?: string
   ssl?: boolean
+  databases?: Database[]
+  expanded?: boolean
 }
 
 export interface Table {

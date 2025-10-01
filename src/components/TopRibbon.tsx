@@ -41,7 +41,17 @@ export default function TopRibbon({ onNewConnection }: TopRibbonProps) {
       console.log('[Menu] New Connection -', dbType.toUpperCase())
       onNewConnection?.(dbType)
     },
-    new: () => console.log('[Ribbon] New'),
+    new: () => console.log('[Menu] New'),
+    newTable: () => console.log('[Menu] New Table'),
+    newView: () => console.log('[Menu] New View'),
+    newFunction: () => console.log('[Menu] New Function'),
+    newUser: () => console.log('[Menu] New User'),
+    newOther: () => console.log('[Menu] New Other'),
+    newQuery: () => console.log('[Menu] New Query'),
+    newBackup: () => console.log('[Menu] New Backup'),
+    newAutoRun: () => console.log('[Menu] New Auto Run'),
+    newModel: () => console.log('[Menu] New Model'),
+    newChartWorkspace: () => console.log('[Menu] New Chart Workspace'),
     openExternal: () => console.log('[Menu] Open External'),
     openRecent: () => console.log('[Menu] Open Recent'),
     closeConnection: () => console.log('[Menu] Close Connection'),
@@ -52,22 +62,35 @@ export default function TopRibbon({ onNewConnection }: TopRibbonProps) {
     exitCatyas: () => window.close(),
 
     // Edit
-    undo: () => console.log('[Edit] Undo'),
-    redo: () => console.log('[Edit] Redo'),
-    cut: () => console.log('[Edit] Cut'),
     copy: () => console.log('[Edit] Copy'),
     paste: () => console.log('[Edit] Paste'),
     selectAll: () => console.log('[Edit] Select All'),
+
+    // View
+    navigationPane: () => console.log('[View] Navigation Pane'),
+    informationPane: () => console.log('[View] Information Pane'),
+    list: () => console.log('[View] List'),
+    details: () => console.log('[View] Details'),
+    erDiagram: () => console.log('[View] ER Diagram'),
+    hideObjectGroup: () => console.log('[View] Hide Object Group'),
+    sort: () => console.log('[View] Sort'),
+    selectColumns: () => console.log('[View] Select Columns'),
+    showHiddenItems: () => console.log('[View] Show Hidden Items'),
 
     // Favorites
     addToFavorites: () => console.log('[Favorites] Add to Favorites'),
     manageFavorites: () => console.log('[Favorites] Manage Favorites'),
 
     // Tools
-    structureSync: () => console.log('[Tools] Structure Sync'),
     dataTransfer: () => console.log('[Tools] Data Transfer'),
-    backup: () => console.log('[Tools] Backup'),
-    scheduledTasks: () => console.log('[Tools] Scheduled Tasks'),
+    dataGeneration: () => console.log('[Tools] Data Generation'),
+    dataSynchronization: () => console.log('[Tools] Data Synchronization'),
+    structureSynchronization: () => console.log('[Tools] Structure Synchronization'),
+    commandLineInterface: () => console.log('[Tools] Command Line Interface'),
+    serverMonitor: () => console.log('[Tools] Server Monitor'),
+    findInDatabaseOrSchema: () => console.log('[Tools] Find in Database or Schema'),
+    historyLog: () => console.log('[Tools] History Log'),
+    options: () => console.log('[Tools] Options'),
 
     // Window - these are now handled by native controls
     minimize: () => console.log('[Window] Minimize (native)'),
@@ -75,8 +98,8 @@ export default function TopRibbon({ onNewConnection }: TopRibbonProps) {
     alwaysOnTop: () => console.log('[Window] Always on Top'),
 
     // Help
-    viewHelp: () => console.log('[Help] View Help'),
-    checkUpdates: () => console.log('[Help] Check Updates'),
+    onlineDocumentation: () => console.log('[Help] Online Documentation'),
+    releaseNotes: () => console.log('[Help] Release Notes'),
     about: () => console.log('[Help] About'),
 
     // Ribbon buttons

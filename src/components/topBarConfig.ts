@@ -32,6 +32,16 @@ export interface MenuBarActions {
   newProject: () => void
   newConnection: (dbType: string) => void
   new: () => void
+  newTable: () => void
+  newView: () => void
+  newFunction: () => void
+  newUser: () => void
+  newOther: () => void
+  newQuery: () => void
+  newBackup: () => void
+  newAutoRun: () => void
+  newModel: () => void
+  newChartWorkspace: () => void
   openExternal: () => void
   openRecent: () => void
   closeConnection: () => void
@@ -42,22 +52,35 @@ export interface MenuBarActions {
   exitCatyas: () => void
 
   // Edit
-  undo: () => void
-  redo: () => void
-  cut: () => void
   copy: () => void
   paste: () => void
   selectAll: () => void
+
+  // View
+  navigationPane: () => void
+  informationPane: () => void
+  list: () => void
+  details: () => void
+  erDiagram: () => void
+  hideObjectGroup: () => void
+  sort: () => void
+  selectColumns: () => void
+  showHiddenItems: () => void
 
   // Favorites
   addToFavorites: () => void
   manageFavorites: () => void
 
   // Tools
-  structureSync: () => void
   dataTransfer: () => void
-  backup: () => void
-  scheduledTasks: () => void
+  dataGeneration: () => void
+  dataSynchronization: () => void
+  structureSynchronization: () => void
+  commandLineInterface: () => void
+  serverMonitor: () => void
+  findInDatabaseOrSchema: () => void
+  historyLog: () => void
+  options: () => void
 
   // Window
   minimize: () => void
@@ -65,8 +88,8 @@ export interface MenuBarActions {
   alwaysOnTop: () => void
 
   // Help
-  viewHelp: () => void
-  checkUpdates: () => void
+  onlineDocumentation: () => void
+  releaseNotes: () => void
   about: () => void
 
   // Ribbon buttons
@@ -125,7 +148,56 @@ export const createMenuBarConfig = (actions: MenuBarActions): MenuGroup[] => [
       },
       {
         id: 'new',
-        action: actions.new
+        children: [
+          {
+            id: 'newTable',
+            action: actions.newTable,
+            shortcut: 'V'
+          },
+          {
+            id: 'newView',
+            action: actions.newView,
+            shortcut: 'W'
+          },
+          {
+            id: 'newFunction',
+            action: actions.newFunction,
+            shortcut: 'X'
+          },
+          {
+            id: 'newUser',
+            action: actions.newUser,
+            shortcut: 'Y'
+          },
+          {
+            id: 'newOther',
+            action: actions.newOther,
+            shortcut: 'Z'
+          },
+          {
+            type: 'separator'
+          },
+          {
+            id: 'newQuery',
+            action: actions.newQuery
+          },
+          {
+            id: 'newBackup',
+            action: actions.newBackup
+          },
+          {
+            id: 'newAutoRun',
+            action: actions.newAutoRun
+          },
+          {
+            id: 'newModel',
+            action: actions.newModel
+          },
+          {
+            id: 'newChartWorkspace',
+            action: actions.newChartWorkspace
+          }
+        ]
       },
       {
         type: 'separator'
@@ -180,24 +252,6 @@ export const createMenuBarConfig = (actions: MenuBarActions): MenuGroup[] => [
     id: 'edit',
     items: [
       {
-        id: 'undo',
-        action: actions.undo,
-        shortcut: 'Ctrl+Z'
-      },
-      {
-        id: 'redo',
-        action: actions.redo,
-        shortcut: 'Ctrl+Y'
-      },
-      {
-        type: 'separator'
-      },
-      {
-        id: 'cut',
-        action: actions.cut,
-        shortcut: 'Ctrl+X'
-      },
-      {
         id: 'copy',
         action: actions.copy,
         shortcut: 'Ctrl+C'
@@ -218,6 +272,56 @@ export const createMenuBarConfig = (actions: MenuBarActions): MenuGroup[] => [
     ]
   },
   {
+    id: 'view',
+    items: [
+      {
+        id: 'navigationPane',
+        action: actions.navigationPane
+      },
+      {
+        id: 'informationPane',
+        action: actions.informationPane
+      },
+      {
+        type: 'separator'
+      },
+      {
+        id: 'list',
+        action: actions.list
+      },
+      {
+        id: 'details',
+        action: actions.details
+      },
+      {
+        id: 'erDiagram',
+        action: actions.erDiagram
+      },
+      {
+        type: 'separator'
+      },
+      {
+        id: 'hideObjectGroup',
+        action: actions.hideObjectGroup
+      },
+      {
+        id: 'sort',
+        action: actions.sort
+      },
+      {
+        id: 'selectColumns',
+        action: actions.selectColumns
+      },
+      {
+        type: 'separator'
+      },
+      {
+        id: 'showHiddenItems',
+        action: actions.showHiddenItems
+      }
+    ]
+  },
+  {
     id: 'favorites',
     items: [
       {
@@ -234,20 +338,51 @@ export const createMenuBarConfig = (actions: MenuBarActions): MenuGroup[] => [
     id: 'tools',
     items: [
       {
-        id: 'structureSync',
-        action: actions.structureSync
-      },
-      {
         id: 'dataTransfer',
         action: actions.dataTransfer
       },
       {
-        id: 'backup',
-        action: actions.backup
+        id: 'dataGeneration',
+        action: actions.dataGeneration
       },
       {
-        id: 'scheduledTasks',
-        action: actions.scheduledTasks
+        id: 'dataSynchronization',
+        action: actions.dataSynchronization
+      },
+      {
+        id: 'structureSynchronization',
+        action: actions.structureSynchronization
+      },
+      {
+        type: 'separator'
+      },
+      {
+        id: 'commandLineInterface',
+        action: actions.commandLineInterface,
+        shortcut: 'F6'
+      },
+      {
+        id: 'serverMonitor',
+        action: actions.serverMonitor
+      },
+      {
+        type: 'separator'
+      },
+      {
+        id: 'findInDatabaseOrSchema',
+        action: actions.findInDatabaseOrSchema
+      },
+      {
+        id: 'historyLog',
+        action: actions.historyLog,
+        shortcut: 'Ctrl+L'
+      },
+      {
+        type: 'separator'
+      },
+      {
+        id: 'options',
+        action: actions.options
       }
     ]
   },
@@ -275,16 +410,15 @@ export const createMenuBarConfig = (actions: MenuBarActions): MenuGroup[] => [
     id: 'help',
     items: [
       {
-        id: 'viewHelp',
-        action: actions.viewHelp,
-        shortcut: 'F1'
+        id: 'onlineDocumentation',
+        action: actions.onlineDocumentation
+      },
+      {
+        id: 'releaseNotes',
+        action: actions.releaseNotes
       },
       {
         type: 'separator'
-      },
-      {
-        id: 'checkUpdates',
-        action: actions.checkUpdates
       },
       {
         id: 'about',

@@ -16,6 +16,18 @@ contextBridge.exposeInMainWorld('electronAPI', {
   getConnections: () => ipcRenderer.invoke('connection:get-all'),
   deleteConnection: (id: string) => ipcRenderer.invoke('connection:delete', id),
 
+  // MySQL Dialog
+  mysqlDialog: {
+    open: () => ipcRenderer.invoke('mysql-dialog:open'),
+    close: () => ipcRenderer.invoke('mysql-dialog:close'),
+    save: (connectionData: any) => ipcRenderer.invoke('mysql-dialog:save', connectionData),
+    onSaved: (callback: (data: any) => void) => {
+      const subscription = (_event: any, data: any) => callback(data)
+      ipcRenderer.on('mysql-connection:saved', subscription)
+      return () => ipcRenderer.removeListener('mysql-connection:saved', subscription)
+    }
+  },
+
   // Window controls
   windowControl: {
     minimize: () => ipcRenderer.invoke('window:minimize'),

@@ -14,6 +14,14 @@ export interface ElectronAPI {
   getConnections: () => Promise<any>
   deleteConnection: (id: string) => Promise<any>
 
+  // MySQL Dialog
+  mysqlDialog: {
+    open: () => Promise<void>
+    close: () => Promise<void>
+    save: (connectionData: any) => Promise<void>
+    onSaved: (callback: (data: any) => void) => () => void
+  }
+
   // Window controls
   windowControl: {
     minimize: () => Promise<void>

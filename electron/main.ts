@@ -1,32 +1,11 @@
 import { app, BrowserWindow, ipcMain } from 'electron'
 import path from 'path'
 import { fileURLToPath } from 'url'
-import { registerMySQLDialogHandlers } from './mysqlDialog.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
 let mainWindow: BrowserWindow | null = null
-
-// Window control handlers - register before window creation
-ipcMain.handle('window:minimize', () => {
-  mainWindow?.minimize()
-})
-
-ipcMain.handle('window:maximize', () => {
-  if (mainWindow?.isMaximized()) {
-    mainWindow?.unmaximize()
-  } else {
-    mainWindow?.maximize()
-  }
-})
-
-ipcMain.handle('window:close', () => {
-  mainWindow?.close()
-})
-
-// Register MySQL dialog handlers
-registerMySQLDialogHandlers(__dirname)
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -34,7 +13,8 @@ function createWindow() {
     height: 900,
     minWidth: 1200,
     minHeight: 700,
-    frame: false,
+    titleBarStyle: 'hidden',
+    ...(process.platform !== 'darwin' ? { titleBarOverlay: true } : {}),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: false,

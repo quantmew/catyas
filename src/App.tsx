@@ -1,29 +1,25 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Titlebar from './components/Titlebar'
 import Sidebar from './components/Sidebar'
 import MainContent from './components/MainContent'
 import TopRibbon from './components/TopRibbon'
+import MySQLConnectionDialog from './components/MySQLConnectionDialog'
 import { Connection } from './types'
 
 function App() {
   const [connections, setConnections] = useState<Connection[]>([])
   const [selectedConnection, setSelectedConnection] = useState<Connection | null>(null)
   const [selectedTable, setSelectedTable] = useState<string | null>(null)
+  const [showMySQLDialog, setShowMySQLDialog] = useState(false)
 
-  useEffect(() => {
-    // Listen for saved connections from dialog window
-    if (window.electronAPI?.mysqlDialog?.onSaved) {
-      const unsubscribe = window.electronAPI.mysqlDialog.onSaved((connectionData: Connection) => {
-        setConnections(prev => [...prev, connectionData])
-        setSelectedConnection(connectionData)
-      })
-
-      return () => unsubscribe()
-    }
-  }, [])
+  const handleSaveConnection = (conn: Connection) => {
+    setConnections(prev => [...prev, conn])
+    setSelectedConnection(conn)
+    setShowMySQLDialog(false)
+  }
 
   const handleOpenMySQLDialog = () => {
-    window.electronAPI?.mysqlDialog?.open()
+    setShowMySQLDialog(true)
   }
 
   return (
@@ -36,19 +32,25 @@ function App() {
           }
         }} />
         <div className="flex flex-1 min-h-0">
-      <Sidebar
-        connections={connections}
-        selectedConnection={selectedConnection}
-        onSelectConnection={setSelectedConnection}
-        onAddConnection={handleOpenMySQLDialog}
-      />
-      <MainContent
-        connection={selectedConnection}
-        selectedTable={selectedTable}
-        onSelectTable={setSelectedTable}
-      />
+          <Sidebar
+            connections={connections}
+            selectedConnection={selectedConnection}
+            onSelectConnection={setSelectedConnection}
+            onAddConnection={handleOpenMySQLDialog}
+          />
+          <MainContent
+            connection={selectedConnection}
+            selectedTable={selectedTable}
+            onSelectTable={setSelectedTable}
+          />
         </div>
       </div>
+
+      <MySQLConnectionDialog
+        open={showMySQLDialog}
+        onClose={() => setShowMySQLDialog(false)}
+        onSave={handleSaveConnection}
+      />
     </div>
   )
 }

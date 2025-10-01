@@ -49,7 +49,7 @@ export default function TopRibbon({ onNewConnection }: TopRibbonProps) {
     closeTab: () => console.log('[Menu] Close Tab'),
     importConnection: () => console.log('[Menu] Import Connection'),
     exportConnection: () => console.log('[Menu] Export Connection'),
-    exitCatyas: () => window.electronAPI?.windowControl?.close?.(),
+    exitCatyas: () => window.close(),
 
     // Edit
     undo: () => console.log('[Edit] Undo'),
@@ -69,9 +69,9 @@ export default function TopRibbon({ onNewConnection }: TopRibbonProps) {
     backup: () => console.log('[Tools] Backup'),
     scheduledTasks: () => console.log('[Tools] Scheduled Tasks'),
 
-    // Window
-    minimize: () => window.electronAPI?.windowControl?.minimize?.(),
-    maximize: () => window.electronAPI?.windowControl?.maximize?.(),
+    // Window - these are now handled by native controls
+    minimize: () => console.log('[Window] Minimize (native)'),
+    maximize: () => console.log('[Window] Maximize (native)'),
     alwaysOnTop: () => console.log('[Window] Always on Top'),
 
     // Help

@@ -2,8 +2,12 @@ import { BrowserWindow, ipcMain } from 'electron'
 import path from 'path'
 
 let mysqlDialogWindow: BrowserWindow | null = null
+let mainWindowWebContentsId: number | null = null
 
 export function createMySQLConnectionDialog(parentWindow: BrowserWindow, __dirname: string) {
+  // Store main window's webContentsId
+  mainWindowWebContentsId = parentWindow.webContents.id
+
   // If dialog already exists, focus it
   if (mysqlDialogWindow && !mysqlDialogWindow.isDestroyed()) {
     mysqlDialogWindow.focus()
@@ -30,13 +34,20 @@ export function createMySQLConnectionDialog(parentWindow: BrowserWindow, __dirna
     backgroundColor: '#1e1e1e'
   })
 
+  // Open DevTools in development
+  if (process.env.VITE_DEV_SERVER_URL) {
+    mysqlDialogWindow.webContents.openDevTools()
+  }
+
   mysqlDialogWindow.once('ready-to-show', () => {
     mysqlDialogWindow?.show()
   })
 
   // Load the MySQL connection dialog page
   if (process.env.VITE_DEV_SERVER_URL) {
-    mysqlDialogWindow.loadURL(`${process.env.VITE_DEV_SERVER_URL}#/mysql-connection`)
+    const url = `${process.env.VITE_DEV_SERVER_URL}#/mysql-connection`
+    console.log('[MySQL Dialog] Loading URL:', url)
+    mysqlDialogWindow.loadURL(url)
   } else {
     mysqlDialogWindow.loadFile(path.join(__dirname, '../dist/index.html'), {
       hash: '/mysql-connection'
@@ -44,7 +55,9 @@ export function createMySQLConnectionDialog(parentWindow: BrowserWindow, __dirna
   }
 
   mysqlDialogWindow.on('closed', () => {
+    console.log('[MySQL Dialog] Window closed')
     mysqlDialogWindow = null
+    mainWindowWebContentsId = null
   })
 
   return mysqlDialogWindow
@@ -63,23 +76,33 @@ export function getMySQLConnectionDialog() {
 export function registerMySQLDialogHandlers(__dirname: string) {
   // MySQL Dialog IPC handlers
   ipcMain.handle('mysql-dialog:open', (event) => {
+    console.log('[MySQL Dialog] Open request received')
     const parentWindow = BrowserWindow.fromWebContents(event.sender)
     if (parentWindow) {
       createMySQLConnectionDialog(parentWindow, __dirname)
+      return { success: true }
     }
+    return { success: false, error: 'Parent window not found' }
   })
 
   ipcMain.handle('mysql-dialog:close', () => {
+    console.log('[MySQL Dialog] Close request received')
     closeMySQLConnectionDialog()
   })
 
   ipcMain.handle('mysql-dialog:save', (_event, connectionData) => {
-    // Send connection data back to main window
-    const allWindows = BrowserWindow.getAllWindows()
-    const mainWindowRef = allWindows.find(w => w !== mysqlDialogWindow)
+    console.log('[MySQL Dialog] Save request received', connectionData)
 
-    if (mainWindowRef && !mainWindowRef.isDestroyed()) {
-      mainWindowRef.webContents.send('mysql-connection:saved', connectionData)
+    // Find main window by webContentsId
+    if (mainWindowWebContentsId !== null) {
+      const mainWindow = BrowserWindow.fromId(mainWindowWebContentsId)
+
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send('mysql-connection:saved', connectionData)
+        console.log('[MySQL Dialog] Data sent to main window')
+      } else {
+        console.error('[MySQL Dialog] Main window not found or destroyed')
+      }
     }
 
     closeMySQLConnectionDialog()

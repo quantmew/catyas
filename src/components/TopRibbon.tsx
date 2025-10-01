@@ -1,5 +1,7 @@
 import { Database, Table2, Users, Settings, Play, FolderPlus, FileUp, RefreshCw } from 'lucide-react'
 import * as Menubar from '@radix-ui/react-menubar'
+import { useTranslation } from 'react-i18next'
+import LanguageSwitcher from './LanguageSwitcher'
 
 function RibbonButton({ icon: Icon, label }: { icon: any; label: string }) {
   return (
@@ -106,20 +108,25 @@ export default function TopRibbon() {
         ))}
       </Menubar.Root>
 
-      <div className="h-12 px-2 flex items-center overflow-x-auto border-t border-gray-100 dark:border-gray-700">
-        <div className="flex items-center pr-3 mr-3 border-r border-gray-200 dark:border-gray-700">
-          <RibbonButton icon={Database} label="新建连接" />
-          <RibbonButton icon={FolderPlus} label="新建" />
-          <RibbonButton icon={RefreshCw} label="刷新" />
-        </div>
-        <div className="flex items-center pr-3 mr-3 border-r border-gray-200 dark:border-gray-700">
-          <RibbonButton icon={Table2} label="表" />
-          <RibbonButton icon={Users} label="用户" />
-          <RibbonButton icon={Play} label="查询" />
-        </div>
+      <div className="h-12 px-2 flex items-center justify-between overflow-x-auto border-t border-gray-100 dark:border-gray-700">
         <div className="flex items-center">
-          <RibbonButton icon={FileUp} label="导入" />
-          <RibbonButton icon={Settings} label="设置" />
+          <div className="flex items-center pr-3 mr-3 border-r border-gray-200 dark:border-gray-700">
+            <RibbonButton icon={Database} label="新建连接" />
+            <RibbonButton icon={FolderPlus} label="新建" />
+            <RibbonButton icon={RefreshCw} label="刷新" />
+          </div>
+          <div className="flex items-center pr-3 mr-3 border-r border-gray-200 dark:border-gray-700">
+            <RibbonButton icon={Table2} label="表" />
+            <RibbonButton icon={Users} label="用户" />
+            <RibbonButton icon={Play} label="查询" />
+          </div>
+          <div className="flex items-center">
+            <RibbonButton icon={FileUp} label="导入" />
+            <RibbonButton icon={Settings} label="设置" />
+          </div>
+        </div>
+        <div className="mr-2">
+          <LanguageSwitcher />
         </div>
       </div>
     </div>

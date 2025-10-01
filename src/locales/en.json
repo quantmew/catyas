@@ -1,0 +1,78 @@
+{
+  "app": {
+    "title": "Catyas"
+  },
+  "window": {
+    "minimize": "Minimize",
+    "maximize": "Maximize",
+    "close": "Close"
+  },
+  "sidebar": {
+    "connections": "Connections",
+    "addConnection": "Add Connection",
+    "noConnections": "No connections yet"
+  },
+  "connection": {
+    "new": "New Connection",
+    "edit": "Edit Connection",
+    "delete": "Delete Connection",
+    "test": "Test Connection",
+    "save": "Save",
+    "cancel": "Cancel",
+    "name": "Connection Name",
+    "type": "Database Type",
+    "host": "Host",
+    "port": "Port",
+    "username": "Username",
+    "password": "Password",
+    "database": "Database",
+    "testSuccess": "Connection successful!",
+    "testFailed": "Connection failed",
+    "deleteConfirm": "Are you sure you want to delete this connection?"
+  },
+  "database": {
+    "types": {
+      "mysql": "MySQL",
+      "postgresql": "PostgreSQL",
+      "mongodb": "MongoDB",
+      "redis": "Redis",
+      "sqlite": "SQLite",
+      "sqlserver": "SQL Server",
+      "oracle": "Oracle",
+      "mariadb": "MariaDB"
+    }
+  },
+  "query": {
+    "editor": "Query Editor",
+    "execute": "Execute",
+    "clear": "Clear",
+    "result": "Result",
+    "noResult": "No results",
+    "error": "Error",
+    "success": "Query executed successfully"
+  },
+  "table": {
+    "name": "Table Name",
+    "structure": "Structure",
+    "data": "Data",
+    "column": "Column",
+    "type": "Type",
+    "nullable": "Nullable",
+    "key": "Key",
+    "default": "Default",
+    "extra": "Extra",
+    "rows": "Rows",
+    "noData": "No data available"
+  },
+  "common": {
+    "search": "Search",
+    "filter": "Filter",
+    "refresh": "Refresh",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "confirm": "Confirm",
+    "yes": "Yes",
+    "no": "No"
+  }
+}

@@ -1,0 +1,78 @@
+{
+  "app": {
+    "title": "Catyas"
+  },
+  "window": {
+    "minimize": "最小化",
+    "maximize": "最大化",
+    "close": "关闭"
+  },
+  "sidebar": {
+    "connections": "连接",
+    "addConnection": "添加连接",
+    "noConnections": "暂无连接"
+  },
+  "connection": {
+    "new": "新建连接",
+    "edit": "编辑连接",
+    "delete": "删除连接",
+    "test": "测试连接",
+    "save": "保存",
+    "cancel": "取消",
+    "name": "连接名称",
+    "type": "数据库类型",
+    "host": "主机地址",
+    "port": "端口",
+    "username": "用户名",
+    "password": "密码",
+    "database": "数据库",
+    "testSuccess": "连接成功！",
+    "testFailed": "连接失败",
+    "deleteConfirm": "确定要删除这个连接吗？"
+  },
+  "database": {
+    "types": {
+      "mysql": "MySQL",
+      "postgresql": "PostgreSQL",
+      "mongodb": "MongoDB",
+      "redis": "Redis",
+      "sqlite": "SQLite",
+      "sqlserver": "SQL Server",
+      "oracle": "Oracle",
+      "mariadb": "MariaDB"
+    }
+  },
+  "query": {
+    "editor": "查询编辑器",
+    "execute": "执行",
+    "clear": "清空",
+    "result": "结果",
+    "noResult": "无结果",
+    "error": "错误",
+    "success": "查询执行成功"
+  },
+  "table": {
+    "name": "表名",
+    "structure": "结构",
+    "data": "数据",
+    "column": "列名",
+    "type": "类型",
+    "nullable": "可为空",
+    "key": "键",
+    "default": "默认值",
+    "extra": "额外",
+    "rows": "行数",
+    "noData": "暂无数据"
+  },
+  "common": {
+    "search": "搜索",
+    "filter": "筛选",
+    "refresh": "刷新",
+    "loading": "加载中...",
+    "error": "错误",
+    "success": "成功",
+    "confirm": "确认",
+    "yes": "是",
+    "no": "否"
+  }
+}

@@ -1,0 +1,217 @@
+{
+  "menubar": [
+    {
+      "id": "file",
+      "items": [
+        {
+          "id": "newProject",
+          "action": "newProject"
+        },
+        {
+          "id": "newConnection",
+          "children": [
+            {
+              "id": "newConnectionMySQL",
+              "action": "newConnection:mysql"
+            },
+            {
+              "id": "newConnectionPostgreSQL",
+              "action": "newConnection:postgresql"
+            },
+            {
+              "id": "newConnectionOracle",
+              "action": "newConnection:oracle"
+            },
+            {
+              "id": "newConnectionSQLite",
+              "action": "newConnection:sqlite"
+            },
+            {
+              "id": "newConnectionSQLServer",
+              "action": "newConnection:sqlserver"
+            },
+            {
+              "id": "newConnectionMariaDB",
+              "action": "newConnection:mariadb"
+            },
+            {
+              "id": "newConnectionMongoDB",
+              "action": "newConnection:mongodb"
+            },
+            {
+              "id": "newConnectionRedis",
+              "action": "newConnection:redis"
+            }
+          ]
+        },
+        {
+          "id": "new",
+          "action": "new"
+        },
+        {
+          "type": "separator"
+        },
+        {
+          "id": "openExternal",
+          "action": "openExternal"
+        },
+        {
+          "id": "openRecent",
+          "action": "openRecent",
+          "disabled": true
+        },
+        {
+          "type": "separator"
+        },
+        {
+          "id": "closeConnection",
+          "action": "closeConnection",
+          "disabled": true
+        },
+        {
+          "id": "closeWindow",
+          "action": "closeWindow"
+        },
+        {
+          "id": "closeTab",
+          "action": "closeTab",
+          "disabled": true
+        },
+        {
+          "type": "separator"
+        },
+        {
+          "id": "importConnection",
+          "action": "importConnection"
+        },
+        {
+          "id": "exportConnection",
+          "action": "exportConnection"
+        },
+        {
+          "type": "separator"
+        },
+        {
+          "id": "exitCatyas",
+          "action": "exitCatyas"
+        }
+      ]
+    },
+    {
+      "id": "edit",
+      "items": [
+        {
+          "id": "undo",
+          "action": "undo",
+          "shortcut": "Ctrl+Z"
+        },
+        {
+          "id": "redo",
+          "action": "redo",
+          "shortcut": "Ctrl+Y"
+        },
+        {
+          "type": "separator"
+        },
+        {
+          "id": "cut",
+          "action": "cut",
+          "shortcut": "Ctrl+X"
+        },
+        {
+          "id": "copy",
+          "action": "copy",
+          "shortcut": "Ctrl+C"
+        },
+        {
+          "id": "paste",
+          "action": "paste",
+          "shortcut": "Ctrl+V"
+        },
+        {
+          "type": "separator"
+        },
+        {
+          "id": "selectAll",
+          "action": "selectAll",
+          "shortcut": "Ctrl+A"
+        }
+      ]
+    },
+    {
+      "id": "favorites",
+      "items": [
+        {
+          "id": "addToFavorites",
+          "action": "addToFavorites"
+        },
+        {
+          "id": "manageFavorites",
+          "action": "manageFavorites"
+        }
+      ]
+    },
+    {
+      "id": "tools",
+      "items": [
+        {
+          "id": "structureSync",
+          "action": "structureSync"
+        },
+        {
+          "id": "dataTransfer",
+          "action": "dataTransfer"
+        },
+        {
+          "id": "backup",
+          "action": "backup"
+        },
+        {
+          "id": "scheduledTasks",
+          "action": "scheduledTasks"
+        }
+      ]
+    },
+    {
+      "id": "window",
+      "items": [
+        {
+          "id": "minimize",
+          "action": "minimize"
+        },
+        {
+          "id": "maximize",
+          "action": "maximize"
+        },
+        {
+          "type": "separator"
+        },
+        {
+          "id": "alwaysOnTop",
+          "action": "alwaysOnTop"
+        }
+      ]
+    },
+    {
+      "id": "help",
+      "items": [
+        {
+          "id": "viewHelp",
+          "action": "viewHelp",
+          "shortcut": "F1"
+        },
+        {
+          "type": "separator"
+        },
+        {
+          "id": "checkUpdates",
+          "action": "checkUpdates"
+        },
+        {
+          "id": "about",
+          "action": "about"
+        }
+      ]
+    }
+  ]
+}

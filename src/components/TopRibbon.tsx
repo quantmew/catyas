@@ -2,6 +2,10 @@ import { Database, Table2, Users, Settings, Play, FolderPlus, FileUp, RefreshCw 
 import * as Menubar from '@radix-ui/react-menubar'
 import { useTranslation } from 'react-i18next'
 import LanguageSwitcher from './LanguageSwitcher'
+import menuConfig from '../config/menuConfig.json'
+import { MenuConfig, isSeparator, MenuItem } from '../types/menu'
+
+const config = menuConfig as MenuConfig
 
 function RibbonButton({ icon: Icon, label }: { icon: any; label: string }) {
   return (
@@ -16,92 +20,141 @@ function RibbonButton({ icon: Icon, label }: { icon: any; label: string }) {
 }
 
 export default function TopRibbon() {
-  const handleCommand = (cmd: string) => {
-    switch (cmd) {
-      // 文件
-      case '新建连接':
-      case '新建':
-      case '打开外部文件':
-      case '打开最近使用过的':
-      case '导入连接':
-      case '导出连接':
-        console.log('[菜单]', cmd)
+  const { t } = useTranslation()
+
+  const handleCommand = (action: string) => {
+    // Handle new connection with database type
+    if (action.startsWith('newConnection:')) {
+      const dbType = action.split(':')[1]
+      console.log('[Menu] New Connection -', dbType.toUpperCase())
+      return
+    }
+
+    switch (action) {
+      // File
+      case 'newProject':
+      case 'new':
+      case 'openExternal':
+      case 'openRecent':
+      case 'closeConnection':
+      case 'importConnection':
+      case 'exportConnection':
+      case 'closeWindow':
+      case 'closeTab':
+        console.log('[Menu]', action)
         break
-      case '退出':
+      case 'exitCatyas':
         window.electronAPI?.windowControl?.close?.()
         break
 
-      // 编辑
-      case '撤销':
-      case '重做':
-      case '剪切':
-      case '复制':
-      case '粘贴':
-      case '全选':
-        console.log('[编辑]', cmd)
+      // Edit
+      case 'undo':
+      case 'redo':
+      case 'cut':
+      case 'copy':
+      case 'paste':
+      case 'selectAll':
+        console.log('[Edit]', action)
         break
 
-      // 收藏夹/工具
-      case '添加到收藏夹':
-      case '管理收藏夹':
-      case '结构同步':
-      case '数据传输':
-      case '备份':
-      case '计划任务':
-        console.log('[工具]', cmd)
+      // Favorites/Tools
+      case 'addToFavorites':
+      case 'manageFavorites':
+      case 'structureSync':
+      case 'dataTransfer':
+      case 'backup':
+      case 'scheduledTasks':
+        console.log('[Tools]', action)
         break
 
-      // 窗口
-      case '最小化':
+      // Window
+      case 'minimize':
         window.electronAPI?.windowControl?.minimize?.()
         break
-      case '最大化':
+      case 'maximize':
         window.electronAPI?.windowControl?.maximize?.()
         break
-      case '置顶':
-        // 若主进程暴露了置顶切换，可改为 toggleAlwaysOnTop
-        console.log('[窗口] 置顶 (占位)')
+      case 'alwaysOnTop':
+        console.log('[Window] Always on Top (placeholder)')
         break
 
-      // 帮助
-      case '查看帮助':
-      case '检查更新':
-      case '关于 Catyas':
-        console.log('[帮助]', cmd)
+      // Help
+      case 'viewHelp':
+      case 'checkUpdates':
+      case 'about':
+        console.log('[Help]', action)
         break
 
       default:
-        console.log('[未处理命令]', cmd)
+        console.log('[Unhandled command]', action)
     }
   }
-  const menu = {
-    文件: ['新建连接', '新建', '打开外部文件', '打开最近使用过的', '关闭窗口', '导入连接', '导出连接', '管理云...', '退出'],
-    编辑: ['撤销', '重做', '剪切', '复制', '粘贴', '全选'],
-    收藏夹: ['添加到收藏夹', '管理收藏夹'],
-    工具: ['结构同步', '数据传输', '备份', '计划任务'],
-    窗口: ['最小化', '最大化', '置顶'],
-    帮助: ['查看帮助', '检查更新', '关于 Catyas'],
-  } as const
+
+  const renderMenuItem = (item: MenuItem): JSX.Element => {
+    // If item has children, render as submenu
+    if (item.children && item.children.length > 0) {
+      return (
+        <Menubar.Sub key={item.id}>
+          <Menubar.SubTrigger className="outline-none w-full text-left px-3 py-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-default data-[disabled]:opacity-50 data-[disabled]:cursor-not-allowed flex items-center justify-between">
+            <span>{t(`menu.${item.id}`)}</span>
+            <span className="ml-8">▶</span>
+          </Menubar.SubTrigger>
+          <Menubar.Portal>
+            <Menubar.SubContent className="min-w-[220px] bg-white dark:bg-gray-800 shadow-lg border border-gray-200 dark:border-gray-700 py-1 rounded">
+              {item.children.map((childItem, index) => {
+                if (isSeparator(childItem)) {
+                  return (
+                    <Menubar.Separator
+                      key={`separator-${index}`}
+                      className="h-px bg-gray-200 dark:bg-gray-700 my-1"
+                    />
+                  )
+                }
+                return renderMenuItem(childItem)
+              })}
+            </Menubar.SubContent>
+          </Menubar.Portal>
+        </Menubar.Sub>
+      )
+    }
+
+    // Regular menu item
+    return (
+      <Menubar.Item
+        key={item.id}
+        onSelect={() => item.action && handleCommand(item.action)}
+        disabled={item.disabled}
+        className="outline-none w-full text-left px-3 py-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-default data-[disabled]:opacity-50 data-[disabled]:cursor-not-allowed flex items-center justify-between"
+      >
+        <span>{t(`menu.${item.id}`)}</span>
+        {item.shortcut && (
+          <span className="text-xs text-gray-500 dark:text-gray-400 ml-8">{item.shortcut}</span>
+        )}
+      </Menubar.Item>
+    )
+  }
 
   return (
     <div className="border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 select-none app-no-drag">
       <Menubar.Root className="h-8 px-1 flex items-center text-[13px] text-gray-800 dark:text-gray-200 space-x-1">
-        {Object.entries(menu).map(([label, items]) => (
-          <Menubar.Menu key={label}>
+        {config.menubar.map((menuGroup) => (
+          <Menubar.Menu key={menuGroup.id}>
             <Menubar.Trigger className="px-2.5 h-8 rounded data-[state=open]:bg-gray-200 dark:data-[state=open]:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700">
-              {label}
+              {t(`menu.${menuGroup.id}`)}
             </Menubar.Trigger>
             <Menubar.Portal>
               <Menubar.Content align="start" className="min-w-[220px] bg-white dark:bg-gray-800 shadow-lg border border-gray-200 dark:border-gray-700 py-1 z-40 rounded">
-                {items.map((item) => (
-                  <Menubar.Item
-                    key={item}
-                    onSelect={() => handleCommand(item)}
-                    className="outline-none w-full text-left px-3 py-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-default"
-                  >
-                    {item}
-                  </Menubar.Item>
-                ))}
+                {menuGroup.items.map((item, index) => {
+                  if (isSeparator(item)) {
+                    return (
+                      <Menubar.Separator
+                        key={`separator-${index}`}
+                        className="h-px bg-gray-200 dark:bg-gray-700 my-1"
+                      />
+                    )
+                  }
+                  return renderMenuItem(item)
+                })}
               </Menubar.Content>
             </Menubar.Portal>
           </Menubar.Menu>

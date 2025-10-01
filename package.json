@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "cross-env WIN_CSC_IDENTITY_AUTO_DISCOVERY=false tsc && vite build && electron-builder",
+    "build": "tsc && vite build && electron-builder",
     "preview": "vite preview",
     "electron:dev": "concurrently \"vite\" \"wait-on http://localhost:5173 && electron .\"",
     "electron:build": "vite build && electron-builder"
@@ -47,7 +47,7 @@
     "concurrently": "^9.0.1",
     "cross-env": "^10.1.0",
     "electron": "^32.0.1",
-    "electron-builder": "^24.13.3",
+    "electron-builder": "^24.6.3",
     "postcss": "^8.4.45",
     "tailwindcss": "^3.4.10",
     "typescript": "^5.5.4",
@@ -70,9 +70,7 @@
       "category": "public.app-category.developer-tools"
     },
     "win": {
-      "target": "portable",
-      "signingHashAlgorithms": [],
-      "signDlls": false
+      "target": "nsis"
     },
     "linux": {
       "target": "AppImage"

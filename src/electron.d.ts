@@ -1,4 +1,7 @@
 export interface ElectronAPI {
+  // Platform info
+  platform: NodeJS.Platform
+
   // Database operations
   testConnection: (config: any) => Promise<any>
   executeQuery: (config: any, query: string) => Promise<any>

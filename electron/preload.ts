@@ -1,6 +1,9 @@
 import { contextBridge, ipcRenderer } from 'electron'
 
 contextBridge.exposeInMainWorld('electronAPI', {
+  // Platform info
+  platform: process.platform,
+
   // Database operations
   testConnection: (config: any) => ipcRenderer.invoke('db:test-connection', config),
   executeQuery: (config: any, query: string) => ipcRenderer.invoke('db:execute-query', config, query),

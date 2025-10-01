@@ -7,6 +7,23 @@ const __dirname = path.dirname(__filename)
 
 let mainWindow: BrowserWindow | null = null
 
+// Window control handlers - register before window creation
+ipcMain.handle('window:minimize', () => {
+  mainWindow?.minimize()
+})
+
+ipcMain.handle('window:maximize', () => {
+  if (mainWindow?.isMaximized()) {
+    mainWindow?.unmaximize()
+  } else {
+    mainWindow?.maximize()
+  }
+})
+
+ipcMain.handle('window:close', () => {
+  mainWindow?.close()
+})
+
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1400,
@@ -41,23 +58,6 @@ function createWindow() {
     mainWindow = null
   })
 }
-
-// Window control handlers
-ipcMain.handle('window:minimize', () => {
-  mainWindow?.minimize()
-})
-
-ipcMain.handle('window:maximize', () => {
-  if (mainWindow?.isMaximized()) {
-    mainWindow?.unmaximize()
-  } else {
-    mainWindow?.maximize()
-  }
-})
-
-ipcMain.handle('window:close', () => {
-  mainWindow?.close()
-})
 
 app.whenReady().then(() => {
   createWindow()

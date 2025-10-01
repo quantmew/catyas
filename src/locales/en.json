@@ -73,7 +73,14 @@
     "database": "Database",
     "testSuccess": "Connection successful!",
     "testFailed": "Connection failed",
-    "deleteConfirm": "Are you sure you want to delete this connection?"
+    "deleteConfirm": "Are you sure you want to delete this connection?",
+    "tabs": {"general":"General","advanced":"Advanced","database":"Database","ssl":"SSL","ssh":"SSH","http":"HTTP"},
+    "general": {"name":"Name","host":"Host","port":"Port","username":"Username","password":"Password","remember":"Remember password"},
+    "advanced": {"settingsPath":"Settings Path","driver":"Client Driver","charset":"Client Charset","keepAlive":"Keep-alive Interval (s)","useCompression":"Use Compression","autoConnect":"Auto Connect","namedPipe":"Use Named Pipe / Socket","limitSessions":"Limit Sessions","compatibility":"Compatibility"},
+    "dbtab": {"useCustomList":"Use custom database list","add":"Add database to list","remove":"Remove database from list"},
+    "ssl": {"useSSL":"Use SSL","useVerify":"Use Verification","clientKey":"Client Key","clientCert":"Client Certificate","caCert":"CA Certificate","verifyServer":"Verify server cert against CA","cipher":"Cipher"},
+    "ssh": {"useTunnel":"Use SSH Tunnel","host":"Host","port":"Port","username":"Username","authMethod":"Auth Method","password":"Password","remember":"Remember password"},
+    "http": {"useTunnel":"Use HTTP Tunnel","url":"Tunnel URL","useBase64":"Encode outgoing queries with base64","auth":"Authentication","usePassword":"Use password authentication","proxy":"Proxy Server","clientKey":"Client Key","clientCert":"Client Certificate","caCert":"CA Certificate","passphrase":"Passphrase"}
   },
   "database": {
     "types": {

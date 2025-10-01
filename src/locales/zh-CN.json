@@ -73,7 +73,14 @@
     "database": "数据库",
     "testSuccess": "连接成功！",
     "testFailed": "连接失败",
-    "deleteConfirm": "确定要删除这个连接吗？"
+    "deleteConfirm": "确定要删除这个连接吗？",
+    "tabs": {"general":"常规","advanced":"高级","database":"数据库","ssl":"SSL","ssh":"SSH","http":"HTTP"},
+    "general": {"name":"连接名","host":"主机","port":"端口","username":"用户名","password":"密码","remember":"保存密码"},
+    "advanced": {"settingsPath":"设置位置","driver":"客户端驱动程序","charset":"客户端字符集","keepAlive":"保持连接间隔（秒）","useCompression":"使用压缩","autoConnect":"自动连接","namedPipe":"使用命名管道、套接字","limitSessions":"限制连接会话","compatibility":"兼容性"},
+    "dbtab": {"useCustomList":"使用自定义数据库列表","add":"添加数据库到列表","remove":"从列表中移除数据库"},
+    "ssl": {"useSSL":"使用 SSL","useVerify":"使用验证","clientKey":"客户端密钥","clientCert":"客户端证书","caCert":"CA 证书","verifyServer":"验证针对 CA 的服务器证书","cipher":"指定的 Cipher"},
+    "ssh": {"useTunnel":"使用 SSH 隧道","host":"主机","port":"端口","username":"用户名","authMethod":"验证方法","password":"密码","remember":"保存密码"},
+    "http": {"useTunnel":"使用 HTTP 隧道","url":"隧道网址","useBase64":"用 base64 编码传出查询","auth":"验证","usePassword":"使用密码验证","proxy":"代理服务器","clientKey":"客户端密钥","clientCert":"客户端证书","caCert":"CA 证书","passphrase":"通行短语"}
   },
   "database": {
     "types": {

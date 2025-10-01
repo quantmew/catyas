@@ -6,6 +6,7 @@ export interface ElectronAPI {
   testConnection: (config: any) => Promise<any>
   executeQuery: (config: any, query: string) => Promise<any>
   getTables: (config: any) => Promise<any>
+  getViews: (config: any) => Promise<any>
   getTableStructure: (config: any, tableName: string) => Promise<any>
   getTableData: (config: any, tableName: string, limit: number, offset: number) => Promise<any>
 

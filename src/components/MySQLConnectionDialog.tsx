@@ -37,11 +37,18 @@ export default function MySQLConnectionDialog({ open, onClose, onSave }: Props) 
     setTesting(true)
     setTestMsg(null)
     try {
-      await new Promise((r) => setTimeout(r, 500))
-      if (!host) throw new Error('Host required')
-      setTestMsg('连接成功！')
+      const config = { host, port: Number(port), username, password }
+      const res = await window.electronAPI?.testConnection(config)
+      if (res?.success) {
+        alert('连接成功！')
+        setTestMsg('连接成功！')
+      } else {
+        alert(`连接失败：${res?.message || '未知错误'}`)
+        setTestMsg(`连接失败：${res?.message || '未知错误'}`)
+      }
     } catch (e: any) {
-      setTestMsg(`连接失败：${e.message || e}`)
+      alert(`连接失败：${e?.message || e}`)
+      setTestMsg(`连接失败：${e?.message || e}`)
     } finally {
       setTesting(false)
     }

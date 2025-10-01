@@ -1,4 +1,4 @@
-import { Database, Plus, ChevronRight, ChevronDown, Folder, Table2 } from 'lucide-react'
+import { Database, Plus, ChevronRight, ChevronDown, Folder, Table2, Layers } from 'lucide-react'
 import { Connection } from '../types'
 import { useState } from 'react'
 
@@ -110,10 +110,10 @@ export default function Sidebar({
                             </span>
                           </div>
 
-                          {/* Tables Level */}
-                          {isExpanded && db.tables && (
+                          {/* Tables & Views Level */}
+                          {isExpanded && (db.tables || (db as any).views) && (
                             <div className="pl-4">
-                              {db.tables.map((table) => (
+                              {db.tables?.map((table) => (
                                 <div
                                   key={table.name}
                                   className="flex items-center gap-2 px-3 py-1 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
@@ -126,6 +126,18 @@ export default function Sidebar({
                                   <Table2 className="w-3 h-3 text-green-600" />
                                   <span className="text-xs text-gray-600 dark:text-gray-300">
                                     {table.name}
+                                  </span>
+                                </div>
+                              ))}
+                              {(db as any).views?.map((view: any) => (
+                                <div
+                                  key={`view-${view.name}`}
+                                  className="flex items-center gap-2 px-3 py-1 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
+                                >
+                                  <div className="w-3 h-3" />
+                                  <Layers className="w-3 h-3 text-purple-600" />
+                                  <span className="text-xs text-gray-600 dark:text-gray-300">
+                                    {view.name}
                                   </span>
                                 </div>
                               ))}

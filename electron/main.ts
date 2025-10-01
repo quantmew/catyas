@@ -136,6 +136,20 @@ ipcMain.handle('db:get-tables', async (_event, config, database) => {
   }
 })
 
+// MySQL/MariaDB: fetch views for a database
+ipcMain.handle('db:get-views', async (_event, config, database) => {
+  try {
+    const pool = getConnectionPool(config)
+    const [rows] = await pool.query(
+      `SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA = ? AND TABLE_TYPE = 'VIEW'`,
+      [database]
+    )
+    return { success: true, views: rows }
+  } catch (error: any) {
+    return { success: false, message: error.message }
+  }
+})
+
 ipcMain.handle('db:execute-query', async (_event, config, query) => {
   try {
     const pool = getConnectionPool(config)

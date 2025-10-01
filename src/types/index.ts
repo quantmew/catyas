@@ -11,6 +11,7 @@ export type DatabaseType =
 export interface Database {
   name: string
   tables?: Table[]
+  views?: { name: string }[]
   expanded?: boolean
 }
 

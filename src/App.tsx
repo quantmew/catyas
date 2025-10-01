@@ -22,6 +22,8 @@ declare global {
       testConnection: (config: any) => Promise<{ success: boolean; message: string }>
       getDatabases: (config: any) => Promise<{ success: boolean; databases?: any[]; message?: string }>
       getTables: (config: any, database: string) => Promise<{ success: boolean; tables?: any[]; message?: string }>
+      getViews: (config: any, database: string) => Promise<{ success: boolean; views?: any[]; message?: string }>
+      getViews: (config: any, database: string) => Promise<{ success: boolean; views?: any[]; message?: string }>
       executeQuery: (config: any, query: string) => Promise<{ success: boolean; data?: any[]; message?: string }>
       getTableStructure: (config: any, tableName: string) => Promise<{ success: boolean; structure?: any[]; message?: string }>
       getTableData: (config: any, tableName: string, limit: number, offset: number) => Promise<{ success: boolean; data?: any[]; message?: string }>
@@ -108,7 +110,7 @@ function App() {
             if (db.name === databaseName) {
               const newExpanded = !db.expanded
 
-              // Load tables on first expansion
+              // Load tables/views on first expansion
               if (newExpanded && !db.tables?.length) {
                 window.electronAPI?.getTables(connection, databaseName).then(result => {
                   if (result?.success && result.tables) {
@@ -123,6 +125,33 @@ function App() {
                                 tables: result.tables.map((t: any) => ({
                                   name: Object.values(t)[0] as string,
                                   type: 'table' as const
+                                })),
+                                expanded: true
+                              }
+                            }
+                            return d
+                          })
+                        }
+                      }
+                      return c
+                    }))
+                  }
+                })
+                // Fetch views as well
+                window.electronAPI?.getViews(connection, databaseName).then(result => {
+                  if (result?.success && result.views) {
+                    setConnections(prev2 => prev2.map(c => {
+                      if (c.id === connectionId && c.databases) {
+                        return {
+                          ...c,
+                          databases: c.databases.map(d => {
+                            if (d.name === databaseName) {
+                              return {
+                                ...d,
+                                ...(d as any),
+                                views: result.views.map((v: any) => ({
+                                  name: v.TABLE_NAME || Object.values(v)[0],
+                                  type: 'view' as const
                                 })),
                                 expanded: true
                               }

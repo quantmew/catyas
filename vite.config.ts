@@ -26,7 +26,7 @@ export default defineConfig({
         }
       },
       {
-        entry: 'electron/preload.cts',
+        entry: 'electron/preload.cjs',
         onstart(options) {
           options.reload()
         },

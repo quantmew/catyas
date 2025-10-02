@@ -4,10 +4,15 @@ import electron from 'vite-plugin-electron'
 import renderer from 'vite-plugin-electron-renderer'
 import { resolve } from 'path'
 
-export default defineConfig({
-  plugins: [
-    react(),
-    electron([
+export default defineConfig(({ mode }) => {
+  const isWeb = mode === 'web'
+
+  return {
+    plugins: [
+      react(),
+      // Only load electron plugins in electron mode
+      ...(!isWeb ? [
+        electron([
       {
         entry: 'electron/main.ts',
         onstart(args) {
@@ -47,15 +52,20 @@ export default defineConfig({
           }
         }
       }
-    ]),
-    renderer()
-  ],
-  resolve: {
-    alias: {
-      '@': resolve(__dirname, './src')
+        ]),
+        renderer()
+      ] : [])
+    ],
+    resolve: {
+      alias: {
+        '@': resolve(__dirname, './src')
+      }
+    },
+    server: {
+      port: 5173
+    },
+    define: {
+      __IS_WEB__: isWeb
     }
-  },
-  server: {
-    port: 5173
   }
 })

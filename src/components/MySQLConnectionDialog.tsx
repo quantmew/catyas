@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Connection } from '../types'
+import { Eye, EyeOff } from 'lucide-react'
 
 interface Props {
   open: boolean
@@ -15,8 +16,8 @@ export default function MySQLConnectionDialog({ open, onClose, onSave }: Props) 
   const [password, setPassword] = useState('')
   const [remember, setRemember] = useState(true)
   const [testing, setTesting] = useState(false)
-  const [testMsg, setTestMsg] = useState<string | null>(null)
   const [tab, setTab] = useState<'general'|'advanced'|'database'|'ssl'|'ssh'|'http'>('general')
+  const [showPassword, setShowPassword] = useState(false)
 
   if (!open) return null
 
@@ -35,20 +36,35 @@ export default function MySQLConnectionDialog({ open, onClose, onSave }: Props) 
 
   const testConnection = async () => {
     setTesting(true)
-    setTestMsg(null)
     try {
-      const config = { host, port: Number(port), username, password }
-      const res = await window.electronAPI?.testConnection(config)
+      // Check if electronAPI is available
+      if (!window.electronAPI) {
+        alert('❌ 连接失败：Electron API 未初始化')
+        return
+      }
+
+      const config = {
+        host,
+        port: Number(port),
+        username,
+        password,
+        database: undefined
+      }
+
+      console.log('Testing connection with config:', { ...config, password: '***' })
+
+      const res = await window.electronAPI.testConnection(config)
+
+      console.log('Test connection result:', res)
+
       if (res?.success) {
-        alert('连接成功！')
-        setTestMsg('连接成功！')
+        alert('✅ 连接成功！')
       } else {
-        alert(`连接失败：${res?.message || '未知错误'}`)
-        setTestMsg(`连接失败：${res?.message || '未知错误'}`)
+        alert(`❌ 连接失败：${res?.message || '未知错误'}`)
       }
     } catch (e: any) {
-      alert(`连接失败：${e?.message || e}`)
-      setTestMsg(`连接失败：${e?.message || e}`)
+      console.error('Test connection error:', e)
+      alert(`❌ 连接失败：${e?.message || String(e)}`)
     } finally {
       setTesting(false)
     }
@@ -76,19 +92,61 @@ export default function MySQLConnectionDialog({ open, onClose, onSave }: Props) 
           {tab==='general' && (
           <div className="grid grid-cols-[100px_1fr] gap-y-3 gap-x-4 items-center">
             <label className="text-right text-sm text-gray-600 dark:text-gray-300">连接名:</label>
-            <input className="border rounded px-2 py-1 text-sm w-full" value={name} onChange={(e)=>setName(e.target.value)} />
+            <input
+              className="border rounded px-2 py-1 text-sm w-full"
+              value={name}
+              onChange={(e)=>setName(e.target.value)}
+              spellCheck={false}
+              autoComplete="off"
+            />
 
             <label className="text-right text-sm text-gray-600 dark:text-gray-300">主机:</label>
-            <input className="border rounded px-2 py-1 text-sm" value={host} onChange={(e)=>setHost(e.target.value)} />
+            <input
+              className="border rounded px-2 py-1 text-sm"
+              value={host}
+              onChange={(e)=>setHost(e.target.value)}
+              spellCheck={false}
+              autoComplete="off"
+            />
 
             <label className="text-right text-sm text-gray-600 dark:text-gray-300">端口:</label>
-            <input className="border rounded px-2 py-1 text-sm w-24" type="number" value={port} onChange={(e)=>setPort(Number(e.target.value))} />
+            <input
+              className="border rounded px-2 py-1 text-sm w-24"
+              type="number"
+              value={port}
+              onChange={(e)=>setPort(Number(e.target.value))}
+              spellCheck={false}
+              autoComplete="off"
+            />
 
             <label className="text-right text-sm text-gray-600 dark:text-gray-300">用户名:</label>
-            <input className="border rounded px-2 py-1 text-sm" value={username} onChange={(e)=>setUsername(e.target.value)} />
+            <input
+              className="border rounded px-2 py-1 text-sm"
+              value={username}
+              onChange={(e)=>setUsername(e.target.value)}
+              spellCheck={false}
+              autoComplete="off"
+            />
 
             <label className="text-right text-sm text-gray-600 dark:text-gray-300">密码:</label>
-            <input className="border rounded px-2 py-1 text-sm" type="password" value={password} onChange={(e)=>setPassword(e.target.value)} />
+            <div className="relative">
+              <input
+                className="border rounded px-2 py-1 text-sm w-full pr-8"
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e)=>setPassword(e.target.value)}
+                spellCheck={false}
+                autoComplete="off"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                tabIndex={-1}
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
 
             <div />
             <label className="inline-flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
@@ -99,21 +157,21 @@ export default function MySQLConnectionDialog({ open, onClose, onSave }: Props) 
           {tab==='advanced' && (
             <div className="grid grid-cols-[140px_1fr] gap-y-3 gap-x-4 items-center">
               <label className="text-right text-sm">设置位置:</label>
-              <div className="flex gap-2 items-center"><input className="border rounded px-2 py-1 text-sm flex-1" /><button className="px-2 py-1 border rounded text-sm">...</button></div>
+              <div className="flex gap-2 items-center"><input className="border rounded px-2 py-1 text-sm flex-1" spellCheck={false} autoComplete="off" /><button className="px-2 py-1 border rounded text-sm">...</button></div>
               <label className="text-right text-sm">客户端驱动程序:</label>
               <select className="border rounded px-2 py-1 text-sm"><option>默认</option></select>
               <label className="text-right text-sm">客户端字符集:</label>
               <select className="border rounded px-2 py-1 text-sm"><option>自动</option></select>
               <label className="text-right text-sm"></label>
-              <label className="inline-flex items-center gap-2 text-sm"><input type="checkbox"/> 保持连接间隔（秒）：<input className="border rounded px-2 py-1 text-sm w-24" placeholder="240" /></label>
+              <label className="inline-flex items-center gap-2 text-sm"><input type="checkbox"/> 保持连接间隔（秒）：<input className="border rounded px-2 py-1 text-sm w-24" placeholder="240" spellCheck={false} autoComplete="off" /></label>
               <label className="text-right text-sm"></label>
               <label className="inline-flex items-center gap-2 text-sm"><input type="checkbox"/> 使用压缩</label>
               <label className="text-right text-sm"></label>
               <label className="inline-flex items-center gap-2 text-sm"><input type="checkbox"/> 自动连接</label>
               <label className="text-right text-sm">使用命名管道、套接字:</label>
-              <input className="border rounded px-2 py-1 text-sm" />
+              <input className="border rounded px-2 py-1 text-sm" spellCheck={false} autoComplete="off" />
               <label className="text-right text-sm">限制连接会话:</label>
-              <input className="border rounded px-2 py-1 text-sm w-24" defaultValue={10} />
+              <input className="border rounded px-2 py-1 text-sm w-24" defaultValue={10} spellCheck={false} autoComplete="off" />
               <label className="text-right text-sm"></label>
               <button className="px-2 py-1 border rounded text-sm w-28">兼容性</button>
             </div>
@@ -135,30 +193,30 @@ export default function MySQLConnectionDialog({ open, onClose, onSave }: Props) 
               <label className="text-right text-sm">使用验证</label>
               <input type="checkbox" />
               <label className="text-right text-sm">客户端密钥:</label>
-              <div className="flex gap-2"><input className="border rounded px-2 py-1 text-sm flex-1"/><button className="px-2 py-1 border rounded text-sm">...</button></div>
+              <div className="flex gap-2"><input className="border rounded px-2 py-1 text-sm flex-1" spellCheck={false} autoComplete="off" /><button className="px-2 py-1 border rounded text-sm">...</button></div>
               <label className="text-right text-sm">客户端证书:</label>
-              <div className="flex gap-2"><input className="border rounded px-2 py-1 text-sm flex-1"/><button className="px-2 py-1 border rounded text-sm">...</button></div>
+              <div className="flex gap-2"><input className="border rounded px-2 py-1 text-sm flex-1" spellCheck={false} autoComplete="off" /><button className="px-2 py-1 border rounded text-sm">...</button></div>
               <label className="text-right text-sm">CA 证书:</label>
-              <div className="flex gap-2"><input className="border rounded px-2 py-1 text-sm flex-1"/><button className="px-2 py-1 border rounded text-sm">...</button></div>
+              <div className="flex gap-2"><input className="border rounded px-2 py-1 text-sm flex-1" spellCheck={false} autoComplete="off" /><button className="px-2 py-1 border rounded text-sm">...</button></div>
               <label className="text-right text-sm"></label>
               <label className="inline-flex items-center gap-2 text-sm"><input type="checkbox"/> 验证针对 CA 的服务器证书</label>
               <label className="text-right text-sm">指定的 Cipher:</label>
-              <input className="border rounded px-2 py-1 text-sm" />
+              <input className="border rounded px-2 py-1 text-sm" spellCheck={false} autoComplete="off" />
             </div>
           )}
           {tab==='ssh' && (
             <div className="grid grid-cols-[140px_1fr] gap-y-3 gap-x-4 items-center">
               <label className="inline-flex items-center gap-2 text-sm col-span-2"><input type="checkbox"/> 使用 SSH 隧道</label>
               <label className="text-right text-sm">主机:</label>
-              <input className="border rounded px-2 py-1 text-sm" />
+              <input className="border rounded px-2 py-1 text-sm" spellCheck={false} autoComplete="off" />
               <label className="text-right text-sm">端口:</label>
-              <input className="border rounded px-2 py-1 text-sm w-24" defaultValue={22} />
+              <input className="border rounded px-2 py-1 text-sm w-24" defaultValue={22} spellCheck={false} autoComplete="off" />
               <label className="text-right text-sm">用户名:</label>
-              <input className="border rounded px-2 py-1 text-sm" />
+              <input className="border rounded px-2 py-1 text-sm" spellCheck={false} autoComplete="off" />
               <label className="text-right text-sm">验证方法:</label>
               <select className="border rounded px-2 py-1 text-sm"><option>密码</option></select>
               <label className="text-right text-sm">密码:</label>
-              <input className="border rounded px-2 py-1 text-sm" disabled />
+              <input className="border rounded px-2 py-1 text-sm" type="password" disabled spellCheck={false} autoComplete="off" />
               <label className="text-right text-sm"></label>
               <label className="inline-flex items-center gap-2 text-sm"><input type="checkbox"/> 保存密码</label>
             </div>
@@ -167,32 +225,28 @@ export default function MySQLConnectionDialog({ open, onClose, onSave }: Props) 
             <div className="grid grid-cols-[140px_1fr] gap-y-3 gap-x-4 items-start">
               <label className="inline-flex items-center gap-2 text-sm col-span-2"><input type="checkbox"/> 使用 HTTP 隧道</label>
               <label className="text-right text-sm">隧道网址:</label>
-              <input className="border rounded px-2 py-1 text-sm" />
+              <input className="border rounded px-2 py-1 text-sm" spellCheck={false} autoComplete="off" />
               <label className="text-right text-sm"></label>
               <label className="inline-flex items-center gap-2 text-sm"><input type="checkbox"/> 用 base64 编码传出查询</label>
               <div className="col-span-2 mt-2 font-medium text-sm">验证</div>
               <label className="inline-flex items-center gap-2 text-sm col-span-2"><input type="checkbox"/> 使用密码验证</label>
               <label className="text-right text-sm">用户名:</label>
-              <input className="border rounded px-2 py-1 text-sm" />
+              <input className="border rounded px-2 py-1 text-sm" spellCheck={false} autoComplete="off" />
               <label className="text-right text-sm">密码:</label>
-              <input className="border rounded px-2 py-1 text-sm" />
+              <input className="border rounded px-2 py-1 text-sm" type="password" spellCheck={false} autoComplete="off" />
               <label className="text-right text-sm"></label>
               <label className="inline-flex items-center gap-2 text-sm"><input type="checkbox"/> 保存密码</label>
               <div className="col-span-2 mt-2 font-medium text-sm">代理服务器</div>
               <label className="inline-flex items-center gap-2 text-sm col-span-2"><input type="checkbox"/> 使用证书验证</label>
               <label className="text-right text-sm">客户端密钥</label>
-              <div className="flex gap-2"><input className="border rounded px-2 py-1 text-sm flex-1"/><button className="px-2 py-1 border rounded text-sm">...</button></div>
+              <div className="flex gap-2"><input className="border rounded px-2 py-1 text-sm flex-1" spellCheck={false} autoComplete="off" /><button className="px-2 py-1 border rounded text-sm">...</button></div>
               <label className="text-right text-sm">客户端证书</label>
-              <div className="flex gap-2"><input className="border rounded px-2 py-1 text-sm flex-1"/><button className="px-2 py-1 border rounded text-sm">...</button></div>
+              <div className="flex gap-2"><input className="border rounded px-2 py-1 text-sm flex-1" spellCheck={false} autoComplete="off" /><button className="px-2 py-1 border rounded text-sm">...</button></div>
               <label className="text-right text-sm">CA 证书</label>
-              <input className="border rounded px-2 py-1 text-sm" />
+              <input className="border rounded px-2 py-1 text-sm" spellCheck={false} autoComplete="off" />
               <label className="text-right text-sm">通行短语</label>
-              <input className="border rounded px-2 py-1 text-sm" />
+              <input className="border rounded px-2 py-1 text-sm" type="password" spellCheck={false} autoComplete="off" />
             </div>
-          )}
-
-          {testMsg && (
-            <div className="mt-3 text-sm text-gray-700 dark:text-gray-200">{testMsg}</div>
           )}
         </div>
         <div className="px-4 py-3 border-t flex items-center justify-between bg-gray-50 dark:bg-neutral-800">

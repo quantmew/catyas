@@ -10,9 +10,9 @@
   "menu": {
     "file": "文件",
     "edit": "编辑",
-    "view": "查看(&V)",
-    "favorites": "收藏夹(&A)",
-    "tools": "工具(&T)",
+    "view": "查看",
+    "favorites": "收藏夹",
+    "tools": "工具",
     "window": "窗口",
     "help": "帮助",
     "newProject": "新建项目",
@@ -76,6 +76,131 @@
     "sort": "排序",
     "selectColumns": "选择列",
     "showHiddenItems": "显示隐藏的项目"
+  },
+  "optionsDialog": {
+    "title": "选项",
+    "general": "常规",
+    "appearance": "外观主题",
+    "theme": {
+      "light": "亮色",
+      "dark": "深色"
+    },
+    "language": "语言",
+    "applyNote": "更改会立即应用。",
+    "generalSection": "常规",
+    "allowDuplicateWindow": "允许重复打开相同的对象",
+    "showObjectsUnderSchemas": "在导航窗格中的模式下显示对象",
+    "showToolbarText": "显示工具栏标签",
+    "showFunctionWizard": "显示函数向导",
+    "confirmSaveBeforeClose": "在关闭前提示保存新建的查询或配置文件",
+    "useSecureInput": "使用安全输入对话框（主窗口）",
+    "autoCheckUpdatesOnStart": "在启动时自动检查更新",
+    "usageData": {
+      "title": "使用情况数据",
+      "share": "共享使用情况数据",
+      "button": "使用情况数据...",
+      "buttonHint": "此对话框尚未实现，敬请期待。",
+      "help": "通过自动发送使用情况数据帮助我们改进 Catyas。"
+    },
+    "restoreDefaults": "默认",
+    "tabs": {
+      "title": "选项卡",
+      "openNewTabAt": "打开新选项卡于",
+      "mainWindow": "主窗口",
+      "lastTabWindow": "最后打开选项卡的窗口",
+      "lastNonMainWindow": "最后打开的选项卡窗口（主窗口除外）",
+      "newWindow": "新窗口",
+      "startupScreen": "启动画面",
+      "objectsOnly": "仅打开对象选项卡",
+      "resumeLast": "从上次离开的画面继续",
+      "openSpecific": "打开特定选项卡或一组选项卡",
+      "setTabs": "设置选项卡...",
+      "setTabsHint": "此功能为占位，暂未实现。"
+    },
+    "autocomplete": {
+      "title": "自动完成代码",
+      "enabled": "使用自动完成代码",
+      "updateInfo": "自动更新自动完成代码的信息",
+      "selectFirst": "自动选择第一个建议项目",
+      "clearInfo": "清除自动完成代码的信息",
+      "cleared": "已清除自动完成缓存"
+    },
+    "editor": {
+      "title": "编辑器",
+      "common": "常规",
+      "showLineNumbers": "显示行号",
+      "codeFolding": "使用代码折叠",
+      "highlightCurrentLine": "使用指示当前行显示",
+      "syntaxHighlight": "使用语法高亮显示",
+      "disableIfLarger": "如果文件大小大于此就禁用 (MB):",
+      "autoRun": "使用自动执行",
+      "indentWidth": "制表符宽度:",
+      "font": "编辑器字体:"
+    },
+    "logs": {
+      "title": "记录",
+      "limitRecords": "限制记录:",
+      "pagePer": "条记录（每页）",
+      "thousandsSeparator": "显示千位分隔符"
+    },
+    "autorecover": {
+      "title": "自动恢复",
+      "query": "查询",
+      "model": "模型",
+      "chart": "图表",
+      "interval": "自动保存间隔(秒):"
+    },
+    "fileLocations": {
+      "title": "文件位置",
+      "logs": "日志位置:",
+      "mysql": "配置文件位置 (MySQL):",
+      "postgresql": "配置文件位置 (PostgreSQL):",
+      "oracle": "配置文件位置 (Oracle):",
+      "sqlite": "配置文件位置 (SQLite):",
+      "sqlserver": "配置文件位置 (SQL Server):",
+      "mariadb": "配置文件位置 (MariaDB):",
+      "mongodb": "配置文件位置 (MongoDB):",
+      "redis": "配置文件位置 (Redis):",
+      "premium": "配置文件位置:",
+      "export": "导出目录:",
+      "browseHint": "此处为占位，暂不打开系统对话框"
+    },
+    "connectivity": {
+      "title": "连接性",
+      "scopeNote": "此选项仅适用于激活或订阅、更新程序和 Cloud。",
+      "verifyCA": "验证针对 CA 的服务器证书",
+      "useProxy": "使用代理服务器:",
+      "proxyType": "代理服务器类型:",
+      "host": "主机:",
+      "port": "端口:",
+      "username": "用户名:",
+      "password": "密码:",
+      "test": "测试连接性",
+      "testHint": "暂未实现实际网络测试"
+    },
+    "environment": {
+      "title": "环境",
+      "executables": "可执行文件",
+      "sqlplus": "SQL*Plus:",
+      "mongoShell": "Mongo Shell 路径:",
+      "mongoDump": "MongoDump 可执行文件路径:",
+      "mongoRestore": "MongoRestore 可执行文件路径:",
+      "mongoImport": "MongoImport 可执行文件路径:",
+      "mongoExport": "MongoExport 可执行文件路径:",
+      "externalEditor": "外部编辑器:",
+      "ociLib": "OCI library (oci.dll):",
+      "browseHint": "此处为占位，暂不打开系统对话框"
+    },
+    "advanced": {
+      "title": "高级",
+      "enableDiagnostic": "启用诊断日志",
+      "showLabs": "显示实验（将来可能弃用）",
+      "allowMultiInstance": "允许重复运行 Catyas",
+      "registerOpenWith": "在“打开方式”列表上注册",
+      "registerOpenWithHint": "占位按钮，无实际注册",
+      "registerUri": "注册 Catyas URI 协议",
+      "registerUriHint": "占位按钮，无实际注册"
+    }
   },
   "sidebar": {
     "connections": "连接",
@@ -160,6 +285,8 @@
     "success": "成功",
     "confirm": "确认",
     "yes": "是",
-    "no": "否"
+    "no": "否",
+    "ok": "确定",
+    "cancel": "取消"
   }
 }

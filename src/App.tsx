@@ -11,6 +11,8 @@ import SQLServerConnectionDialog from './components/SQLServerConnectionDialog'
 import MariaDBConnectionDialog from './components/MariaDBConnectionDialog'
 import MongoDBConnectionDialog from './components/MongoDBConnectionDialog'
 import RedisConnectionDialog from './components/RedisConnectionDialog'
+import OptionsDialog from './components/OptionsDialog'
+import DataTransferWizard from './components/DataTransferWizard/index'
 import { Connection, Database } from './types'
 
 type DatabaseType = 'mysql' | 'postgresql' | 'oracle' | 'sqlite' | 'sqlserver' | 'mariadb' | 'mongodb' | 'redis' | null
@@ -36,12 +38,16 @@ function App() {
   const [selectedConnection, setSelectedConnection] = useState<Connection | null>(null)
   const [selectedTable, setSelectedTable] = useState<string | null>(null)
   const [activeDialog, setActiveDialog] = useState<DatabaseType>(null)
+  const [transferOpen, setTransferOpen] = useState(false)
+  const [optionsOpen, setOptionsOpen] = useState(false)
+  const [leftSidebarWidth, setLeftSidebarWidth] = useState(260)
+  const [rightSidebarWidth, setRightSidebarWidth] = useState(300)
 
   const handleSaveConnection = async (conn: Connection) => {
-    // Fetch databases for MySQL/MariaDB
-    if (conn.type === 'mysql' || conn.type === 'mariadb') {
+    // Fetch databases for MySQL/MariaDB (only in Electron mode)
+    if ((conn.type === 'mysql' || conn.type === 'mariadb') && window.electronAPI) {
       try {
-        const result = await window.electronAPI?.getDatabases(conn)
+        const result = await window.electronAPI.getDatabases(conn)
         if (result?.success && result.databases) {
           conn.databases = result.databases.map((db: any) => ({
             name: db.Database || db.SCHEMA_NAME || Object.values(db)[0],
@@ -53,6 +59,13 @@ function App() {
       } catch (error) {
         console.error('Failed to fetch databases:', error)
       }
+    } else if (!window.electronAPI) {
+      // Web mode: add mock databases for demonstration
+      conn.databases = [
+        { name: 'test_db', tables: [], expanded: false },
+        { name: 'demo_db', tables: [], expanded: false }
+      ]
+      conn.expanded = true
     }
 
     setConnections(prev => [...prev, conn])
@@ -68,9 +81,9 @@ function App() {
       if (c.id === conn.id) {
         const newExpanded = !c.expanded
 
-        // Load databases on first expansion if MySQL/MariaDB
-        if (newExpanded && !c.databases && (c.type === 'mysql' || c.type === 'mariadb')) {
-          window.electronAPI?.getDatabases(c).then(result => {
+        // Load databases on first expansion if MySQL/MariaDB (Electron mode)
+        if (newExpanded && !c.databases && (c.type === 'mysql' || c.type === 'mariadb') && window.electronAPI) {
+          window.electronAPI.getDatabases(c).then(result => {
             if (result?.success && result.databases) {
               setConnections(prev => prev.map(prevConn => {
                 if (prevConn.id === c.id) {
@@ -110,9 +123,9 @@ function App() {
             if (db.name === databaseName) {
               const newExpanded = !db.expanded
 
-              // Load tables/views on first expansion
-              if (newExpanded && !db.tables?.length) {
-                window.electronAPI?.getTables(connection, databaseName).then(result => {
+              // Load tables/views on first expansion (Electron mode)
+              if (newExpanded && !db.tables?.length && window.electronAPI) {
+                window.electronAPI.getTables(connection, databaseName).then(result => {
                   if (result?.success && result.tables) {
                     setConnections(prev2 => prev2.map(c => {
                       if (c.id === connectionId && c.databases) {
@@ -137,8 +150,9 @@ function App() {
                     }))
                   }
                 })
-                // Fetch views as well
-                window.electronAPI?.getViews(connection, databaseName).then(result => {
+                // Fetch views as well (Electron mode)
+                if (window.electronAPI) {
+                  window.electronAPI.getViews(connection, databaseName).then(result => {
                   if (result?.success && result.views) {
                     setConnections(prev2 => prev2.map(c => {
                       if (c.id === connectionId && c.databases) {
@@ -163,7 +177,36 @@ function App() {
                       return c
                     }))
                   }
-                })
+                  })
+                }
+              } else if (newExpanded && !db.tables?.length && !window.electronAPI) {
+                // Web mode: add mock tables for demonstration
+                setConnections(prev2 => prev2.map(c => {
+                  if (c.id === connectionId && c.databases) {
+                    return {
+                      ...c,
+                      databases: c.databases.map(d => {
+                        if (d.name === databaseName) {
+                          return {
+                            ...d,
+                            tables: [
+                              { name: 'users', type: 'table' as const },
+                              { name: 'orders', type: 'table' as const },
+                              { name: 'products', type: 'table' as const }
+                            ],
+                            views: [
+                              { name: 'user_stats' },
+                              { name: 'order_summary' }
+                            ],
+                            expanded: true
+                          }
+                        }
+                        return d
+                      })
+                    }
+                  }
+                  return c
+                }))
               }
 
               return { ...db, expanded: newExpanded }
@@ -186,27 +229,121 @@ function App() {
     setActiveDialog(null)
   }
 
+  const handleLeftResize = (e: React.MouseEvent) => {
+    e.preventDefault()
+    const startX = e.clientX
+    const startWidth = leftSidebarWidth
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const diff = e.clientX - startX
+      const newWidth = Math.max(200, Math.min(600, startWidth + diff))
+      setLeftSidebarWidth(newWidth)
+    }
+
+    const handleMouseUp = () => {
+      document.removeEventListener('mousemove', handleMouseMove)
+      document.removeEventListener('mouseup', handleMouseUp)
+      document.body.style.cursor = ''
+      document.body.style.userSelect = ''
+    }
+
+    document.addEventListener('mousemove', handleMouseMove)
+    document.addEventListener('mouseup', handleMouseUp)
+    document.body.style.cursor = 'col-resize'
+    document.body.style.userSelect = 'none'
+  }
+
+  const handleRightResize = (e: React.MouseEvent) => {
+    e.preventDefault()
+    const startX = e.clientX
+    const startWidth = rightSidebarWidth
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const diff = startX - e.clientX
+      const newWidth = Math.max(250, Math.min(600, startWidth + diff))
+      setRightSidebarWidth(newWidth)
+    }
+
+    const handleMouseUp = () => {
+      document.removeEventListener('mousemove', handleMouseMove)
+      document.removeEventListener('mouseup', handleMouseUp)
+      document.body.style.cursor = ''
+      document.body.style.userSelect = ''
+    }
+
+    document.addEventListener('mousemove', handleMouseMove)
+    document.addEventListener('mouseup', handleMouseUp)
+    document.body.style.cursor = 'col-resize'
+    document.body.style.userSelect = 'none'
+  }
+
+  // Listen for Tools->Options menu
+  window.addEventListener('open-options-dialog', () => setOptionsOpen(true))
+
+  // Listen for Tools->Data Transfer menu
+  window.addEventListener('open-data-transfer-dialog', () => setTransferOpen(true))
+
   return (
-    <div className="flex flex-col h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="flex flex-col h-screen bg-background text-foreground">
       <Titlebar />
-      <div className="flex flex-col flex-1 min-h-0" style={{ marginTop: '32px' }}>
+      <div className="flex flex-col flex-1 min-h-0" style={{ marginTop: window.electronAPI ? '32px' : '0' }}>
         <TopRibbon onNewConnection={(dbType: string) => {
           setActiveDialog(dbType as DatabaseType)
         }} />
         <div className="flex flex-1 min-h-0">
-          <Sidebar
-            connections={connections}
-            selectedConnection={selectedConnection}
-            onSelectConnection={handleSelectConnection}
-            onAddConnection={() => setActiveDialog('mysql')}
-            onToggleDatabase={handleToggleDatabase}
-            onSelectTable={handleSelectTable}
-          />
-          <MainContent
-            connection={selectedConnection}
-            selectedTable={selectedTable}
-            onSelectTable={setSelectedTable}
-          />
+          {/* Left Sidebar */}
+          <div className="flex" style={{ width: leftSidebarWidth }}>
+            <Sidebar
+              connections={connections}
+              selectedConnection={selectedConnection}
+              onSelectConnection={handleSelectConnection}
+              onAddConnection={() => setActiveDialog('mysql')}
+              onToggleDatabase={handleToggleDatabase}
+              onSelectTable={handleSelectTable}
+            />
+            {/* Resize Handle */}
+            <div
+              className="w-1 bg-gray-200 dark:bg-gray-700 hover:bg-blue-500 dark:hover:bg-blue-500 cursor-col-resize transition-colors"
+              onMouseDown={handleLeftResize}
+            />
+          </div>
+
+          {/* Center Content */}
+          <div className="flex-1 min-w-0">
+            <MainContent
+              connection={selectedConnection}
+              selectedTable={selectedTable}
+              onSelectTable={setSelectedTable}
+            />
+          </div>
+
+          {/* Right Sidebar */}
+          <div className="flex" style={{ width: rightSidebarWidth }}>
+            {/* Resize Handle */}
+            <div
+              className="w-1 bg-gray-200 dark:bg-gray-700 hover:bg-blue-500 dark:hover:bg-blue-500 cursor-col-resize transition-colors"
+              onMouseDown={handleRightResize}
+            />
+            <div className="flex-1 bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 overflow-hidden">
+              <div className="h-full flex flex-col">
+                <div className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">
+                  <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">信息</h3>
+                </div>
+                <div className="flex-1 overflow-auto p-4">
+                  <div className="text-sm text-gray-600 dark:text-gray-400">
+                    {selectedTable ? (
+                      <div>
+                        <p className="font-medium mb-2">表信息</p>
+                        <p>表名: {selectedTable}</p>
+                      </div>
+                    ) : (
+                      <p>请选择一个表</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -250,6 +387,10 @@ function App() {
         onClose={handleCloseDialog}
         onSave={handleSaveConnection}
       />
+
+      {/* 暂未接入按钮入口，这里先保留组件，后续接入菜单/工具栏 */}
+      <DataTransferWizard open={transferOpen} onClose={()=>setTransferOpen(false)} connections={connections} />
+      <OptionsDialog open={optionsOpen} onClose={()=>setOptionsOpen(false)} />
     </div>
   )
 }

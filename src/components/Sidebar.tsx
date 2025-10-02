@@ -36,9 +36,9 @@ export default function Sidebar({
   }
 
   return (
-    <div className="w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col">
+    <div className="flex-1 bg-white dark:bg-gray-800 flex flex-col overflow-hidden">
       {/* Header */}
-      <div className="h-12 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between px-4">
+      <div className="h-12 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between px-4 flex-shrink-0">
         <h2 className="font-semibold text-sm text-gray-700 dark:text-gray-200">Connections</h2>
         <button
           onClick={onAddConnection}

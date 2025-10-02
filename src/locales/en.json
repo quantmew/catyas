@@ -77,6 +77,131 @@
     "selectColumns": "Select Columns",
     "showHiddenItems": "Show Hidden Items"
   },
+  "optionsDialog": {
+    "title": "Options",
+    "general": "General",
+    "appearance": "Appearance",
+    "theme": {
+      "light": "Light",
+      "dark": "Dark"
+    },
+    "language": "Language",
+    "applyNote": "Changes apply immediately.",
+    "generalSection": "General",
+    "allowDuplicateWindow": "Allow opening duplicate objects",
+    "showObjectsUnderSchemas": "Show objects under schemas in navigation pane",
+    "showToolbarText": "Show toolbar labels",
+    "showFunctionWizard": "Show function wizard",
+    "confirmSaveBeforeClose": "Prompt to save new query/config before closing",
+    "useSecureInput": "Use secure input dialog (main window)",
+    "autoCheckUpdatesOnStart": "Check for updates on startup",
+    "usageData": {
+      "title": "Usage Data",
+      "share": "Share anonymous usage data",
+      "button": "Usage Data...",
+      "buttonHint": "This dialog is not implemented yet.",
+      "help": "Help us improve Catyas by sending anonymous usage data."
+    },
+    "restoreDefaults": "Defaults",
+    "tabs": {
+      "title": "Tabs",
+      "openNewTabAt": "Open new tab in",
+      "mainWindow": "Main Window",
+      "lastTabWindow": "Window with the last opened tab",
+      "lastNonMainWindow": "Last non-main window",
+      "newWindow": "New Window",
+      "startupScreen": "Startup screen",
+      "objectsOnly": "Open object tabs only",
+      "resumeLast": "Resume from last session",
+      "openSpecific": "Open specific tab(s)",
+      "setTabs": "Set Tabs...",
+      "setTabsHint": "This feature is a placeholder."
+    },
+    "autocomplete": {
+      "title": "Autocomplete",
+      "enabled": "Enable autocomplete",
+      "updateInfo": "Auto update autocomplete info",
+      "selectFirst": "Auto select first suggestion",
+      "clearInfo": "Clear autocomplete info",
+      "cleared": "Autocomplete cache cleared"
+    },
+    "editor": {
+      "title": "Editor",
+      "common": "Common",
+      "showLineNumbers": "Show line numbers",
+      "codeFolding": "Enable code folding",
+      "highlightCurrentLine": "Highlight current line",
+      "syntaxHighlight": "Enable syntax highlight",
+      "disableIfLarger": "Disable if file larger than (MB):",
+      "autoRun": "Enable auto execution",
+      "indentWidth": "Indent width:",
+      "font": "Editor font:"
+    },
+    "logs": {
+      "title": "Logs",
+      "limitRecords": "Limit records:",
+      "pagePer": "rows per page",
+      "thousandsSeparator": "Show thousands separator"
+    },
+    "autorecover": {
+      "title": "Auto Recovery",
+      "query": "Query",
+      "model": "Model",
+      "chart": "Chart",
+      "interval": "Autosave interval (s):"
+    },
+    "fileLocations": {
+      "title": "File Locations",
+      "logs": "Logs location:",
+      "mysql": "Profiles (MySQL):",
+      "postgresql": "Profiles (PostgreSQL):",
+      "oracle": "Profiles (Oracle):",
+      "sqlite": "Profiles (SQLite):",
+      "sqlserver": "Profiles (SQL Server):",
+      "mariadb": "Profiles (MariaDB):",
+      "mongodb": "Profiles (MongoDB):",
+      "redis": "Profiles (Redis):",
+      "premium": "Profiles:",
+      "export": "Export to:",
+      "browseHint": "Placeholder: file dialog not wired yet"
+    },
+    "connectivity": {
+      "title": "Connectivity",
+      "scopeNote": "Applies to activation/subscription, updater and Cloud only.",
+      "verifyCA": "Verify server certificate against CA",
+      "useProxy": "Use proxy server:",
+      "proxyType": "Proxy type:",
+      "host": "Host:",
+      "port": "Port:",
+      "username": "Username:",
+      "password": "Password:",
+      "test": "Test Connectivity",
+      "testHint": "Network test not implemented"
+    },
+    "environment": {
+      "title": "Environment",
+      "executables": "Executables",
+      "sqlplus": "SQL*Plus:",
+      "mongoShell": "Mongo Shell path:",
+      "mongoDump": "MongoDump path:",
+      "mongoRestore": "MongoRestore path:",
+      "mongoImport": "MongoImport path:",
+      "mongoExport": "MongoExport path:",
+      "externalEditor": "External editor:",
+      "ociLib": "OCI library (oci.dll):",
+      "browseHint": "Placeholder: file dialog not wired yet"
+    },
+    "advanced": {
+      "title": "Advanced",
+      "enableDiagnostic": "Enable diagnostic log",
+      "showLabs": "Show labs (may be removed)",
+      "allowMultiInstance": "Allow multiple Catyas instances",
+      "registerOpenWith": "Register in Open With list",
+      "registerOpenWithHint": "Placeholder button",
+      "registerUri": "Register Catyas URI scheme",
+      "registerUriHint": "Placeholder button"
+    }
+  },
   "sidebar": {
     "connections": "Connections",
     "addConnection": "Add Connection",
@@ -160,6 +285,8 @@
     "success": "Success",
     "confirm": "Confirm",
     "yes": "Yes",
-    "no": "No"
+    "no": "No",
+    "ok": "OK",
+    "cancel": "Cancel"
   }
 }

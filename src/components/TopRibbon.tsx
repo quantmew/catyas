@@ -47,7 +47,10 @@ export default function TopRibbon({ onNewConnection }: TopRibbonProps) {
     newFunction: () => console.log('[Menu] New Function'),
     newUser: () => console.log('[Menu] New User'),
     newOther: () => console.log('[Menu] New Other'),
-    newQuery: () => console.log('[Menu] New Query'),
+    newQuery: () => {
+      const event = new CustomEvent('open-new-query-tab')
+      window.dispatchEvent(event)
+    },
     newBackup: () => console.log('[Menu] New Backup'),
     newAutoRun: () => console.log('[Menu] New Auto Run'),
     newModel: () => console.log('[Menu] New Model'),
@@ -82,7 +85,10 @@ export default function TopRibbon({ onNewConnection }: TopRibbonProps) {
     manageFavorites: () => console.log('[Favorites] Manage Favorites'),
 
     // Tools
-    dataTransfer: () => console.log('[Tools] Data Transfer'),
+    dataTransfer: () => {
+      const event = new CustomEvent('open-data-transfer-dialog')
+      window.dispatchEvent(event)
+    },
     dataGeneration: () => console.log('[Tools] Data Generation'),
     dataSynchronization: () => console.log('[Tools] Data Synchronization'),
     structureSynchronization: () => console.log('[Tools] Structure Synchronization'),
@@ -90,7 +96,10 @@ export default function TopRibbon({ onNewConnection }: TopRibbonProps) {
     serverMonitor: () => console.log('[Tools] Server Monitor'),
     findInDatabaseOrSchema: () => console.log('[Tools] Find in Database or Schema'),
     historyLog: () => console.log('[Tools] History Log'),
-    options: () => console.log('[Tools] Options'),
+    options: () => {
+      const event = new CustomEvent('open-options-dialog')
+      window.dispatchEvent(event)
+    },
 
     // Window - these are now handled by native controls
     minimize: () => console.log('[Window] Minimize (native)'),
@@ -198,9 +207,7 @@ export default function TopRibbon({ onNewConnection }: TopRibbonProps) {
             </div>
           ))}
         </div>
-        <div className="mr-2">
-          <LanguageSwitcher />
-        </div>
+        <div className="mr-2" />
       </div>
     </div>
   )

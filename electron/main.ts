@@ -100,6 +100,7 @@ function getConnectionPool(config: any): mysql.Pool {
 
 // IPC Handlers
 ipcMain.handle('db:test-connection', async (_event, config) => {
+  console.log('[Main] Testing connection to:', config.host, config.port, config.username)
   try {
     const connection = await mysql.createConnection({
       host: config.host,
@@ -107,12 +108,17 @@ ipcMain.handle('db:test-connection', async (_event, config) => {
       user: config.username,
       password: config.password,
       database: config.database || undefined,
+      connectTimeout: 10000, // 10 seconds timeout
     })
+    console.log('[Main] Connection created, pinging...')
     await connection.ping()
+    console.log('[Main] Ping successful')
     await connection.end()
+    console.log('[Main] Connection closed')
     return { success: true, message: 'Connection successful!' }
   } catch (error: any) {
-    return { success: false, message: error.message }
+    console.error('[Main] Connection error:', error)
+    return { success: false, message: error.message || error.code || String(error) }
   }
 })
 

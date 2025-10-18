@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
-import { X, Table2, Play } from 'lucide-react'
-import SqlEditor from './SqlEditor'
+import { X, Table2, Play, Save, Wrench, Sparkles, FileCode, BarChart3 } from 'lucide-react'
+import MonacoSqlEditor from './MonacoSqlEditor'
+import { useTranslation } from 'react-i18next'
 
 interface Tab {
   id: string
@@ -15,17 +16,18 @@ interface TabbedViewProps {
 }
 
 export default function TabbedView({ selectedTable, connection }: TabbedViewProps) {
+  const { t } = useTranslation()
   const [tabs, setTabs] = useState<Tab[]>([
-    { id: 'welcome', title: '欢迎', type: 'query' }
+    { id: 'welcome', title: t('query.welcome'), type: 'query' }
   ])
   const [activeTab, setActiveTab] = useState('welcome')
   const [queryTexts, setQueryTexts] = useState<Record<string,string>>({})
 
   useEffect(()=>{
-    const handler = () => addTab('无标题 - 查询','query')
+    const handler = () => addTab(t('query.untitledQuery'),'query')
     window.addEventListener('open-new-query-tab', handler as any)
     return () => window.removeEventListener('open-new-query-tab', handler as any)
-  }, [tabs])
+  }, [tabs, t])
 
   const closeTab = (tabId: string, e: React.MouseEvent) => {
     e.stopPropagation()
@@ -80,35 +82,35 @@ export default function TabbedView({ selectedTable, connection }: TabbedViewProp
           </div>
         ))}
         <button
-          onClick={() => addTab('新查询', 'query')}
+          onClick={() => addTab(t('query.newQuery'), 'query')}
           className="px-3 py-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
-          title="新建查询"
+          title={t('query.newQuery')}
         >
           +
         </button>
       </div>
 
       {/* Tab Content */}
-      <div className="flex-1 overflow-auto">
+      <div className="flex-1 overflow-hidden">
         {tabs.map(tab => (
           <div
             key={tab.id}
-            className={`h-full ${activeTab === tab.id ? 'block' : 'hidden'}`}
+            className={`h-full ${activeTab === tab.id ? 'flex' : 'hidden'} flex-col`}
           >
             {tab.id === 'welcome' ? (
               <div className="h-full flex items-center justify-center">
                 <div className="text-center text-gray-500 dark:text-gray-400">
-                  <h2 className="text-2xl font-semibold mb-4">欢迎使用 Catyas</h2>
-                  <p className="mb-2">请从左侧选择一个数据库连接</p>
-                  <p>或者创建一个新的连接</p>
+                  <h2 className="text-2xl font-semibold mb-4">{t('query.welcomeMessage')}</h2>
+                  <p className="mb-2">{t('query.selectConnection')}</p>
+                  <p>{t('query.createConnection')}</p>
                 </div>
               </div>
             ) : tab.type === 'table' ? (
-              <div className="h-full p-4">
+              <div className="flex-1 p-4 overflow-auto">
                 <div className="bg-gray-50 dark:bg-gray-900 rounded p-4 mb-4">
-                  <h3 className="text-sm font-semibold mb-2">表: {tab.title}</h3>
+                  <h3 className="text-sm font-semibold mb-2">{t('table.name')}: {tab.title}</h3>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
-                    连接: {connection?.name || '未连接'}
+                    {t('connection.name')}: {connection?.name || t('query.notConnected')}
                   </p>
                 </div>
                 <div className="border border-gray-200 dark:border-gray-700 rounded overflow-auto">
@@ -116,20 +118,20 @@ export default function TabbedView({ selectedTable, connection }: TabbedViewProp
                     <thead className="bg-gray-50 dark:bg-gray-900">
                       <tr>
                         <th className="px-4 py-2 text-left font-medium text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700">
-                          列名
+                          {t('table.columnName')}
                         </th>
                         <th className="px-4 py-2 text-left font-medium text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700">
-                          数据类型
+                          {t('table.dataType')}
                         </th>
                         <th className="px-4 py-2 text-left font-medium text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700">
-                          值
+                          {t('table.value')}
                         </th>
                       </tr>
                     </thead>
                     <tbody>
                       <tr>
                         <td className="px-4 py-2 border-b border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400" colSpan={3}>
-                          加载中...
+                          {t('table.loading')}
                         </td>
                       </tr>
                     </tbody>
@@ -137,41 +139,66 @@ export default function TabbedView({ selectedTable, connection }: TabbedViewProp
                 </div>
               </div>
             ) : (
-              <div className="h-full flex flex-col">
-                <div className="flex-1 p-0">
-                  {/* 顶部工具栏 */}
-                  <div className="h-10 px-3 flex items-center gap-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-sm">
-                    <button className="px-2 py-1 border rounded bg-white dark:bg-gray-800">保存</button>
-                    <button className="px-2 py-1 border rounded bg-white dark:bg-gray-800">查询创建工具</button>
-                    <button className="px-2 py-1 border rounded bg-white dark:bg-gray-800">美化 SQL</button>
-                    <button className="px-2 py-1 border rounded bg-white dark:bg-gray-800">代码段</button>
-                    <button className="px-2 py-1 border rounded bg-white dark:bg-gray-800">创建图表</button>
-                    <div className="mx-2 w-px h-6 bg-gray-200 dark:bg-gray-700" />
-                    {/* 连接与数据库选择 */}
+              <>
+                {/* 顶部工具栏 - 两行布局 */}
+                <div className="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 flex-shrink-0">
+                  {/* 第一行 - 工具按钮 */}
+                  <div className="h-10 px-3 flex items-center gap-3 text-sm border-b border-gray-200 dark:border-gray-700">
+                    <button className="px-2 py-1 border rounded bg-white dark:bg-gray-800 flex items-center gap-1.5 hover:bg-gray-100 dark:hover:bg-gray-700">
+                      <Save className="w-3.5 h-3.5" />
+                      <span>{t('query.save')}</span>
+                    </button>
+                    <div className="w-px h-6 bg-gray-300 dark:bg-gray-600" />
+                    <button className="px-2 py-1 border rounded bg-white dark:bg-gray-800 flex items-center gap-1.5 hover:bg-gray-100 dark:hover:bg-gray-700">
+                      <Wrench className="w-3.5 h-3.5" />
+                      <span>{t('query.queryBuilder')}</span>
+                    </button>
+                    <button className="px-2 py-1 border rounded bg-white dark:bg-gray-800 flex items-center gap-1.5 hover:bg-gray-100 dark:hover:bg-gray-700">
+                      <Sparkles className="w-3.5 h-3.5" />
+                      <span>{t('query.beautifySQL')}</span>
+                    </button>
+                    <button className="px-2 py-1 border rounded bg-white dark:bg-gray-800 flex items-center gap-1.5 hover:bg-gray-100 dark:hover:bg-gray-700">
+                      <FileCode className="w-3.5 h-3.5" />
+                      <span>{t('query.snippets')}</span>
+                    </button>
+                    <div className="w-px h-6 bg-gray-300 dark:bg-gray-600" />
+                    <button className="px-2 py-1 border rounded bg-white dark:bg-gray-800 flex items-center gap-1.5 hover:bg-gray-100 dark:hover:bg-gray-700">
+                      <BarChart3 className="w-3.5 h-3.5" />
+                      <span>{t('query.createChart')}</span>
+                    </button>
+                  </div>
+
+                  {/* 第二行 - 连接选择和执行按钮 */}
+                  <div className="h-10 px-3 flex items-center gap-3 text-sm">
                     <select className="h-7 min-w-[140px] border rounded px-2 bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200">
-                      <option>{connection?.name || '未连接'}</option>
+                      <option>{connection?.name || t('query.notConnected')}</option>
                     </select>
                     <select className="h-7 min-w-[120px] border rounded px-2 bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200">
                       <option>macro</option>
                     </select>
                     <div className="mx-2 w-px h-6 bg-gray-200 dark:bg-gray-700" />
-                    <button className="px-2 py-1 border rounded bg-white dark:bg-gray-800 text-blue-600">运行</button>
-                    <button className="px-2 py-1 border rounded bg-white dark:bg-gray-800" disabled>停止</button>
-                    <button className="px-2 py-1 border rounded bg-white dark:bg-gray-800">解释</button>
+                    <button className="px-2 py-1 border rounded bg-white dark:bg-gray-800 text-blue-600 hover:bg-gray-100 dark:hover:bg-gray-700">{t('query.run')}</button>
+                    <button className="px-2 py-1 border rounded bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700" disabled>{t('query.stop')}</button>
+                    <button className="px-2 py-1 border rounded bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700">{t('query.explain')}</button>
                   </div>
+                </div>
 
-                  {/* SQL 编辑区域 */}
-                  <div className="p-2">
-                    <SqlEditor value={queryTexts[tab.id]||''} onChange={(v)=>setQueryTexts(prev=>({...prev, [tab.id]: v}))} />
-                  </div>
+                {/* SQL 编辑区域 - 占据2/3空间 */}
+                <div className="flex-[2] min-h-0 overflow-hidden">
+                  <MonacoSqlEditor
+                    value={queryTexts[tab.id]||''}
+                    onChange={(v)=>setQueryTexts(prev=>({...prev, [tab.id]: v}))}
+                  />
                 </div>
-                <div className="flex-1 border-t border-gray-200 dark:border-gray-700 p-4">
-                  <h4 className="text-sm font-semibold mb-2 text-gray-700 dark:text-gray-300">查询结果</h4>
+
+                {/* 查询结果区域 - 占据1/3空间 */}
+                <div className="flex-1 min-h-0 border-t border-gray-200 dark:border-gray-700 p-4 overflow-auto">
+                  <h4 className="text-sm font-semibold mb-2 text-gray-700 dark:text-gray-300">{t('query.queryResult')}</h4>
                   <div className="text-sm text-gray-500 dark:text-gray-400">
-                    暂无结果
+                    {t('query.noResults')}
                   </div>
                 </div>
-              </div>
+              </>
             )}
           </div>
         ))}

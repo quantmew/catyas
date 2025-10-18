@@ -10,9 +10,9 @@
   "menu": {
     "file": "File",
     "edit": "Edit",
-    "view": "View(&V)",
-    "favorites": "Favorites(&A)",
-    "tools": "Tools(&T)",
+    "view": "View",
+    "favorites": "Favorites",
+    "tools": "Tools",
     "window": "Window",
     "help": "Help",
     "newProject": "New Project",
@@ -205,7 +205,8 @@
   "sidebar": {
     "connections": "Connections",
     "addConnection": "Add Connection",
-    "noConnections": "No connections yet"
+    "noConnections": "No connections yet",
+    "noConnectionsHint": "No connections yet.<br />Click + to add one."
   },
   "connection": {
     "new": "New Connection",
@@ -251,7 +252,24 @@
     "result": "Result",
     "noResult": "No results",
     "error": "Error",
-    "success": "Query executed successfully"
+    "success": "Query executed successfully",
+    "welcome": "Welcome",
+    "newQuery": "New Query",
+    "untitledQuery": "Untitled - Query",
+    "save": "Save",
+    "queryBuilder": "Query Builder",
+    "beautifySQL": "Beautify SQL",
+    "snippets": "Snippets",
+    "createChart": "Create Chart",
+    "run": "Run",
+    "stop": "Stop",
+    "explain": "Explain",
+    "queryResult": "Query Result",
+    "noResults": "No results",
+    "welcomeMessage": "Welcome to Catyas",
+    "selectConnection": "Please select a database connection from the left",
+    "createConnection": "Or create a new connection",
+    "notConnected": "Not Connected"
   },
   "table": {
     "name": "Table Name",
@@ -264,7 +282,12 @@
     "default": "Default",
     "extra": "Extra",
     "rows": "Rows",
-    "noData": "No data available"
+    "noData": "No data available",
+    "selectTable": "Please select a table",
+    "loading": "Loading...",
+    "columnName": "Column Name",
+    "dataType": "Data Type",
+    "value": "Value"
   },
   "ribbon": {
     "newConnection": "New Connection",

@@ -205,7 +205,8 @@
   "sidebar": {
     "connections": "连接",
     "addConnection": "添加连接",
-    "noConnections": "暂无连接"
+    "noConnections": "暂无连接",
+    "noConnectionsHint": "暂无连接。<br />点击 + 添加连接。"
   },
   "connection": {
     "new": "新建连接",
@@ -251,7 +252,24 @@
     "result": "结果",
     "noResult": "无结果",
     "error": "错误",
-    "success": "查询执行成功"
+    "success": "查询执行成功",
+    "welcome": "欢迎",
+    "newQuery": "新查询",
+    "untitledQuery": "无标题 - 查询",
+    "save": "保存",
+    "queryBuilder": "查询创建工具",
+    "beautifySQL": "美化 SQL",
+    "snippets": "代码段",
+    "createChart": "创建图表",
+    "run": "运行",
+    "stop": "停止",
+    "explain": "解释",
+    "queryResult": "查询结果",
+    "noResults": "暂无结果",
+    "welcomeMessage": "欢迎使用 Catyas",
+    "selectConnection": "请从左侧选择一个数据库连接",
+    "createConnection": "或者创建一个新的连接",
+    "notConnected": "未连接"
   },
   "table": {
     "name": "表名",
@@ -264,7 +282,12 @@
     "default": "默认值",
     "extra": "额外",
     "rows": "行数",
-    "noData": "暂无数据"
+    "noData": "暂无数据",
+    "selectTable": "请选择一个表",
+    "loading": "加载中...",
+    "columnName": "列名",
+    "dataType": "数据类型",
+    "value": "值"
   },
   "ribbon": {
     "newConnection": "新建连接",

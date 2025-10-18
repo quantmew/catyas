@@ -1,6 +1,7 @@
 import { Database, Plus, ChevronRight, ChevronDown, Folder, Table2, Layers } from 'lucide-react'
 import { Connection } from '../types'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 interface SidebarProps {
   connections: Connection[]
@@ -19,6 +20,7 @@ export default function Sidebar({
   onToggleDatabase,
   onSelectTable,
 }: SidebarProps) {
+  const { t } = useTranslation()
   const [expandedDatabases, setExpandedDatabases] = useState<Set<string>>(new Set())
 
   const toggleDatabase = (key: string) => {
@@ -39,11 +41,11 @@ export default function Sidebar({
     <div className="flex-1 bg-white dark:bg-gray-800 flex flex-col overflow-hidden">
       {/* Header */}
       <div className="h-12 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between px-4 flex-shrink-0">
-        <h2 className="font-semibold text-sm text-gray-700 dark:text-gray-200">Connections</h2>
+        <h2 className="font-semibold text-sm text-gray-700 dark:text-gray-200">{t('sidebar.connections')}</h2>
         <button
           onClick={onAddConnection}
           className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
-          title="New Connection"
+          title={t('sidebar.addConnection')}
         >
           <Plus className="w-4 h-4 text-gray-600 dark:text-gray-300" />
         </button>
@@ -52,10 +54,10 @@ export default function Sidebar({
       {/* Connection List */}
       <div className="flex-1 overflow-y-auto">
         {connections.length === 0 ? (
-          <div className="p-4 text-center text-sm text-gray-500 dark:text-gray-400">
-            No connections yet.<br />
-            Click + to add one.
-          </div>
+          <div
+            className="p-4 text-center text-sm text-gray-500 dark:text-gray-400"
+            dangerouslySetInnerHTML={{ __html: t('sidebar.noConnectionsHint') }}
+          />
         ) : (
           <div className="py-2">
             {connections.map((connection) => (

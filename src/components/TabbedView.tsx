@@ -15,7 +15,7 @@ interface TabbedViewProps {
   connection?: any
 }
 
-export default function TabbedView({ selectedTable, connection }: TabbedViewProps) {
+export default function TabbedView({ selectedTable: _selectedTable, connection }: TabbedViewProps) {
   const { t } = useTranslation()
   const [tabs, setTabs] = useState<Tab[]>([
     { id: 'welcome', title: t('query.welcome'), type: 'query' }

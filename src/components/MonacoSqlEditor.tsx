@@ -35,7 +35,7 @@ export default function MonacoSqlEditor({ value, onChange }: MonacoSqlEditorProp
   const handleEditorDidMount: OnMount = (editor, monaco) => {
     // 注册 SQL 关键字和常用函数的自动补全
     monaco.languages.registerCompletionItemProvider('sql', {
-      provideCompletionItems: (model, position) => {
+      provideCompletionItems: (model: monaco.editor.ITextModel, position: monaco.Position) => {
         const word = model.getWordUntilPosition(position)
         const range = {
           startLineNumber: position.lineNumber,
@@ -123,7 +123,7 @@ export default function MonacoSqlEditor({ value, onChange }: MonacoSqlEditorProp
         height={height}
         defaultLanguage="sql"
         value={value}
-        onChange={(val) => onChange(val || '')}
+        onChange={(val: string | undefined) => onChange(val || '')}
         onMount={handleEditorDidMount}
         theme={theme === 'dark' ? 'vs-dark' : 'light'}
         options={{

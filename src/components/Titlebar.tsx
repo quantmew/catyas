@@ -11,6 +11,9 @@ const Titlebar: React.FC = () => {
     }
   }, [])
 
+  // In web mode (no electronAPI), don't render titlebar
+  if (!window.electronAPI) return null
+
   // Default to Windows style if platform not detected yet
   if (!platform) {
     return <TitlebarWindows />

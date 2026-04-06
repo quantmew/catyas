@@ -1,6 +1,7 @@
 import { app, BrowserWindow, ipcMain } from 'electron'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import fs from 'fs'
 import mysql from 'mysql2/promise'
 
 const __filename = fileURLToPath(import.meta.url)
@@ -74,12 +75,76 @@ function createWindow() {
   })
 }
 
+// Connection persistence
+const CONNECTIONS_FILE = path.join(app.getPath('userData'), 'connections.json')
+
+function loadSavedConnections(): any[] {
+  try {
+    if (fs.existsSync(CONNECTIONS_FILE)) {
+      const data = fs.readFileSync(CONNECTIONS_FILE, 'utf-8')
+      return JSON.parse(data)
+    }
+  } catch (err) {
+    console.error('Failed to load connections:', err)
+  }
+  return []
+}
+
+function saveConnectionsToFile(connections: any[]): void {
+  try {
+    fs.writeFileSync(CONNECTIONS_FILE, JSON.stringify(connections, null, 2), 'utf-8')
+  } catch (err) {
+    console.error('Failed to save connections:', err)
+  }
+}
+
+// Connection persistence IPC handlers
+ipcMain.handle('connection:save', async (_event, config) => {
+  try {
+    const connections = loadSavedConnections()
+    const existingIdx = connections.findIndex((c: any) => c.id === config.id)
+    if (existingIdx >= 0) {
+      connections[existingIdx] = config
+    } else {
+      connections.push(config)
+    }
+    saveConnectionsToFile(connections)
+    return { success: true }
+  } catch (error: any) {
+    return { success: false, message: error.message }
+  }
+})
+
+ipcMain.handle('connection:get-all', async () => {
+  try {
+    return { success: true, connections: loadSavedConnections() }
+  } catch (error: any) {
+    return { success: false, message: error.message }
+  }
+})
+
+ipcMain.handle('connection:delete', async (_event, id) => {
+  try {
+    const connections = loadSavedConnections()
+    const filtered = connections.filter((c: any) => c.id !== id)
+    saveConnectionsToFile(filtered)
+    return { success: true }
+  } catch (error: any) {
+    return { success: false, message: error.message }
+  }
+})
+
 // Database connection cache
 const connectionPool = new Map<string, mysql.Pool>()
 
-// Helper function to get or create connection pool
-function getConnectionPool(config: any): mysql.Pool {
-  const key = `${config.host}:${config.port}:${config.username}`
+// Identifier whitelist validation to prevent SQL injection
+function isValidIdentifier(name: string): boolean {
+  return /^[a-zA-Z_][a-zA-Z0-9_]*$/.test(name)
+}
+
+// Helper function to get or create connection pool (optionally scoped to a database)
+function getConnectionPool(config: any, database?: string): mysql.Pool {
+  const key = `${config.host}:${config.port}:${config.username}:${database || config.database || ''}`
 
   if (!connectionPool.has(key)) {
     const pool = mysql.createPool({
@@ -87,7 +152,7 @@ function getConnectionPool(config: any): mysql.Pool {
       port: config.port,
       user: config.username,
       password: config.password,
-      database: config.database || undefined,
+      database: database || config.database || undefined,
       waitForConnections: true,
       connectionLimit: 10,
       queueLimit: 0
@@ -128,6 +193,9 @@ ipcMain.handle('db:get-databases', async (_event, config) => {
 
 ipcMain.handle('db:get-tables', async (_event, config, database) => {
   try {
+    if (!isValidIdentifier(database)) {
+      return { success: false, message: `Invalid database name: ${database}` }
+    }
     const pool = getConnectionPool(config)
     const [rows] = await pool.query(`SHOW TABLES FROM \`${database}\``)
     return { success: true, tables: rows }
@@ -150,9 +218,9 @@ ipcMain.handle('db:get-views', async (_event, config, database) => {
   }
 })
 
-ipcMain.handle('db:execute-query', async (_event, config, query) => {
+ipcMain.handle('db:execute-query', async (_event, config, query, database) => {
   try {
-    const pool = getConnectionPool(config)
+    const pool = getConnectionPool(config, database)
     const [rows] = await pool.query(query)
     return { success: true, data: rows }
   } catch (error: any) {
@@ -160,9 +228,12 @@ ipcMain.handle('db:execute-query', async (_event, config, query) => {
   }
 })
 
-ipcMain.handle('db:get-table-structure', async (_event, config, tableName) => {
+ipcMain.handle('db:get-table-structure', async (_event, config, database, tableName) => {
   try {
-    const pool = getConnectionPool(config)
+    if (!isValidIdentifier(database) || !isValidIdentifier(tableName)) {
+      return { success: false, message: 'Invalid database or table name' }
+    }
+    const pool = getConnectionPool(config, database)
     const [rows] = await pool.query(`DESCRIBE \`${tableName}\``)
     return { success: true, structure: rows }
   } catch (error: any) {
@@ -170,11 +241,31 @@ ipcMain.handle('db:get-table-structure', async (_event, config, tableName) => {
   }
 })
 
-ipcMain.handle('db:get-table-data', async (_event, config, tableName, limit = 1000, offset = 0) => {
+ipcMain.handle('db:get-table-data', async (_event, config, database, tableName, limit = 1000, offset = 0) => {
+  try {
+    if (!isValidIdentifier(database) || !isValidIdentifier(tableName)) {
+      return { success: false, message: 'Invalid database or table name' }
+    }
+    const safeLimit = Math.max(1, Math.floor(Number(limit) || 1000))
+    const safeOffset = Math.max(0, Math.floor(Number(offset) || 0))
+    const pool = getConnectionPool(config, database)
+    const [rows] = await pool.query(`SELECT * FROM \`${tableName}\` LIMIT ? OFFSET ?`, [safeLimit, safeOffset])
+    return { success: true, data: rows }
+  } catch (error: any) {
+    return { success: false, message: error.message }
+  }
+})
+
+ipcMain.handle('db:get-table-info', async (_event, config, database, tableName) => {
   try {
     const pool = getConnectionPool(config)
-    const [rows] = await pool.query(`SELECT * FROM \`${tableName}\` LIMIT ${limit} OFFSET ${offset}`)
-    return { success: true, data: rows }
+    const [rows] = await pool.query(
+      `SELECT ENGINE, ROW_FORMAT, TABLE_ROWS, CREATE_TIME, UPDATE_TIME, TABLE_COLLATION
+       FROM information_schema.TABLES
+       WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ?`,
+      [database, tableName]
+    )
+    return { success: true, info: (rows as any[])[0] || null }
   } catch (error: any) {
     return { success: false, message: error.message }
   }

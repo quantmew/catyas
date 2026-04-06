@@ -1,0 +1,56 @@
+{
+  "app": {"title": "Catyas"},
+  "window": {"minimize": "Minimizar", "maximize": "Maximizar", "close": "Cerrar"},
+  "menu": {
+    "file": "Archivo", "edit": "Editar", "view": "Ver(&V)", "favorites": "Favoritos(&A)", "tools": "Herramientas(&T)",
+    "window": "Ventana", "help": "Ayuda", "newProject": "Nuevo proyecto", "newConnection": "Nueva conexión",
+    "newConnectionMySQL": "MySQL...", "newConnectionPostgreSQL": "PostgreSQL...", "newConnectionOracle": "Oracle...",
+    "newConnectionSQLite": "SQLite...", "newConnectionSQLServer": "SQL Server...", "newConnectionMariaDB": "MariaDB...",
+    "newConnectionMongoDB": "MongoDB...", "newConnectionRedis": "Redis...", "new": "Nuevo",
+    "newTable": "Tabla (V)...", "newView": "Vista (W)...", "newFunction": "Función (X)...",
+    "newUser": "Usuario (Y)...", "newOther": "Otro (Z)", "newQuery": "Consulta...", "newBackup": "Copia de seguridad...",
+    "newAutoRun": "Ejecución automática...", "newModel": "Modelo...", "newChartWorkspace": "Área de trabajo de gráficos...",
+    "openExternal": "Abrir archivo externo", "openRecent": "Abrir reciente", "closeConnection": "Cerrar conexión",
+    "importConnection": "Importar conexión...", "exportConnection": "Exportar conexión...", "closeWindow": "Cerrar ventana",
+    "closeTab": "Cerrar pestaña", "exitCatyas": "Salir de Catyas", "undo": "Deshacer", "redo": "Rehacer",
+    "cut": "Cortar", "copy": "Copiar", "paste": "Pegar", "selectAll": "Seleccionar todo",
+    "addToFavorites": "Añadir a favoritos", "manageFavorites": "Gestionar favoritos", "dataTransfer": "Transferencia de datos...",
+    "dataGeneration": "Generación de datos...", "dataSynchronization": "Sincronización de datos...",
+    "structureSynchronization": "Sincronización de estructura...", "commandLineInterface": "Interfaz de línea de comandos...",
+    "serverMonitor": "Monitor de servidor", "findInDatabaseOrSchema": "Buscar en base de datos o esquema...",
+    "historyLog": "Registro histórico...", "options": "Opciones...", "minimize": "Minimizar", "maximize": "Maximizar",
+    "alwaysOnTop": "Siempre visible", "onlineDocumentation": "Documentación en línea", "releaseNotes": "Notas de la versión",
+    "about": "Acerca de Catyas", "navigationPane": "Panel de navegación", "informationPane": "Panel de información",
+    "list": "Lista", "details": "Detalles", "erDiagram": "Diagrama ER", "hideObjectGroup": "Ocultar grupo de objetos",
+    "sort": "Ordenar", "selectColumns": "Seleccionar columnas", "showHiddenItems": "Mostrar elementos ocultos"
+  },
+  "sidebar": {"connections": "Conexiones", "addConnection": "Añadir conexión", "noConnections": "No hay conexiones"},
+  "connection": {
+    "new": "Nueva conexión", "edit": "Editar conexión", "delete": "Eliminar conexión", "test": "Probar conexión", "save": "Guardar", "cancel": "Cancelar",
+    "name": "Nombre de conexión", "type": "Tipo de base de datos", "host": "Host", "port": "Puerto", "username": "Usuario",
+    "password": "Contraseña", "database": "Base de datos", "testSuccess": "¡Conexión exitosa!", "testFailed": "Fallo en la conexión",
+    "deleteConfirm": "¿Está seguro de que desea eliminar esta conexión?",
+    "tabs": {"general":"General", "advanced":"Avanzado", "database":"Base de datos", "ssl":"SSL", "ssh":"SSH", "http":"HTTP"},
+    "general": {"name":"Nombre", "host":"Host", "port":"Puerto", "username":"Usuario", "password":"Contraseña", "remember":"Recordar contraseña"},
+    "advanced": {"settingsPath":"Ruta de configuración", "driver":"Controlador de cliente", "charset":"Juego de caracteres del cliente", "keepAlive":"Intervalo de keep-alive (s)", "useCompression":"Usar compresión", "autoConnect":"Conexión automática", "namedPipe":"Usar pipe nombrado / socket", "limitSessions":"Limitar sesiones", "compatibility":"Compatibilidad"},
+    "dbtab": {"useCustomList":"Usar lista personalizada de bases de datos", "add":"Añadir base de datos a la lista", "remove":"Eliminar base de datos de la lista"},
+    "ssl": {"useSSL":"Usar SSL", "useVerify":"Usar verificación", "clientKey":"Clave de cliente", "clientCert":"Certificado de cliente", "caCert":"Certificado CA", "verifyServer":"Verificar certificado del servidor contra CA", "cipher":"Cifrado"},
+    "ssh": {"useTunnel":"Usar túnel SSH", "host":"Host", "port":"Puerto", "username":"Usuario", "authMethod":"Método de autenticación", "password":"Contraseña", "remember":"Recordar contraseña"},
+    "http": {"useTunnel":"Usar túnel HTTP", "url":"URL del túnel", "useBase64":"Codificar consultas salientes en base64", "auth":"Autenticación", "usePassword":"Usar autenticación por contraseña", "proxy":"Servidor proxy", "clientKey":"Clave de cliente", "clientCert":"Certificado de cliente", "caCert":"Certificado CA", "passphrase":"Frase de contraseña"}
+  },
+  "database": {"types": {"mysql": "MySQL", "postgresql": "PostgreSQL", "mongodb": "MongoDB", "redis": "Redis", "sqlite": "SQLite", "sqlserver": "SQL Server", "oracle": "Oracle", "mariadb": "MariaDB"}},
+  "query": {"editor": "Editor de consultas", "execute": "Ejecutar", "clear": "Limpiar", "result": "Resultado", "noResult": "Sin resultados", "error": "Error", "success": "Consulta ejecutada exitosamente"},
+  "table": {"name": "Nombre de la tabla", "structure": "Estructura", "data": "Datos", "column": "Columna", "type": "Tipo", "nullable": "Nullable", "key": "Clave", "default": "Predeterminado", "extra": "Extra", "rows": "Filas", "noData": "No hay datos disponibles"},
+  "ribbon": {"newConnection": "Nueva conexión", "new": "Nuevo", "refresh": "Actualizar", "table": "Tabla", "users": "Usuarios", "query": "Consulta", "import": "Importar", "settings": "Configuración"},
+  "common": {"search": "Buscar", "filter": "Filtrar", "refresh": "Actualizar", "loading": "Cargando...", "error": "Error", "success": "Éxito", "confirm": "Confirmar", "yes": "Sí", "no": "No", "close": "Cerrar", "ok": "Aceptar", "cancel": "Cancelar"},
+  "options": {
+    "title": "Opciones", "default": "Predeterminado", "ok": "Aceptar", "cancel": "Cancelar", "comingSoon": "Próximamente",
+    "categories": {"environment": "General", "tabs": "Pestañas", "autoComplete": "Autocompletado", "editor": "Editor", "records": "Registros", "autoRecovery": "Recuperación automática", "fileLocation": "Ubicación de archivos", "connectivity": "Conectividad", "advanced": "Avanzado"},
+    "general": {
+      "theme": "Tema", "themeLight": "Claro", "themeDark": "Oscuro", "language": "Idioma", "behavior": "Comportamiento",
+      "confirmOnClose": "Confirmar al cerrar", "autoStart": "Iniciar al arranque", "minimizeToTray": "Minimizar a la bandeja del sistema",
+      "showHiddenFiles": "Mostrar archivos ocultos", "sendUsageData": "Enviar datos anónimos de uso para ayudar a mejorar Catyas",
+      "restartNote": "* Los cambios surten efecto después de reiniciar"
+    }
+  }
+}

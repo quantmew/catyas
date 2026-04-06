@@ -101,11 +101,16 @@
     "deleteConfirm": "Are you sure you want to delete this connection?",
     "tabs": {"general":"General","advanced":"Advanced","database":"Database","ssl":"SSL","ssh":"SSH","http":"HTTP"},
     "general": {"name":"Name","host":"Host","port":"Port","username":"Username","password":"Password","remember":"Remember password"},
-    "advanced": {"settingsPath":"Settings Path","driver":"Client Driver","charset":"Client Charset","keepAlive":"Keep-alive Interval (s)","useCompression":"Use Compression","autoConnect":"Auto Connect","namedPipe":"Use Named Pipe / Socket","limitSessions":"Limit Sessions","compatibility":"Compatibility"},
-    "dbtab": {"useCustomList":"Use custom database list","add":"Add database to list","remove":"Remove database from list"},
-    "ssl": {"useSSL":"Use SSL","useVerify":"Use Verification","clientKey":"Client Key","clientCert":"Client Certificate","caCert":"CA Certificate","verifyServer":"Verify server cert against CA","cipher":"Cipher"},
+    "advanced": {"settingsPath":"Settings Path","driver":"Client Driver","charset":"Client Charset","keepAlive":"Keep-alive Interval (s)","keepAliveCheckbox":"Keep-alive","useCompression":"Use Compression","autoConnect":"Auto Connect","namedPipe":"Use Named Pipe / Socket","limitSessions":"Limit Sessions","limitSessionsCheckbox":"Limit","compatibility":"Compatibility"},
+    "dbtab": {"useCustomList":"Use custom database list","add":"Add database to list","remove":"Remove database from list","database":"Database","autoOpen":"Auto Open","noDatabases":"No databases"},
+    "ssl": {"useSSL":"Use SSL","useVerify":"Use Verification","clientKey":"Client Key","clientCert":"Client Certificate","caCert":"CA Certificate","verifyServer":"Verify server cert against CA","cipher":"Cipher","verification":"Verification"},
     "ssh": {"useTunnel":"Use SSH Tunnel","host":"Host","port":"Port","username":"Username","authMethod":"Auth Method","password":"Password","remember":"Remember password"},
-    "http": {"useTunnel":"Use HTTP Tunnel","url":"Tunnel URL","useBase64":"Encode outgoing queries with base64","auth":"Authentication","usePassword":"Use password authentication","proxy":"Proxy Server","clientKey":"Client Key","clientCert":"Client Certificate","caCert":"CA Certificate","passphrase":"Passphrase"}
+    "http": {"useTunnel":"Use HTTP Tunnel","url":"Tunnel URL","useBase64":"Encode outgoing queries with base64","auth":"Authentication","proxy":"Proxy","usePassword":"Use password authentication","proxy":"Proxy Server","clientKey":"Client Key","clientCert":"Client Certificate","caCert":"CA Certificate","passphrase":"Passphrase","useCertAuth":"Use certificate authentication"},
+    "testConnection": "Test Connection",
+    "testing": "Testing...",
+    "connectionSuccess": "Connection successful!",
+    "ok": "OK",
+    "cancel": "Cancel"
   },
   "database": {
     "types": {
@@ -160,6 +165,40 @@
     "success": "Success",
     "confirm": "Confirm",
     "yes": "Yes",
-    "no": "No"
+    "no": "No",
+    "close": "Close",
+    "ok": "OK",
+    "cancel": "Cancel"
+  },
+  "options": {
+    "title": "Options",
+    "default": "Default",
+    "ok": "OK",
+    "cancel": "Cancel",
+    "comingSoon": "Coming soon",
+    "categories": {
+      "environment": "General",
+      "tabs": "Tabs",
+      "autoComplete": "Auto Completion",
+      "editor": "Editor",
+      "records": "Records",
+      "autoRecovery": "Auto Recovery",
+      "fileLocation": "File Location",
+      "connectivity": "Connectivity",
+      "advanced": "Advanced"
+    },
+    "general": {
+      "theme": "Theme",
+      "themeLight": "Light",
+      "themeDark": "Dark",
+      "language": "Language",
+      "behavior": "Behavior",
+      "confirmOnClose": "Confirm on close",
+      "autoStart": "Launch at startup",
+      "minimizeToTray": "Minimize to system tray",
+      "showHiddenFiles": "Show hidden files",
+      "sendUsageData": "Send anonymous usage data to help improve Catyas",
+      "restartNote": "* Changes take effect after restart"
+    }
   }
 }

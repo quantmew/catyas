@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Titlebar from './components/Titlebar'
 import Sidebar from './components/Sidebar'
 import MainContent from './components/MainContent'
@@ -11,31 +11,27 @@ import SQLServerConnectionDialog from './components/SQLServerConnectionDialog'
 import MariaDBConnectionDialog from './components/MariaDBConnectionDialog'
 import MongoDBConnectionDialog from './components/MongoDBConnectionDialog'
 import RedisConnectionDialog from './components/RedisConnectionDialog'
-import { Connection, Database } from './types'
+import OptionsDialog from './components/OptionsDialog'
+import { Connection } from './types'
 
 type DatabaseType = 'mysql' | 'postgresql' | 'oracle' | 'sqlite' | 'sqlserver' | 'mariadb' | 'mongodb' | 'redis' | null
-
-declare global {
-  interface Window {
-    electronAPI?: {
-      platform: string
-      testConnection: (config: any) => Promise<{ success: boolean; message: string }>
-      getDatabases: (config: any) => Promise<{ success: boolean; databases?: any[]; message?: string }>
-      getTables: (config: any, database: string) => Promise<{ success: boolean; tables?: any[]; message?: string }>
-      getViews: (config: any, database: string) => Promise<{ success: boolean; views?: any[]; message?: string }>
-      getViews: (config: any, database: string) => Promise<{ success: boolean; views?: any[]; message?: string }>
-      executeQuery: (config: any, query: string) => Promise<{ success: boolean; data?: any[]; message?: string }>
-      getTableStructure: (config: any, tableName: string) => Promise<{ success: boolean; structure?: any[]; message?: string }>
-      getTableData: (config: any, tableName: string, limit: number, offset: number) => Promise<{ success: boolean; data?: any[]; message?: string }>
-    }
-  }
-}
 
 function App() {
   const [connections, setConnections] = useState<Connection[]>([])
   const [selectedConnection, setSelectedConnection] = useState<Connection | null>(null)
   const [selectedTable, setSelectedTable] = useState<string | null>(null)
+  const [selectedDatabase, setSelectedDatabase] = useState<string | null>(null)
   const [activeDialog, setActiveDialog] = useState<DatabaseType>(null)
+  const [optionsOpen, setOptionsOpen] = useState(false)
+
+  // Load saved connections on mount
+  useEffect(() => {
+    window.electronAPI?.getConnections().then(result => {
+      if (result?.success && result.connections) {
+        setConnections(result.connections)
+      }
+    })
+  }, [])
 
   const handleSaveConnection = async (conn: Connection) => {
     // Fetch databases for MySQL/MariaDB
@@ -58,6 +54,10 @@ function App() {
     setConnections(prev => [...prev, conn])
     setSelectedConnection(conn)
     setActiveDialog(null)
+
+    // Persist connection (strip runtime state)
+    const { databases, expanded, ...connConfig } = conn
+    window.electronAPI?.saveConnection(connConfig as any)
   }
 
   const handleSelectConnection = async (conn: Connection) => {
@@ -71,12 +71,12 @@ function App() {
         // Load databases on first expansion if MySQL/MariaDB
         if (newExpanded && !c.databases && (c.type === 'mysql' || c.type === 'mariadb')) {
           window.electronAPI?.getDatabases(c).then(result => {
-            if (result?.success && result.databases) {
+            if (result?.success && result.databases != null) {
               setConnections(prev => prev.map(prevConn => {
                 if (prevConn.id === c.id) {
                   return {
                     ...prevConn,
-                    databases: result.databases.map((db: any) => ({
+                    databases: result.databases!.map((db: any) => ({
                       name: db.Database || db.SCHEMA_NAME || Object.values(db)[0],
                       tables: [],
                       expanded: false
@@ -113,7 +113,7 @@ function App() {
               // Load tables/views on first expansion
               if (newExpanded && !db.tables?.length) {
                 window.electronAPI?.getTables(connection, databaseName).then(result => {
-                  if (result?.success && result.tables) {
+                  if (result?.success && result.tables != null) {
                     setConnections(prev2 => prev2.map(c => {
                       if (c.id === connectionId && c.databases) {
                         return {
@@ -122,7 +122,7 @@ function App() {
                             if (d.name === databaseName) {
                               return {
                                 ...d,
-                                tables: result.tables.map((t: any) => ({
+                                tables: result.tables!.map((t: any) => ({
                                   name: Object.values(t)[0] as string,
                                   type: 'table' as const
                                 })),
@@ -139,7 +139,7 @@ function App() {
                 })
                 // Fetch views as well
                 window.electronAPI?.getViews(connection, databaseName).then(result => {
-                  if (result?.success && result.views) {
+                  if (result?.success && result.views != null) {
                     setConnections(prev2 => prev2.map(c => {
                       if (c.id === connectionId && c.databases) {
                         return {
@@ -149,7 +149,7 @@ function App() {
                               return {
                                 ...d,
                                 ...(d as any),
-                                views: result.views.map((v: any) => ({
+                                views: result.views!.map((v: any) => ({
                                   name: v.TABLE_NAME || Object.values(v)[0],
                                   type: 'view' as const
                                 })),
@@ -176,10 +176,9 @@ function App() {
     }))
   }
 
-  const handleSelectTable = (connectionId: string, databaseName: string, tableName: string) => {
-    console.log('Selected table:', connectionId, databaseName, tableName)
+  const handleSelectTable = (_connectionId: string, databaseName: string, tableName: string) => {
     setSelectedTable(tableName)
-    // TODO: Load table data
+    setSelectedDatabase(databaseName)
   }
 
   const handleCloseDialog = () => {
@@ -192,7 +191,7 @@ function App() {
       <div className="flex flex-col flex-1 min-h-0" style={{ marginTop: '32px' }}>
         <TopRibbon onNewConnection={(dbType: string) => {
           setActiveDialog(dbType as DatabaseType)
-        }} />
+        }} onOpenOptions={() => setOptionsOpen(true)} />
         <div className="flex flex-1 min-h-0">
           <Sidebar
             connections={connections}
@@ -205,7 +204,7 @@ function App() {
           <MainContent
             connection={selectedConnection}
             selectedTable={selectedTable}
-            onSelectTable={setSelectedTable}
+            selectedDatabase={selectedDatabase}
           />
         </div>
       </div>
@@ -249,6 +248,10 @@ function App() {
         open={activeDialog === 'redis'}
         onClose={handleCloseDialog}
         onSave={handleSaveConnection}
+      />
+      <OptionsDialog
+        open={optionsOpen}
+        onClose={() => setOptionsOpen(false)}
       />
     </div>
   )

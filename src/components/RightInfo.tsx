@@ -1,35 +1,96 @@
-import { Info } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Info, Loader2 } from 'lucide-react'
+import { Connection } from '../types'
 
 interface RightInfoProps {
-  tableName?: string | null
+  connection: Connection | null
+  database: string | null
+  tableName: string | null
 }
 
-export default function RightInfo({ tableName }: RightInfoProps) {
+interface TableInfo {
+  ENGINE?: string
+  ROW_FORMAT?: string
+  TABLE_ROWS?: number
+  CREATE_TIME?: string
+  UPDATE_TIME?: string
+  TABLE_COLLATION?: string
+}
+
+export default function RightInfo({ connection, database, tableName }: RightInfoProps) {
+  const [info, setInfo] = useState<TableInfo | null>(null)
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    if (!window.electronAPI || !connection || !database || !tableName) {
+      setInfo(null)
+      return
+    }
+
+    setLoading(true)
+    window.electronAPI.getTableInfo(connection, database, tableName)
+      .then(result => {
+        if (result.success) {
+          setInfo(result.info || null)
+        } else {
+          setInfo(null)
+        }
+      })
+      .catch(() => setInfo(null))
+      .finally(() => setLoading(false))
+  }, [connection, database, tableName])
+
   return (
     <div className="w-72 bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 flex flex-col">
       <div className="h-12 border-b border-gray-200 dark:border-gray-700 flex items-center px-4 gap-2">
         <Info className="w-4 h-4 text-gray-500" />
-        <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">属性</span>
+        <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">Properties</span>
       </div>
       <div className="p-4 text-xs text-gray-600 dark:text-gray-300 space-y-2 overflow-auto">
         <div>
-          <div className="text-gray-400">对象</div>
-          <div className="font-medium text-gray-800 dark:text-gray-100">{tableName || '未选择'}</div>
+          <div className="text-gray-400">Table</div>
+          <div className="font-medium text-gray-800 dark:text-gray-100">{tableName || 'Not selected'}</div>
         </div>
-        <div>
-          <div className="text-gray-400">引擎</div>
-          <div>InnoDB</div>
-        </div>
-        <div>
-          <div className="text-gray-400">行格式</div>
-          <div>Dynamic</div>
-        </div>
-        <div>
-          <div className="text-gray-400">修改日期</div>
-          <div>2025-09-28 17:31:00</div>
-        </div>
+        {database && (
+          <div>
+            <div className="text-gray-400">Database</div>
+            <div className="font-medium text-gray-800 dark:text-gray-100">{database}</div>
+          </div>
+        )}
+        {loading ? (
+          <div className="flex items-center gap-2 py-2">
+            <Loader2 className="w-4 h-4 animate-spin text-gray-400" />
+            <span className="text-gray-400">Loading...</span>
+          </div>
+        ) : info ? (
+          <>
+            <div>
+              <div className="text-gray-400">Engine</div>
+              <div>{info.ENGINE || 'Unknown'}</div>
+            </div>
+            <div>
+              <div className="text-gray-400">Row Format</div>
+              <div>{info.ROW_FORMAT || 'Unknown'}</div>
+            </div>
+            <div>
+              <div className="text-gray-400">Row Count</div>
+              <div>{info.TABLE_ROWS != null ? info.TABLE_ROWS.toLocaleString() : 'Unknown'}</div>
+            </div>
+            <div>
+              <div className="text-gray-400">Collation</div>
+              <div>{info.TABLE_COLLATION || 'Unknown'}</div>
+            </div>
+            <div>
+              <div className="text-gray-400">Created</div>
+              <div>{info.CREATE_TIME ? new Date(info.CREATE_TIME).toLocaleString() : 'Unknown'}</div>
+            </div>
+            <div>
+              <div className="text-gray-400">Updated</div>
+              <div>{info.UPDATE_TIME ? new Date(info.UPDATE_TIME).toLocaleString() : 'N/A'}</div>
+            </div>
+          </>
+        ) : null}
       </div>
     </div>
   )
 }
-

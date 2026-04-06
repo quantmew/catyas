@@ -9,9 +9,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
   getDatabases: (config) => ipcRenderer.invoke('db:get-databases', config),
   getTables: (config, database) => ipcRenderer.invoke('db:get-tables', config, database),
   getViews: (config, database) => ipcRenderer.invoke('db:get-views', config, database),
-  executeQuery: (config, query) => ipcRenderer.invoke('db:execute-query', config, query),
-  getTableStructure: (config, tableName) => ipcRenderer.invoke('db:get-table-structure', config, tableName),
-  getTableData: (config, tableName, limit, offset) => ipcRenderer.invoke('db:get-table-data', config, tableName, limit, offset),
+  executeQuery: (config, query, database) => ipcRenderer.invoke('db:execute-query', config, query, database),
+  getTableStructure: (config, database, tableName) => ipcRenderer.invoke('db:get-table-structure', config, database, tableName),
+  getTableData: (config, database, tableName, limit, offset) => ipcRenderer.invoke('db:get-table-data', config, database, tableName, limit, offset),
+  getTableInfo: (config, database, tableName) => ipcRenderer.invoke('db:get-table-info', config, database, tableName),
 
   // Connection management
   saveConnection: (config) => ipcRenderer.invoke('connection:save', config),

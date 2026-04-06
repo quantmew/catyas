@@ -1,34 +1,114 @@
 import * as Menubar from '@radix-ui/react-menubar'
+import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import { useTranslation } from 'react-i18next'
-import LanguageSwitcher from './LanguageSwitcher'
-import { createMenuBarConfig, createRibbonConfig, MenuBarActions, MenuItem, MenuSeparator, RibbonButton as RibbonButtonConfig } from './topBarConfig'
+import { createMenuBarConfig, MenuBarActions, MenuItem, MenuSeparator } from './topBarConfig'
 import { useMemo } from 'react'
+import {
+  Database,
+  FolderPlus,
+  Table,
+  Eye,
+  FileCode,
+  User,
+  Wrench,
+  Play,
+  Upload,
+  Bot,
+  GitBranch,
+  BarChart3,
+  ChevronDown
+} from 'lucide-react'
 
 const isSeparator = (item: MenuItem | MenuSeparator): item is MenuSeparator => {
   return 'type' in item && item.type === 'separator'
 }
 
-function RibbonButton({ config }: { config: RibbonButtonConfig }) {
-  const { t } = useTranslation()
-  const Icon = config.icon
+const databaseTypes = [
+  { type: 'mysql', label: 'MySQL', icon: Database },
+  { type: 'postgresql', label: 'PostgreSQL', icon: Database },
+  { type: 'oracle', label: 'Oracle', icon: Database },
+  { type: 'sqlite', label: 'SQLite', icon: Database },
+  { type: 'sqlserver', label: 'SQL Server', icon: Database },
+  { type: 'mariadb', label: 'MariaDB', icon: Database },
+  { type: 'mongodb', label: 'MongoDB', icon: Database },
+  { type: 'redis', label: 'Redis', icon: Database }
+]
 
+interface RibbonButtonProps {
+  icon: React.ComponentType<{ className?: string }>
+  label: string
+  onClick?: () => void
+  active?: boolean
+}
+
+function RibbonButton({ icon: Icon, label, onClick, active }: RibbonButtonProps) {
   return (
     <button
-      onClick={config.action}
-      className="flex flex-col items-center justify-center w-16 h-14 mx-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200"
-      title={t(`ribbon.${config.id}`)}
+      onClick={onClick}
+      className={`flex flex-col items-center justify-center min-w-[64px] h-[72px] px-2 rounded transition-colors ${
+        active
+          ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400'
+          : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200'
+      }`}
     >
-      <Icon className="w-5 h-5 mb-0.5" />
-      <span className="text-[11px] leading-none">{t(`ribbon.${config.id}`)}</span>
+      <Icon className="w-6 h-6 mb-1" />
+      <span className="text-[12px] leading-none whitespace-nowrap">{label}</span>
     </button>
+  )
+}
+
+interface RibbonButtonWithDropdownProps {
+  icon: React.ComponentType<{ className?: string }>
+  label: string
+  onClick?: (dbType: string) => void
+  active?: boolean
+}
+
+function RibbonButtonWithDropdown({ icon: Icon, label, onClick, active }: RibbonButtonWithDropdownProps) {
+  return (
+    <DropdownMenu.Root>
+      <DropdownMenu.Trigger asChild>
+        <button
+          className={`flex flex-col items-center justify-center min-w-[64px] h-[72px] px-2 rounded transition-colors ${
+            active
+              ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400'
+              : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200'
+          }`}
+        >
+          <div className="relative inline-flex items-center justify-center">
+            <Icon className="w-6 h-6" />
+            <ChevronDown className="w-2.5 h-2.5 absolute -bottom-0.5 -right-2 text-gray-400" />
+          </div>
+          <span className="text-[12px] leading-none whitespace-nowrap mt-0.5">{label}</span>
+        </button>
+      </DropdownMenu.Trigger>
+      <DropdownMenu.Portal>
+        <DropdownMenu.Content
+          align="start"
+          sideOffset={4}
+          className="min-w-[180px] bg-white dark:bg-gray-800 shadow-lg border border-gray-200 dark:border-gray-700 py-1 rounded z-50"
+        >
+          {databaseTypes.map((db) => (
+            <DropdownMenu.Item
+              key={db.type}
+              onSelect={() => onClick?.(db.type)}
+              className="outline-none px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 cursor-default text-gray-700 dark:text-gray-200"
+            >
+              {db.label}
+            </DropdownMenu.Item>
+          ))}
+        </DropdownMenu.Content>
+      </DropdownMenu.Portal>
+    </DropdownMenu.Root>
   )
 }
 
 interface TopRibbonProps {
   onNewConnection?: (dbType: string) => void
+  onOpenOptions?: () => void
 }
 
-export default function TopRibbon({ onNewConnection }: TopRibbonProps) {
+export default function TopRibbon({ onNewConnection, onOpenOptions }: TopRibbonProps) {
   const { t } = useTranslation()
 
   const actions: MenuBarActions = useMemo(() => ({
@@ -90,9 +170,9 @@ export default function TopRibbon({ onNewConnection }: TopRibbonProps) {
     serverMonitor: () => console.log('[Tools] Server Monitor'),
     findInDatabaseOrSchema: () => console.log('[Tools] Find in Database or Schema'),
     historyLog: () => console.log('[Tools] History Log'),
-    options: () => console.log('[Tools] Options'),
+    options: () => onOpenOptions?.(),
 
-    // Window - these are now handled by native controls
+    // Window
     minimize: () => console.log('[Window] Minimize (native)'),
     maximize: () => console.log('[Window] Maximize (native)'),
     alwaysOnTop: () => console.log('[Window] Always on Top'),
@@ -108,14 +188,12 @@ export default function TopRibbon({ onNewConnection }: TopRibbonProps) {
     users: () => console.log('[Ribbon] Users'),
     query: () => console.log('[Ribbon] Query'),
     import: () => console.log('[Ribbon] Import'),
-    settings: () => console.log('[Ribbon] Settings')
-  }), [onNewConnection])
+    settings: () => onOpenOptions?.()
+  }), [onNewConnection, onOpenOptions])
 
   const menuBarConfig = useMemo(() => createMenuBarConfig(actions), [actions])
-  const ribbonConfig = useMemo(() => createRibbonConfig(actions), [actions])
 
   const renderMenuItem = (item: MenuItem): JSX.Element => {
-    // If item has children, render as submenu
     if (item.children && item.children.length > 0) {
       return (
         <Menubar.Sub key={item.id}>
@@ -142,7 +220,6 @@ export default function TopRibbon({ onNewConnection }: TopRibbonProps) {
       )
     }
 
-    // Regular menu item
     return (
       <Menubar.Item
         key={item.id}
@@ -160,7 +237,8 @@ export default function TopRibbon({ onNewConnection }: TopRibbonProps) {
 
   return (
     <div className="border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 select-none app-no-drag">
-      <Menubar.Root className="h-8 px-1 flex items-center text-[13px] text-gray-800 dark:text-gray-200 space-x-1">
+      {/* Menu Bar */}
+      <Menubar.Root className="h-8 px-2 flex items-center text-[13px] text-gray-800 dark:text-gray-200 space-x-1">
         {menuBarConfig.map((menuGroup) => (
           <Menubar.Menu key={menuGroup.id}>
             <Menubar.Trigger className="px-2.5 h-8 rounded data-[state=open]:bg-gray-200 dark:data-[state=open]:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700">
@@ -185,21 +263,115 @@ export default function TopRibbon({ onNewConnection }: TopRibbonProps) {
         ))}
       </Menubar.Root>
 
-      <div className="h-12 px-2 flex items-center justify-between overflow-x-auto border-t border-gray-100 dark:border-gray-700">
+      {/* Ribbon Toolbar - redesigned to match Navicat style */}
+      <div className="h-[76px] px-2 flex items-center gap-1 overflow-x-auto overflow-y-hidden scrollbar-hide">
+        {/* Connection button with dropdown */}
         <div className="flex items-center">
-          {ribbonConfig.map((group: import('./topBarConfig').RibbonGroup, groupIndex: number) => (
-            <div
-              key={groupIndex}
-              className={`flex items-center ${groupIndex < ribbonConfig.length - 1 ? 'pr-3 mr-3 border-r border-gray-200 dark:border-gray-700' : ''}`}
-            >
-              {group.buttons.map((button: RibbonButtonConfig) => (
-                <RibbonButton key={button.id} config={button} />
-              ))}
-            </div>
-          ))}
+          <RibbonButtonWithDropdown
+            icon={Database}
+            label={t('ribbon.newConnection')}
+            onClick={(dbType) => onNewConnection?.(dbType)}
+          />
         </div>
-        <div className="mr-2">
-          <LanguageSwitcher />
+
+        {/* New Query button */}
+        <div className="flex items-center">
+          <RibbonButton
+            icon={FolderPlus}
+            label={t('ribbon.new')}
+            onClick={() => onNewConnection?.('mysql')}
+          />
+        </div>
+
+        {/* Table */}
+        <div className="flex items-center">
+          <RibbonButton
+            icon={Table}
+            label={t('ribbon.table')}
+            onClick={actions.table}
+            active={true}
+          />
+        </div>
+
+        {/* View */}
+        <div className="flex items-center">
+          <RibbonButton
+            icon={Eye}
+            label={t('menu.newView')}
+            onClick={actions.newView}
+          />
+        </div>
+
+        {/* Function */}
+        <div className="flex items-center">
+          <RibbonButton
+            icon={FileCode}
+            label={t('menu.newFunction')}
+            onClick={actions.newFunction}
+          />
+        </div>
+
+        {/* User */}
+        <div className="flex items-center">
+          <RibbonButton
+            icon={User}
+            label={t('ribbon.users')}
+            onClick={actions.users}
+          />
+        </div>
+
+        {/* Other - dropdown */}
+        <div className="flex items-center">
+          <RibbonButton
+            icon={Wrench}
+            label={t('menu.newOther')}
+            onClick={actions.newOther}
+          />
+        </div>
+
+        {/* Query */}
+        <div className="flex items-center">
+          <RibbonButton
+            icon={Play}
+            label={t('ribbon.query')}
+            onClick={actions.query}
+          />
+        </div>
+
+        {/* Backup */}
+        <div className="flex items-center">
+          <RibbonButton
+            icon={Upload}
+            label={t('menu.newBackup')}
+            onClick={actions.newBackup}
+          />
+        </div>
+
+        {/* Auto Run */}
+        <div className="flex items-center">
+          <RibbonButton
+            icon={Bot}
+            label={t('menu.newAutoRun')}
+            onClick={actions.newAutoRun}
+          />
+        </div>
+
+        {/* Model */}
+        <div className="flex items-center">
+          <RibbonButton
+            icon={GitBranch}
+            label={t('menu.newModel')}
+            onClick={actions.newModel}
+          />
+        </div>
+
+        {/* Chart */}
+        <div className="flex items-center">
+          <RibbonButton
+            icon={BarChart3}
+            label={t('menu.newChartWorkspace')}
+            onClick={actions.newChartWorkspace}
+          />
         </div>
       </div>
     </div>

@@ -1,0 +1,56 @@
+{
+  "app": {"title": "Catyas"},
+  "window": {"minimize": "Свернуть", "maximize": "Развернуть", "close": "Закрыть"},
+  "menu": {
+    "file": "Файл", "edit": "Правка", "view": "Вид(&V)", "favorites": "Избранное(&A)", "tools": "Инструменты(&T)",
+    "window": "Окно", "help": "Справка", "newProject": "Новый проект", "newConnection": "Новое подключение",
+    "newConnectionMySQL": "MySQL...", "newConnectionPostgreSQL": "PostgreSQL...", "newConnectionOracle": "Oracle...",
+    "newConnectionSQLite": "SQLite...", "newConnectionSQLServer": "SQL Server...", "newConnectionMariaDB": "MariaDB...",
+    "newConnectionMongoDB": "MongoDB...", "newConnectionRedis": "Redis...", "new": "Новый",
+    "newTable": "Таблица (V)...", "newView": "Представление (W)...", "newFunction": "Функция (X)...",
+    "newUser": "Пользователь (Y)...", "newOther": "Другое (Z)", "newQuery": "Запрос...", "newBackup": "Резервная копия...",
+    "newAutoRun": "Автоматический запуск...", "newModel": "Модель...", "newChartWorkspace": "Рабочая область диаграмм...",
+    "openExternal": "Открыть внешний файл", "openRecent": "Открыть недавний", "closeConnection": "Закрыть подключение",
+    "importConnection": "Импорт подключения...", "exportConnection": "Экспорт подключения...", "closeWindow": "Закрыть окно",
+    "closeTab": "Закрыть вкладку", "exitCatyas": "Выйти из Catyas", "undo": "Отменить", "redo": "Повторить",
+    "cut": "Вырезать", "copy": "Копировать", "paste": "Вставить", "selectAll": "Выделить все",
+    "addToFavorites": "Добавить в избранное", "manageFavorites": "Управление избранным", "dataTransfer": "Передача данных...",
+    "dataGeneration": "Генерация данных...", "dataSynchronization": "Синхронизация данных...",
+    "structureSynchronization": "Синхронизация структуры...", "commandLineInterface": "Командная строка...",
+    "serverMonitor": "Монитор сервера", "findInDatabaseOrSchema": "Найти в базе данных или схеме...",
+    "historyLog": "Журнал истории...", "options": "Параметры...", "minimize": "Свернуть", "maximize": "Развернуть",
+    "alwaysOnTop": "Поверх всех окон", "onlineDocumentation": "Онлайн-документация", "releaseNotes": "Примечания к выпуску",
+    "about": "О программе Catyas", "navigationPane": "Панель навигации", "informationPane": "Панель информации",
+    "list": "Список", "details": "Подробности", "erDiagram": "ER-диаграмма", "hideObjectGroup": "Скрыть группу объектов",
+    "sort": "Сортировать", "selectColumns": "Выбрать столбцы", "showHiddenItems": "Показать скрытые элементы"
+  },
+  "sidebar": {"connections": "Подключения", "addConnection": "Добавить подключение", "noConnections": "Нет подключений"},
+  "connection": {
+    "new": "Новое подключение", "edit": "Изменить подключение", "delete": "Удалить подключение", "test": "Проверить подключение", "save": "Сохранить", "cancel": "Отмена",
+    "name": "Имя подключения", "type": "Тип базы данных", "host": "Хост", "port": "Порт", "username": "Имя пользователя",
+    "password": "Пароль", "database": "База данных", "testSuccess": "Подключение успешно!", "testFailed": "Ошибка подключения",
+    "deleteConfirm": "Вы уверены, что хотите удалить это подключение?",
+    "tabs": {"general":"Общие", "advanced":"Дополнительно", "database":"База данных", "ssl":"SSL", "ssh":"SSH", "http":"HTTP"},
+    "general": {"name":"Имя", "host":"Хост", "port":"Порт", "username":"Имя пользователя", "password":"Пароль", "remember":"Запомнить пароль"},
+    "advanced": {"settingsPath":"Путь настроек", "driver":"Драйвер клиента", "charset":"Клиентская кодировка", "keepAlive":"Интервал поддержки соединения (с)", "useCompression":"Использовать сжатие", "autoConnect":"Автоматическое подключение", "namedPipe":"Использовать именованный канал / сокет", "limitSessions":"Ограничить сессии", "compatibility":"Совместимость"},
+    "dbtab": {"useCustomList":"Использовать пользовательский список баз данных", "add":"Добавить базу данных в список", "remove":"Удалить базу данных из списка"},
+    "ssl": {"useSSL":"Использовать SSL", "useVerify":"Использовать проверку", "clientKey":"Ключ клиента", "clientCert":"Сертификат клиента", "caCert":"Сертификат ЦС", "verifyServer":"Проверить сертификат сервера по ЦС", "cipher":"Шифрование"},
+    "ssh": {"useTunnel":"Использовать SSH-туннель", "host":"Хост", "port":"Порт", "username":"Имя пользователя", "authMethod":"Метод аутентификации", "password":"Пароль", "remember":"Запомнить пароль"},
+    "http": {"useTunnel":"Использовать HTTP-туннель", "url":"URL туннеля", "useBase64":"Кодировать исходящие запросы в base64", "auth":"Аутентификация", "usePassword":"Использовать аутентификацию по паролю", "proxy":"Прокси-сервер", "clientKey":"Ключ клиента", "clientCert":"Сертификат клиента", "caCert":"Сертификат ЦС", "passphrase":"Ключевая фраза"}
+  },
+  "database": {"types": {"mysql": "MySQL", "postgresql": "PostgreSQL", "mongodb": "MongoDB", "redis": "Redis", "sqlite": "SQLite", "sqlserver": "SQL Server", "oracle": "Oracle", "mariadb": "MariaDB"}},
+  "query": {"editor": "Редактор запросов", "execute": "Выполнить", "clear": "Очистить", "result": "Результат", "noResult": "Нет результатов", "error": "Ошибка", "success": "Запрос выполнен успешно"},
+  "table": {"name": "Имя таблицы", "structure": "Структура", "data": "Данные", "column": "Столбец", "type": "Тип", "nullable": "Nullable", "key": "Ключ", "default": "По умолчанию", "extra": "Дополнительно", "rows": "Строки", "noData": "Нет данных"},
+  "ribbon": {"newConnection": "Новое подключение", "new": "Новый", "refresh": "Обновить", "table": "Таблица", "users": "Пользователи", "query": "Запрос", "import": "Импорт", "settings": "Настройки"},
+  "common": {"search": "Поиск", "filter": "Фильтр", "refresh": "Обновить", "loading": "Загрузка...", "error": "Ошибка", "success": "Успех", "confirm": "Подтвердить", "yes": "Да", "no": "Нет", "close": "Закрыть", "ok": "ОК", "cancel": "Отмена"},
+  "options": {
+    "title": "Параметры", "default": "По умолчанию", "ok": "ОК", "cancel": "Отмена", "comingSoon": "Скоро",
+    "categories": {"environment": "Общие", "tabs": "Вкладки", "autoComplete": "Автодополнение", "editor": "Редактор", "records": "Записи", "autoRecovery": "Автовосстановление", "fileLocation": "Расположение файлов", "connectivity": "Подключение", "advanced": "Дополнительно"},
+    "general": {
+      "theme": "Тема", "themeLight": "Светлая", "themeDark": "Темная", "language": "Язык", "behavior": "Поведение",
+      "confirmOnClose": "Подтверждать при закрытии", "autoStart": "Запускать при старте системы", "minimizeToTray": "Сворачивать в системный трей",
+      "showHiddenFiles": "Показывать скрытые файлы", "sendUsageData": "Отправлять анонимные данные об использовании для улучшения Catyas",
+      "restartNote": "* Изменения вступят в силу после перезапуска"
+    }
+  }
+}

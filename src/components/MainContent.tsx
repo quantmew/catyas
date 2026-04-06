@@ -1,4 +1,4 @@
-import { Connection } from '../types'
+import { Connection, Table } from '../types'
 import TableList from './TableList'
 import TableView from './TableView'
 import RightInfo from './RightInfo'
@@ -6,13 +6,13 @@ import RightInfo from './RightInfo'
 interface MainContentProps {
   connection: Connection | null
   selectedTable: string | null
-  onSelectTable: (table: string) => void
+  selectedDatabase: string | null
 }
 
 export default function MainContent({
   connection,
   selectedTable,
-  onSelectTable,
+  selectedDatabase,
 }: MainContentProps) {
   if (!connection) {
     return (
@@ -29,15 +29,26 @@ export default function MainContent({
     )
   }
 
+  // Find the currently selected database and its tables
+  const currentDb = connection.databases?.find(db => db.name === selectedDatabase)
+  const tables: Table[] = currentDb?.tables || []
+
   return (
     <div className="flex-1 flex min-h-0">
       <TableList
-        connection={connection}
+        databaseName={selectedDatabase || connection.database || connection.name}
+        tables={tables}
         selectedTable={selectedTable}
-        onSelectTable={onSelectTable}
+        onSelectTable={(_tableName) => {
+          // Table click from TableList panel
+        }}
       />
-      {selectedTable ? (
-        <TableView connection={connection} tableName={selectedTable} />
+      {selectedTable && selectedDatabase ? (
+        <TableView
+          connection={connection}
+          database={selectedDatabase}
+          tableName={selectedTable}
+        />
       ) : (
         <div className="flex-1 flex items-center justify-center bg-white dark:bg-gray-800">
           <p className="text-gray-500 dark:text-gray-400">
@@ -45,7 +56,11 @@ export default function MainContent({
           </p>
         </div>
       )}
-      <RightInfo tableName={selectedTable} />
+      <RightInfo
+        connection={connection}
+        database={selectedDatabase}
+        tableName={selectedTable}
+      />
     </div>
   )
 }

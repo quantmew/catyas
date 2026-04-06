@@ -1,5 +1,7 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Connection } from '../types'
+import { Database as DatabaseIcon, CircleDot } from 'lucide-react'
 
 interface Props {
   open: boolean
@@ -7,28 +9,81 @@ interface Props {
   onSave: (conn: Connection) => void
 }
 
+type Tab = 'general' | 'advanced' | 'database' | 'ssl' | 'ssh' | 'http'
+
 export default function MySQLConnectionDialog({ open, onClose, onSave }: Props) {
+  const { t } = useTranslation()
+  const [tab, setTab] = useState<Tab>('general')
+  const [testing, setTesting] = useState(false)
+  const [testMsg, setTestMsg] = useState<string | null>(null)
+
+  // General tab state
   const [name, setName] = useState('')
   const [host, setHost] = useState('localhost')
   const [port, setPort] = useState(3306)
   const [username, setUsername] = useState('root')
   const [password, setPassword] = useState('')
-  const [remember, setRemember] = useState(true)
-  const [testing, setTesting] = useState(false)
-  const [testMsg, setTestMsg] = useState<string | null>(null)
-  const [tab, setTab] = useState<'general'|'advanced'|'database'|'ssl'|'ssh'|'http'>('general')
+  const [rememberPwd, setRememberPwd] = useState(true)
+
+  // Advanced tab state
+  const [settingsPath, setSettingsPath] = useState('')
+  const [driver, setDriver] = useState('default')
+  const [charset, setCharset] = useState('auto')
+  const [keepAlive, setKeepAlive] = useState(false)
+  const [keepAliveInterval, setKeepAliveInterval] = useState(240)
+  const [useCompression, setUseCompression] = useState(false)
+  const [autoConnect, setAutoConnect] = useState(false)
+  const [limitSessions, setLimitSessions] = useState(false)
+  const [maxSessions, setMaxSessions] = useState(10)
+
+  // Database tab state
+  const [useCustomDbList, setUseCustomDbList] = useState(false)
+  const databases: string[] = []
+
+  // SSL tab state
+  const [useSSL, setUseSSL] = useState(false)
+  const [useVerify, setUseVerify] = useState(false)
+  const [clientKey, setClientKey] = useState('')
+  const [clientCert, setClientCert] = useState('')
+  const [caCert, setCaCert] = useState('')
+  const [verifyServerCert, setVerifyServerCert] = useState(false)
+  const [cipher, setCipher] = useState('')
+
+  // SSH tab state
+  const [useSSH, setUseSSH] = useState(false)
+  const [sshHost, setSshHost] = useState('')
+  const [sshPort, setSshPort] = useState(22)
+  const [sshUsername, setSshUsername] = useState('')
+  const [sshAuthMethod, setSshAuthMethod] = useState('password')
+  const [sshPassword, setSshPassword] = useState('')
+  const [sshRememberPwd, setSshRememberPwd] = useState(false)
+
+  // HTTP tab state
+  const [useHTTP, setUseHTTP] = useState(false)
+  const [httpUrl, setHttpUrl] = useState('')
+  const [useBase64, setUseBase64] = useState(false)
+  const [httpTab, setHttpTab] = useState<'auth' | 'proxy'>('auth')
+  const [httpUsePwd, setHttpUsePwd] = useState(false)
+  const [httpUsername, setHttpUsername] = useState('')
+  const [httpPassword, setHttpPassword] = useState('')
+  const [httpRememberPwd, setHttpRememberPwd] = useState(false)
+  const [httpUseCert, setHttpUseCert] = useState(false)
+  const [httpClientKey, setHttpClientKey] = useState('')
+  const [httpClientCert, setHttpClientCert] = useState('')
+  const [httpCaCert, setHttpCaCert] = useState('')
+  const [httpPassphrase, setHttpPassphrase] = useState('')
 
   if (!open) return null
 
-  const save = () => {
+  const handleSave = () => {
     const conn: Connection = {
       id: `mysql-${Date.now()}`,
-      name: name || host,
+      name: name || `${host}:${port}`,
       type: 'mysql',
       host,
       port: Number(port),
       username,
-      password: remember ? password : undefined,
+      password: rememberPwd ? password : undefined,
     }
     onSave(conn)
   }
@@ -40,168 +95,641 @@ export default function MySQLConnectionDialog({ open, onClose, onSave }: Props) 
       const config = { host, port: Number(port), username, password }
       const res = await window.electronAPI?.testConnection(config)
       if (res?.success) {
-        alert('连接成功！')
-        setTestMsg('连接成功！')
+        setTestMsg(t('connection.connectionSuccess'))
       } else {
-        alert(`连接失败：${res?.message || '未知错误'}`)
-        setTestMsg(`连接失败：${res?.message || '未知错误'}`)
+        setTestMsg(`${t('connection.testFailed')}: ${res?.message || 'Unknown error'}`)
       }
     } catch (e: any) {
-      alert(`连接失败：${e?.message || e}`)
-      setTestMsg(`连接失败：${e?.message || e}`)
+      setTestMsg(`${t('connection.testFailed')}: ${e?.message || e}`)
     } finally {
       setTesting(false)
     }
   }
 
+  const tabs = [
+    { id: 'general' as Tab, label: t('connection.tabs.general') },
+    { id: 'advanced' as Tab, label: t('connection.tabs.advanced') },
+    { id: 'database' as Tab, label: t('connection.tabs.database') },
+    { id: 'ssl' as Tab, label: t('connection.tabs.ssl') },
+    { id: 'ssh' as Tab, label: t('connection.tabs.ssh') },
+    { id: 'http' as Tab, label: t('connection.tabs.http') },
+  ]
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
-      <div className="w-[680px] bg-white dark:bg-neutral-900 rounded shadow-lg border border-gray-200 dark:border-neutral-700">
-        <div className="px-4 py-2 border-b text-sm font-semibold bg-gray-50 dark:bg-neutral-800 dark:text-neutral-100">新建连接 (MySQL)</div>
-        <div className="px-4 pt-3">
-          <div className="flex gap-2 mb-3">
-            {[
-              {k:'general', t:'常规'},
-              {k:'advanced', t:'高级'},
-              {k:'database', t:'数据库'},
-              {k:'ssl', t:'SSL'},
-              {k:'ssh', t:'SSH'},
-              {k:'http', t:'HTTP'},
-            ].map(({k,t})=> (
-              <button key={k} className={`px-3 py-1 text-sm border rounded-t ${tab===k?'bg-white border-b-0':'bg-gray-100 hover:bg-gray-200'} `} onClick={()=>setTab(k as any)}>{t}</button>
+      <div className="w-[720px] bg-gray-50 dark:bg-gray-800 rounded shadow-xl border border-gray-300 dark:border-gray-600">
+        {/* Header */}
+        <div className="flex items-center justify-between px-4 py-2 border-b border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700">
+          <span className="text-sm font-semibold text-gray-800 dark:text-gray-200">{t('connection.new')} (MySQL)</span>
+          <button onClick={onClose} className="p-1 hover:bg-gray-200 dark:hover:bg-gray-600 rounded">
+            <svg className="w-4 h-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        {/* Tabs */}
+        <div className="px-3 pt-3 border-b border-gray-300 dark:border-gray-600">
+          <div className="flex gap-1">
+            {tabs.map(({ id, label }) => (
+              <button
+                key={id}
+                onClick={() => setTab(id)}
+                className={`px-3 py-1.5 text-[13px] border border-gray-300 dark:border-gray-600 rounded-t transition-colors ${
+                  tab === id
+                    ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-b-white dark:border-b-gray-800 -mb-px'
+                    : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
+                }`}
+              >
+                {label}
+              </button>
             ))}
           </div>
         </div>
-        <div className="px-5 pb-4">
-          {tab==='general' && (
-          <div className="grid grid-cols-[100px_1fr] gap-y-3 gap-x-4 items-center">
-            <label className="text-right text-sm text-gray-600 dark:text-gray-300">连接名:</label>
-            <input className="border rounded px-2 py-1 text-sm w-full" value={name} onChange={(e)=>setName(e.target.value)} />
 
-            <label className="text-right text-sm text-gray-600 dark:text-gray-300">主机:</label>
-            <input className="border rounded px-2 py-1 text-sm" value={host} onChange={(e)=>setHost(e.target.value)} />
-
-            <label className="text-right text-sm text-gray-600 dark:text-gray-300">端口:</label>
-            <input className="border rounded px-2 py-1 text-sm w-24" type="number" value={port} onChange={(e)=>setPort(Number(e.target.value))} />
-
-            <label className="text-right text-sm text-gray-600 dark:text-gray-300">用户名:</label>
-            <input className="border rounded px-2 py-1 text-sm" value={username} onChange={(e)=>setUsername(e.target.value)} />
-
-            <label className="text-right text-sm text-gray-600 dark:text-gray-300">密码:</label>
-            <input className="border rounded px-2 py-1 text-sm" type="password" value={password} onChange={(e)=>setPassword(e.target.value)} />
-
-            <div />
-            <label className="inline-flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
-              <input type="checkbox" className="accent-blue-600" checked={remember} onChange={(e)=>setRemember(e.target.checked)} /> 保存密码
-            </label>
+        {/* Connection diagram */}
+        <div className="px-4 py-4 flex items-center justify-center gap-8 bg-gray-50 dark:bg-gray-800">
+          <div className="flex flex-col items-center">
+            <CircleDot className="w-12 h-12 text-gray-400 dark:text-gray-500 mb-1" />
+            <span className="text-xs text-gray-600 dark:text-gray-400">Navicat</span>
           </div>
-          )}
-          {tab==='advanced' && (
-            <div className="grid grid-cols-[140px_1fr] gap-y-3 gap-x-4 items-center">
-              <label className="text-right text-sm">设置位置:</label>
-              <div className="flex gap-2 items-center"><input className="border rounded px-2 py-1 text-sm flex-1" /><button className="px-2 py-1 border rounded text-sm">...</button></div>
-              <label className="text-right text-sm">客户端驱动程序:</label>
-              <select className="border rounded px-2 py-1 text-sm"><option>默认</option></select>
-              <label className="text-right text-sm">客户端字符集:</label>
-              <select className="border rounded px-2 py-1 text-sm"><option>自动</option></select>
-              <label className="text-right text-sm"></label>
-              <label className="inline-flex items-center gap-2 text-sm"><input type="checkbox"/> 保持连接间隔（秒）：<input className="border rounded px-2 py-1 text-sm w-24" placeholder="240" /></label>
-              <label className="text-right text-sm"></label>
-              <label className="inline-flex items-center gap-2 text-sm"><input type="checkbox"/> 使用压缩</label>
-              <label className="text-right text-sm"></label>
-              <label className="inline-flex items-center gap-2 text-sm"><input type="checkbox"/> 自动连接</label>
-              <label className="text-right text-sm">使用命名管道、套接字:</label>
-              <input className="border rounded px-2 py-1 text-sm" />
-              <label className="text-right text-sm">限制连接会话:</label>
-              <input className="border rounded px-2 py-1 text-sm w-24" defaultValue={10} />
-              <label className="text-right text-sm"></label>
-              <button className="px-2 py-1 border rounded text-sm w-28">兼容性</button>
-            </div>
-          )}
-          {tab==='database' && (
-            <div>
-              <label className="inline-flex items-center gap-2 text-sm mb-2"><input type="checkbox"/> 使用自定义数据库列表</label>
-              <div className="border rounded h-64 bg-white"></div>
-              <div className="mt-2 flex gap-2">
-                <button className="px-3 py-1.5 text-sm border rounded" disabled>添加数据库到列表</button>
-                <button className="px-3 py-1.5 text-sm border rounded" disabled>从列表中移除数据库</button>
+          <div className="flex-1 h-px bg-gray-300 dark:bg-gray-600 max-w-[120px]"></div>
+          <div className="flex flex-col items-center">
+            <DatabaseIcon className="w-12 h-12 text-gray-400 dark:text-gray-500 mb-1" />
+            <span className="text-xs text-gray-600 dark:text-gray-400">{t('database.types.mysql')}</span>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="px-6 py-4 bg-white dark:bg-gray-800 min-h-[380px]">
+          {tab === 'general' && (
+            <div className="space-y-3">
+              <div className="grid grid-cols-[80px_1fr] gap-3 items-center">
+                <label className="text-right text-sm text-gray-700 dark:text-gray-300">{t('connection.general.name')}:</label>
+                <input
+                  className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1.5 text-sm focus:outline-none focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
+              </div>
+              <div className="grid grid-cols-[80px_1fr] gap-3 items-center">
+                <label className="text-right text-sm text-gray-700 dark:text-gray-300">{t('connection.general.host')}:</label>
+                <input
+                  className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1.5 text-sm focus:outline-none focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200"
+                  value={host}
+                  onChange={(e) => setHost(e.target.value)}
+                />
+              </div>
+              <div className="grid grid-cols-[80px_1fr] gap-3 items-center">
+                <label className="text-right text-sm text-gray-700 dark:text-gray-300">{t('connection.general.port')}:</label>
+                <input
+                  type="number"
+                  className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1.5 text-sm w-32 focus:outline-none focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200"
+                  value={port}
+                  onChange={(e) => setPort(Number(e.target.value))}
+                />
+              </div>
+              <div className="grid grid-cols-[80px_1fr] gap-3 items-center">
+                <label className="text-right text-sm text-gray-700 dark:text-gray-300">{t('connection.general.username')}:</label>
+                <input
+                  className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1.5 text-sm focus:outline-none focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                />
+              </div>
+              <div className="grid grid-cols-[80px_1fr] gap-3 items-center">
+                <label className="text-right text-sm text-gray-700 dark:text-gray-300">{t('connection.general.password')}:</label>
+                <input
+                  type="password"
+                  className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1.5 text-sm focus:outline-none focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </div>
+              <div className="grid grid-cols-[80px_1fr] gap-3 items-center">
+                <div />
+                <label className="inline-flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    className="accent-blue-600"
+                    checked={rememberPwd}
+                    onChange={(e) => setRememberPwd(e.target.checked)}
+                  />
+                  {t('connection.general.remember')}
+                </label>
               </div>
             </div>
           )}
-          {tab==='ssl' && (
-            <div className="grid grid-cols-[140px_1fr] gap-y-3 gap-x-4 items-center">
-              <label className="text-right text-sm">使用 SSL</label>
-              <input type="checkbox" />
-              <label className="text-right text-sm">使用验证</label>
-              <input type="checkbox" />
-              <label className="text-right text-sm">客户端密钥:</label>
-              <div className="flex gap-2"><input className="border rounded px-2 py-1 text-sm flex-1"/><button className="px-2 py-1 border rounded text-sm">...</button></div>
-              <label className="text-right text-sm">客户端证书:</label>
-              <div className="flex gap-2"><input className="border rounded px-2 py-1 text-sm flex-1"/><button className="px-2 py-1 border rounded text-sm">...</button></div>
-              <label className="text-right text-sm">CA 证书:</label>
-              <div className="flex gap-2"><input className="border rounded px-2 py-1 text-sm flex-1"/><button className="px-2 py-1 border rounded text-sm">...</button></div>
-              <label className="text-right text-sm"></label>
-              <label className="inline-flex items-center gap-2 text-sm"><input type="checkbox"/> 验证针对 CA 的服务器证书</label>
-              <label className="text-right text-sm">指定的 Cipher:</label>
-              <input className="border rounded px-2 py-1 text-sm" />
-            </div>
-          )}
-          {tab==='ssh' && (
-            <div className="grid grid-cols-[140px_1fr] gap-y-3 gap-x-4 items-center">
-              <label className="inline-flex items-center gap-2 text-sm col-span-2"><input type="checkbox"/> 使用 SSH 隧道</label>
-              <label className="text-right text-sm">主机:</label>
-              <input className="border rounded px-2 py-1 text-sm" />
-              <label className="text-right text-sm">端口:</label>
-              <input className="border rounded px-2 py-1 text-sm w-24" defaultValue={22} />
-              <label className="text-right text-sm">用户名:</label>
-              <input className="border rounded px-2 py-1 text-sm" />
-              <label className="text-right text-sm">验证方法:</label>
-              <select className="border rounded px-2 py-1 text-sm"><option>密码</option></select>
-              <label className="text-right text-sm">密码:</label>
-              <input className="border rounded px-2 py-1 text-sm" disabled />
-              <label className="text-right text-sm"></label>
-              <label className="inline-flex items-center gap-2 text-sm"><input type="checkbox"/> 保存密码</label>
-            </div>
-          )}
-          {tab==='http' && (
-            <div className="grid grid-cols-[140px_1fr] gap-y-3 gap-x-4 items-start">
-              <label className="inline-flex items-center gap-2 text-sm col-span-2"><input type="checkbox"/> 使用 HTTP 隧道</label>
-              <label className="text-right text-sm">隧道网址:</label>
-              <input className="border rounded px-2 py-1 text-sm" />
-              <label className="text-right text-sm"></label>
-              <label className="inline-flex items-center gap-2 text-sm"><input type="checkbox"/> 用 base64 编码传出查询</label>
-              <div className="col-span-2 mt-2 font-medium text-sm">验证</div>
-              <label className="inline-flex items-center gap-2 text-sm col-span-2"><input type="checkbox"/> 使用密码验证</label>
-              <label className="text-right text-sm">用户名:</label>
-              <input className="border rounded px-2 py-1 text-sm" />
-              <label className="text-right text-sm">密码:</label>
-              <input className="border rounded px-2 py-1 text-sm" />
-              <label className="text-right text-sm"></label>
-              <label className="inline-flex items-center gap-2 text-sm"><input type="checkbox"/> 保存密码</label>
-              <div className="col-span-2 mt-2 font-medium text-sm">代理服务器</div>
-              <label className="inline-flex items-center gap-2 text-sm col-span-2"><input type="checkbox"/> 使用证书验证</label>
-              <label className="text-right text-sm">客户端密钥</label>
-              <div className="flex gap-2"><input className="border rounded px-2 py-1 text-sm flex-1"/><button className="px-2 py-1 border rounded text-sm">...</button></div>
-              <label className="text-right text-sm">客户端证书</label>
-              <div className="flex gap-2"><input className="border rounded px-2 py-1 text-sm flex-1"/><button className="px-2 py-1 border rounded text-sm">...</button></div>
-              <label className="text-right text-sm">CA 证书</label>
-              <input className="border rounded px-2 py-1 text-sm" />
-              <label className="text-right text-sm">通行短语</label>
-              <input className="border rounded px-2 py-1 text-sm" />
+
+          {tab === 'advanced' && (
+            <div className="space-y-3">
+              <div className="grid grid-cols-[100px_1fr_auto] gap-3 items-center">
+                <label className="text-right text-sm text-gray-700 dark:text-gray-300">{t('connection.advanced.settingsPath')}:</label>
+                <input
+                  className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1.5 text-sm focus:outline-none focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200"
+                  value={settingsPath}
+                  onChange={(e) => setSettingsPath(e.target.value)}
+                />
+                <button className="px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded text-sm hover:bg-gray-50 dark:hover:bg-gray-600 dark:text-gray-200">...</button>
+              </div>
+              <div className="grid grid-cols-[100px_1fr] gap-3 items-center">
+                <label className="text-right text-sm text-gray-700 dark:text-gray-300">{t('connection.advanced.driver')}:</label>
+                <select
+                  className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1.5 text-sm focus:outline-none focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200"
+                  value={driver}
+                  onChange={(e) => setDriver(e.target.value)}
+                >
+                  <option value="default">Default</option>
+                  <option value="mysqlnative">mysqlnative</option>
+                </select>
+              </div>
+              <div className="grid grid-cols-[100px_1fr] gap-3 items-center">
+                <label className="text-right text-sm text-gray-700 dark:text-gray-300">{t('connection.advanced.charset')}:</label>
+                <select
+                  className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1.5 text-sm focus:outline-none focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200"
+                  value={charset}
+                  onChange={(e) => setCharset(e.target.value)}
+                >
+                  <option value="auto">Auto</option>
+                  <option value="utf8">utf8</option>
+                  <option value="utf8mb4">utf8mb4</option>
+                  <option value="gbk">gbk</option>
+                </select>
+              </div>
+              <div className="grid grid-cols-[100px_1fr] gap-3 items-center">
+                <label className="text-right text-sm text-gray-700 dark:text-gray-300"></label>
+                <label className="inline-flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={keepAlive}
+                    onChange={(e) => setKeepAlive(e.target.checked)}
+                    className="accent-blue-600"
+                  />
+                  {t('connection.advanced.keepAlive')}:
+                  <input
+                    type="number"
+                    className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1 text-sm w-20 focus:outline-none focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200"
+                    value={keepAliveInterval}
+                    onChange={(e) => setKeepAliveInterval(Number(e.target.value))}
+                    disabled={!keepAlive}
+                  />
+                </label>
+              </div>
+              <div className="grid grid-cols-[100px_1fr] gap-3 items-center">
+                <label className="text-right text-sm text-gray-700 dark:text-gray-300"></label>
+                <label className="inline-flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={useCompression}
+                    onChange={(e) => setUseCompression(e.target.checked)}
+                    className="accent-blue-600"
+                  />
+                  {t('connection.advanced.useCompression')}
+                </label>
+              </div>
+              <div className="grid grid-cols-[100px_1fr] gap-3 items-center">
+                <label className="text-right text-sm text-gray-700 dark:text-gray-300"></label>
+                <label className="inline-flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={autoConnect}
+                    onChange={(e) => setAutoConnect(e.target.checked)}
+                    className="accent-blue-600"
+                  />
+                  {t('connection.advanced.autoConnect')}
+                </label>
+              </div>
+              <div className="grid grid-cols-[100px_1fr] gap-3 items-center">
+                <label className="text-right text-sm text-gray-700 dark:text-gray-300">{t('connection.advanced.namedPipe')}:</label>
+                <input
+                  className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1.5 text-sm focus:outline-none focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200"
+                  disabled
+                />
+              </div>
+              <div className="grid grid-cols-[100px_1fr] gap-3 items-center">
+                <label className="text-right text-sm text-gray-700 dark:text-gray-300">{t('connection.advanced.limitSessions')}:</label>
+                <label className="inline-flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+                  <input
+                    type="checkbox"
+                    checked={limitSessions}
+                    onChange={(e) => setLimitSessions(e.target.checked)}
+                    className="accent-blue-600"
+                  />
+                  <input
+                    type="number"
+                    className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1 text-sm w-20 focus:outline-none focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200"
+                    value={maxSessions}
+                    onChange={(e) => setMaxSessions(Number(e.target.value))}
+                    disabled={!limitSessions}
+                  />
+                </label>
+              </div>
+              <div className="grid grid-cols-[100px_1fr] gap-3 items-center">
+                <label className="text-right text-sm text-gray-700 dark:text-gray-300"></label>
+                <button className="px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded text-sm hover:bg-gray-50 dark:hover:bg-gray-600 dark:text-gray-200">
+                  {t('connection.advanced.compatibility')}
+                </button>
+              </div>
             </div>
           )}
 
-          {testMsg && (
-            <div className="mt-3 text-sm text-gray-700 dark:text-gray-200">{testMsg}</div>
+          {tab === 'database' && (
+            <div className="space-y-3">
+              <label className="inline-flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={useCustomDbList}
+                  onChange={(e) => setUseCustomDbList(e.target.checked)}
+                  className="accent-blue-600"
+                />
+                {t('connection.dbtab.useCustomList')}
+              </label>
+              <div className="border border-gray-300 dark:border-gray-600 rounded">
+                <table className="w-full text-sm">
+                  <thead className="bg-gray-50 dark:bg-gray-700">
+                    <tr>
+                      <th className="text-left px-3 py-2 text-gray-700 dark:text-gray-300 font-normal">{t('connection.dbtab.database')}</th>
+                      <th className="text-left px-3 py-2 text-gray-700 dark:text-gray-300 font-normal w-24">{t('connection.dbtab.autoOpen')}</th>
+                    </tr>
+                  </thead>
+                  <tbody className="h-64">
+                    {databases.length === 0 ? (
+                      <tr>
+                        <td colSpan={2} className="px-3 py-8 text-center text-gray-400 dark:text-gray-500">
+                          {t('connection.dbtab.noDatabases')}
+                        </td>
+                      </tr>
+                    ) : (
+                      databases.map((db) => (
+                        <tr key={db} className="border-t border-gray-200 dark:border-gray-600">
+                          <td className="px-3 py-2 text-gray-700 dark:text-gray-300">{db}</td>
+                          <td className="px-3 py-2 text-center">
+                            <input type="checkbox" className="accent-blue-600" />
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+              <div className="flex gap-2">
+                <button className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded text-gray-600 dark:text-gray-400" disabled>
+                  {t('connection.dbtab.add')}
+                </button>
+                <button className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded text-gray-600 dark:text-gray-400" disabled>
+                  {t('connection.dbtab.remove')}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {tab === 'ssl' && (
+            <div className="space-y-3">
+              <label className="inline-flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={useSSL}
+                  onChange={(e) => setUseSSL(e.target.checked)}
+                  className="accent-blue-600"
+                />
+                {t('connection.ssl.useSSL')}
+              </label>
+              <fieldset className="border border-gray-300 dark:border-gray-600 rounded p-3">
+                <legend className="text-xs text-gray-600 dark:text-gray-400 px-1">{t('connection.ssl.verification')}</legend>
+                <div className="space-y-3">
+                  <label className="inline-flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={useVerify}
+                      onChange={(e) => setUseVerify(e.target.checked)}
+                      className="accent-blue-600"
+                    />
+                    {t('connection.ssl.useVerify')}
+                  </label>
+                  <div className="grid grid-cols-[100px_1fr_auto] gap-3 items-center">
+                    <label className="text-right text-sm text-gray-700 dark:text-gray-300">{t('connection.ssl.clientKey')}:</label>
+                    <input
+                      className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1.5 text-sm focus:outline-none focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200"
+                      value={clientKey}
+                      onChange={(e) => setClientKey(e.target.value)}
+                      disabled={!useVerify}
+                    />
+                    <button className="px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded text-sm hover:bg-gray-50 dark:hover:bg-gray-600 dark:text-gray-200" disabled={!useVerify}>...</button>
+                  </div>
+                  <div className="grid grid-cols-[100px_1fr_auto] gap-3 items-center">
+                    <label className="text-right text-sm text-gray-700 dark:text-gray-300">{t('connection.ssl.clientCert')}:</label>
+                    <input
+                      className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1.5 text-sm focus:outline-none focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200"
+                      value={clientCert}
+                      onChange={(e) => setClientCert(e.target.value)}
+                      disabled={!useVerify}
+                    />
+                    <button className="px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded text-sm hover:bg-gray-50 dark:hover:bg-gray-600 dark:text-gray-200" disabled={!useVerify}>...</button>
+                  </div>
+                  <div className="grid grid-cols-[100px_1fr_auto] gap-3 items-center">
+                    <label className="text-right text-sm text-gray-700 dark:text-gray-300">{t('connection.ssl.caCert')}:</label>
+                    <input
+                      className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1.5 text-sm focus:outline-none focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200"
+                      value={caCert}
+                      onChange={(e) => setCaCert(e.target.value)}
+                      disabled={!useVerify}
+                    />
+                    <button className="px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded text-sm hover:bg-gray-50 dark:hover:bg-gray-600 dark:text-gray-200" disabled={!useVerify}>...</button>
+                  </div>
+                  <div className="grid grid-cols-[100px_1fr] gap-3 items-center">
+                    <label className="text-right text-sm text-gray-700 dark:text-gray-300"></label>
+                    <label className="inline-flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={verifyServerCert}
+                        onChange={(e) => setVerifyServerCert(e.target.checked)}
+                        className="accent-blue-600"
+                        disabled={!useVerify}
+                      />
+                      {t('connection.ssl.verifyServer')}
+                    </label>
+                  </div>
+                  <div className="grid grid-cols-[100px_1fr] gap-3 items-center">
+                    <label className="text-right text-sm text-gray-700 dark:text-gray-300">{t('connection.ssl.cipher')}:</label>
+                    <input
+                      className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1.5 text-sm focus:outline-none focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200"
+                      value={cipher}
+                      onChange={(e) => setCipher(e.target.value)}
+                    />
+                  </div>
+                </div>
+              </fieldset>
+            </div>
+          )}
+
+          {tab === 'ssh' && (
+            <div className="space-y-3">
+              <label className="inline-flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={useSSH}
+                  onChange={(e) => setUseSSH(e.target.checked)}
+                  className="accent-blue-600"
+                />
+                {t('connection.ssh.useTunnel')}
+              </label>
+              <div className="grid grid-cols-[100px_1fr] gap-3 items-center">
+                <label className="text-right text-sm text-gray-700 dark:text-gray-300">{t('connection.ssh.host')}:</label>
+                <input
+                  className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1.5 text-sm focus:outline-none focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200"
+                  value={sshHost}
+                  onChange={(e) => setSshHost(e.target.value)}
+                  disabled={!useSSH}
+                />
+              </div>
+              <div className="grid grid-cols-[100px_1fr] gap-3 items-center">
+                <label className="text-right text-sm text-gray-700 dark:text-gray-300">{t('connection.ssh.port')}:</label>
+                <input
+                  type="number"
+                  className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1.5 text-sm w-32 focus:outline-none focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200"
+                  value={sshPort}
+                  onChange={(e) => setSshPort(Number(e.target.value))}
+                  disabled={!useSSH}
+                />
+              </div>
+              <div className="grid grid-cols-[100px_1fr] gap-3 items-center">
+                <label className="text-right text-sm text-gray-700 dark:text-gray-300">{t('connection.ssh.username')}:</label>
+                <input
+                  className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1.5 text-sm focus:outline-none focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200"
+                  value={sshUsername}
+                  onChange={(e) => setSshUsername(e.target.value)}
+                  disabled={!useSSH}
+                />
+              </div>
+              <div className="grid grid-cols-[100px_1fr] gap-3 items-center">
+                <label className="text-right text-sm text-gray-700 dark:text-gray-300">{t('connection.ssh.authMethod')}:</label>
+                <select
+                  className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1.5 text-sm focus:outline-none focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200"
+                  value={sshAuthMethod}
+                  onChange={(e) => setSshAuthMethod(e.target.value)}
+                  disabled={!useSSH}
+                >
+                  <option value="password">{t('connection.general.password')}</option>
+                  <option value="key">Key</option>
+                </select>
+              </div>
+              <div className="grid grid-cols-[100px_1fr] gap-3 items-center">
+                <label className="text-right text-sm text-gray-700 dark:text-gray-300">{t('connection.ssh.password')}:</label>
+                <input
+                  type="password"
+                  className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1.5 text-sm focus:outline-none focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200"
+                  value={sshPassword}
+                  onChange={(e) => setSshPassword(e.target.value)}
+                  disabled={!useSSH}
+                />
+              </div>
+              <div className="grid grid-cols-[100px_1fr] gap-3 items-center">
+                <label className="text-right text-sm text-gray-700 dark:text-gray-300"></label>
+                <label className="inline-flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={sshRememberPwd}
+                    onChange={(e) => setSshRememberPwd(e.target.checked)}
+                    className="accent-blue-600"
+                    disabled={!useSSH}
+                  />
+                  {t('connection.ssh.remember')}
+                </label>
+              </div>
+            </div>
+          )}
+
+          {tab === 'http' && (
+            <div className="space-y-3">
+              <label className="inline-flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={useHTTP}
+                  onChange={(e) => setUseHTTP(e.target.checked)}
+                  className="accent-blue-600"
+                />
+                {t('connection.http.useTunnel')}
+              </label>
+              <div className="grid grid-cols-[100px_1fr] gap-3 items-center">
+                <label className="text-right text-sm text-gray-700 dark:text-gray-300">{t('connection.http.url')}:</label>
+                <input
+                  className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1.5 text-sm focus:outline-none focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200"
+                  value={httpUrl}
+                  onChange={(e) => setHttpUrl(e.target.value)}
+                  disabled={!useHTTP}
+                />
+              </div>
+              <div className="grid grid-cols-[100px_1fr] gap-3 items-center">
+                <label className="text-right text-sm text-gray-700 dark:text-gray-300"></label>
+                <label className="inline-flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={useBase64}
+                    onChange={(e) => setUseBase64(e.target.checked)}
+                    className="accent-blue-600"
+                    disabled={!useHTTP}
+                  />
+                  {t('connection.http.useBase64')}
+                </label>
+              </div>
+
+              {/* HTTP sub-tabs */}
+              <div className="mt-4">
+                <div className="flex gap-1 border-b border-gray-300 dark:border-gray-600 mb-3">
+                  <button
+                    onClick={() => setHttpTab('auth')}
+                    className={`px-3 py-1 text-sm border border-b-0 rounded-t ${
+                      httpTab === 'auth'
+                        ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 -mb-px'
+                        : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 border-transparent'
+                    }`}
+                  >
+                    {t('connection.http.auth')}
+                  </button>
+                  <button
+                    onClick={() => setHttpTab('proxy')}
+                    className={`px-3 py-1 text-sm border border-b-0 rounded-t ${
+                      httpTab === 'proxy'
+                        ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 -mb-px'
+                        : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 border-transparent'
+                    }`}
+                  >
+                    {t('connection.http.proxy')}
+                  </button>
+                </div>
+
+                {httpTab === 'auth' && (
+                  <div className="space-y-3">
+                    <label className="inline-flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={httpUsePwd}
+                        onChange={(e) => setHttpUsePwd(e.target.checked)}
+                        className="accent-blue-600"
+                        disabled={!useHTTP}
+                      />
+                      {t('connection.http.usePassword')}
+                    </label>
+                    <div className="grid grid-cols-[100px_1fr] gap-3 items-center">
+                      <label className="text-right text-sm text-gray-700 dark:text-gray-300">{t('connection.general.username')}:</label>
+                      <input
+                        className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1.5 text-sm focus:outline-none focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200"
+                        value={httpUsername}
+                        onChange={(e) => setHttpUsername(e.target.value)}
+                        disabled={!useHTTP || !httpUsePwd}
+                      />
+                    </div>
+                    <div className="grid grid-cols-[100px_1fr] gap-3 items-center">
+                      <label className="text-right text-sm text-gray-700 dark:text-gray-300">{t('connection.general.password')}:</label>
+                      <input
+                        type="password"
+                        className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1.5 text-sm focus:outline-none focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200"
+                        value={httpPassword}
+                        onChange={(e) => setHttpPassword(e.target.value)}
+                        disabled={!useHTTP || !httpUsePwd}
+                      />
+                    </div>
+                    <div className="grid grid-cols-[100px_1fr] gap-3 items-center">
+                      <label className="text-right text-sm text-gray-700 dark:text-gray-300"></label>
+                      <label className="inline-flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={httpRememberPwd}
+                          onChange={(e) => setHttpRememberPwd(e.target.checked)}
+                          className="accent-blue-600"
+                          disabled={!useHTTP || !httpUsePwd}
+                        />
+                        {t('connection.general.remember')}
+                      </label>
+                    </div>
+                  </div>
+                )}
+
+                {httpTab === 'proxy' && (
+                  <div className="space-y-3">
+                    <label className="inline-flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={httpUseCert}
+                        onChange={(e) => setHttpUseCert(e.target.checked)}
+                        className="accent-blue-600"
+                        disabled={!useHTTP}
+                      />
+                      {t('connection.http.useCertAuth')}
+                    </label>
+                    <div className="grid grid-cols-[100px_1fr_auto] gap-3 items-center">
+                      <label className="text-right text-sm text-gray-700 dark:text-gray-300">{t('connection.http.clientKey')}:</label>
+                      <input
+                        className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1.5 text-sm focus:outline-none focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200"
+                        value={httpClientKey}
+                        onChange={(e) => setHttpClientKey(e.target.value)}
+                        disabled={!useHTTP || !httpUseCert}
+                      />
+                      <button className="px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded text-sm hover:bg-gray-50 dark:hover:bg-gray-600 dark:text-gray-200" disabled={!useHTTP || !httpUseCert}>...</button>
+                    </div>
+                    <div className="grid grid-cols-[100px_1fr_auto] gap-3 items-center">
+                      <label className="text-right text-sm text-gray-700 dark:text-gray-300">{t('connection.http.clientCert')}:</label>
+                      <input
+                        className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1.5 text-sm focus:outline-none focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200"
+                        value={httpClientCert}
+                        onChange={(e) => setHttpClientCert(e.target.value)}
+                        disabled={!useHTTP || !httpUseCert}
+                      />
+                      <button className="px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded text-sm hover:bg-gray-50 dark:hover:bg-gray-600 dark:text-gray-200" disabled={!useHTTP || !httpUseCert}>...</button>
+                    </div>
+                    <div className="grid grid-cols-[100px_1fr_auto] gap-3 items-center">
+                      <label className="text-right text-sm text-gray-700 dark:text-gray-300">{t('connection.http.caCert')}:</label>
+                      <input
+                        className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1.5 text-sm focus:outline-none focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200"
+                        value={httpCaCert}
+                        onChange={(e) => setHttpCaCert(e.target.value)}
+                        disabled={!useHTTP || !httpUseCert}
+                      />
+                      <button className="px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded text-sm hover:bg-gray-50 dark:hover:bg-gray-600 dark:text-gray-200" disabled={!useHTTP || !httpUseCert}>...</button>
+                    </div>
+                    <div className="grid grid-cols-[100px_1fr] gap-3 items-center">
+                      <label className="text-right text-sm text-gray-700 dark:text-gray-300">{t('connection.http.passphrase')}:</label>
+                      <input
+                        className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1.5 text-sm focus:outline-none focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200"
+                        value={httpPassphrase}
+                        onChange={(e) => setHttpPassphrase(e.target.value)}
+                        disabled={!useHTTP || !httpUseCert}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
           )}
         </div>
-        <div className="px-4 py-3 border-t flex items-center justify-between bg-gray-50 dark:bg-neutral-800">
-          <button className="px-3 py-1.5 text-sm border rounded bg-white hover:bg-gray-50" onClick={testConnection} disabled={testing}>
-            {testing ? '测试中…' : '测试连接'}
-          </button>
-          <div className="space-x-2">
-            <button className="px-3 py-1.5 text-sm border rounded" onClick={onClose}>取消</button>
-            <button className="px-3 py-1.5 text-sm border rounded bg-blue-600 text-white" onClick={save}>确定</button>
+
+        {/* Footer */}
+        <div className="px-4 py-3 border-t border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 flex items-center justify-between">
+          <div className="text-xs text-gray-500 dark:text-gray-400 w-4">
+            {testMsg && (
+              <span className={testMsg.includes('success') ? 'text-green-600' : 'text-red-600'}>{testMsg}</span>
+            )}
+          </div>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={testConnection}
+              disabled={testing}
+              className="px-6 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 disabled:opacity-50"
+            >
+              {testing ? t('connection.testing') : t('connection.testConnection')}
+            </button>
+            <button
+              onClick={handleSave}
+              className="px-6 py-1.5 text-sm border border-blue-500 rounded bg-white dark:bg-gray-800 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30"
+            >
+              {t('connection.ok')}
+            </button>
+            <button
+              onClick={onClose}
+              className="px-6 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200"
+            >
+              {t('connection.cancel')}
+            </button>
           </div>
         </div>
       </div>

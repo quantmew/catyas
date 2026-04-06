@@ -1,6 +1,5 @@
 import { Database, Plus, ChevronRight, ChevronDown, Folder, Table2, Layers } from 'lucide-react'
 import { Connection } from '../types'
-import { useState } from 'react'
 
 interface SidebarProps {
   connections: Connection[]
@@ -19,17 +18,6 @@ export default function Sidebar({
   onToggleDatabase,
   onSelectTable,
 }: SidebarProps) {
-  const [expandedDatabases, setExpandedDatabases] = useState<Set<string>>(new Set())
-
-  const toggleDatabase = (key: string) => {
-    const newExpanded = new Set(expandedDatabases)
-    if (newExpanded.has(key)) {
-      newExpanded.delete(key)
-    } else {
-      newExpanded.add(key)
-    }
-    setExpandedDatabases(newExpanded)
-  }
 
   const getDatabaseIcon = (_type: string) => {
     return <Database className="w-4 h-4" />
@@ -86,20 +74,16 @@ export default function Sidebar({
                 {connection.expanded && connection.databases && (
                   <div className="pl-4">
                     {connection.databases.map((db) => {
-                      const dbKey = `${connection.id}-${db.name}`
-                      const isExpanded = expandedDatabases.has(dbKey)
-
                       return (
-                        <div key={dbKey}>
+                        <div key={`${connection.id}-${db.name}`}>
                           <div
                             className="flex items-center gap-2 px-3 py-1 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
                             onClick={(e) => {
                               e.stopPropagation()
-                              toggleDatabase(dbKey)
                               onToggleDatabase(connection.id, db.name)
                             }}
                           >
-                            {isExpanded ? (
+                            {db.expanded ? (
                               <ChevronDown className="w-3 h-3 text-gray-500" />
                             ) : (
                               <ChevronRight className="w-3 h-3 text-gray-500" />
@@ -111,7 +95,7 @@ export default function Sidebar({
                           </div>
 
                           {/* Tables & Views Level */}
-                          {isExpanded && (db.tables || (db as any).views) && (
+                          {db.expanded && (db.tables || (db as any).views) && (
                             <div className="pl-4">
                               {db.tables?.map((table) => (
                                 <div

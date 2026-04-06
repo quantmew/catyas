@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 export default {
+  darkMode: 'class',
   content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
@@ -36,5 +37,17 @@ export default {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    function({ addUtilities }) {
+      addUtilities({
+        '.scrollbar-hide': {
+          '&::-webkit-scrollbar': {
+            display: 'none',
+          },
+          '-ms-overflow-style': 'none',
+          'scrollbar-width': 'none',
+        },
+      })
+    }
+  ],
 }

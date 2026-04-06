@@ -80,7 +80,13 @@
   "sidebar": {
     "connections": "Connexions",
     "addConnection": "Ajouter une connexion",
-    "noConnections": "Aucune connexion"
+    "noConnections": "Aucune connexion",
+    "clickToAdd": "Cliquez sur + pour en ajouter une."
+  },
+  "welcome": {
+    "title": "Bienvenue sur Catyas",
+    "selectConnection": "Sélectionnez une connexion dans la barre latérale pour commencer",
+    "selectTable": "Sélectionnez une table pour afficher son contenu"
   },
   "connection": {
     "new": "Nouvelle connexion",

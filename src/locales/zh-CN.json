@@ -80,7 +80,13 @@
   "sidebar": {
     "connections": "连接",
     "addConnection": "添加连接",
-    "noConnections": "暂无连接"
+    "noConnections": "暂无连接",
+    "clickToAdd": "点击 + 添加一个。"
+  },
+  "welcome": {
+    "title": "欢迎来到 Catyas",
+    "selectConnection": "从侧边栏选择一个连接开始",
+    "selectTable": "选择一个表来查看其内容"
   },
   "connection": {
     "new": "新建连接",

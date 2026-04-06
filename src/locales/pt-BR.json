@@ -24,7 +24,8 @@
     "list": "Lista", "details": "Detalhes", "erDiagram": "Diagrama ER", "hideObjectGroup": "Ocultar grupo de objetos",
     "sort": "Ordenar", "selectColumns": "Selecionar colunas", "showHiddenItems": "Mostrar itens ocultos"
   },
-  "sidebar": {"connections": "Conexões", "addConnection": "Adicionar conexão", "noConnections": "Nenhuma conexão"},
+  "sidebar": {"connections": "Conexões", "addConnection": "Adicionar conexão", "noConnections": "Nenhuma conexão", "clickToAdd": "Clique em + para adicionar uma."},
+  "welcome": {"title": "Bem-vindo ao Catyas", "selectConnection": "Selecione uma conexão na barra lateral para começar", "selectTable": "Selecione uma tabela para ver seu conteúdo"},
   "connection": {
     "new": "Nova conexão", "edit": "Editar conexão", "delete": "Excluir conexão", "test": "Testar conexão", "save": "Salvar", "cancel": "Cancelar",
     "name": "Nome da conexão", "type": "Tipo de banco de dados", "host": "Host", "port": "Porta", "username": "Usuário",

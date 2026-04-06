@@ -23,7 +23,8 @@
     "hideObjectGroup": "オブジェクトグループを非表示", "sort": "並べ替え", "selectColumns": "列を選択",
     "showHiddenItems": "隠し項目を表示"
   },
-  "sidebar": {"connections": "接続", "addConnection": "接続を追加", "noConnections": "接続がありません"},
+  "sidebar": {"connections": "接続", "addConnection": "接続を追加", "noConnections": "接続がありません", "clickToAdd": "＋をクリックして追加"},
+  "welcome": {"title": "Catyas へようこそ", "selectConnection": "サイドバーから接続を選択して開始", "selectTable": "テーブルを選択して内容を表示"},
   "connection": {
     "new": "新規接続", "edit": "接続を編集", "delete": "接続を削除", "test": "接続をテスト", "save": "保存", "cancel": "キャンセル",
     "name": "接続名", "type": "データベースの種類", "host": "ホスト", "port": "ポート", "username": "ユーザー名",

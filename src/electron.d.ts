@@ -16,6 +16,9 @@ export interface ElectronAPI {
   saveConnection: (config: any) => Promise<any>
   getConnections: () => Promise<any>
   deleteConnection: (id: string) => Promise<any>
+
+  // File dialog
+  openFileDialog: (options?: any) => Promise<{ success: boolean; filePath?: string }>
 }
 
 declare global {

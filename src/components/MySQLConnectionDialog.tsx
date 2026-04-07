@@ -2,6 +2,13 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Connection } from '../types'
 import { Database as DatabaseIcon, CircleDot } from 'lucide-react'
+import {
+  ConnectionDialogHeader,
+  ConnectionDiagram,
+  ConnectionDialogTabs,
+  ConnectionDialogContent,
+  ConnectionDialogFooter
+} from './ConnectionDialogBase'
 
 interface Props {
   open: boolean
@@ -106,6 +113,30 @@ export default function MySQLConnectionDialog({ open, onClose, onSave }: Props) 
     }
   }
 
+  const handleBrowseFile = async (field: 'settings' | 'key' | 'cert' | 'ca') => {
+    try {
+      const result = await window.electronAPI?.openFileDialog()
+      if (result?.success && result.filePath) {
+        switch (field) {
+          case 'settings':
+            setSettingsPath(result.filePath)
+            break
+          case 'key':
+            setClientKey(result.filePath)
+            break
+          case 'cert':
+            setClientCert(result.filePath)
+            break
+          case 'ca':
+            setCaCert(result.filePath)
+            break
+        }
+      }
+    } catch (err) {
+      console.error('Failed to open file dialog:', err)
+    }
+  }
+
   const tabs = [
     { id: 'general' as Tab, label: t('connection.tabs.general') },
     { id: 'advanced' as Tab, label: t('connection.tabs.advanced') },
@@ -117,51 +148,30 @@ export default function MySQLConnectionDialog({ open, onClose, onSave }: Props) 
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
-      <div className="w-[720px] bg-gray-50 dark:bg-gray-800 rounded shadow-xl border border-gray-300 dark:border-gray-600">
+      <div className="w-[750px] h-[650px] bg-gray-50 dark:bg-gray-800 rounded shadow-xl border border-gray-300 dark:border-gray-600 flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between px-4 py-2 border-b border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700">
-          <span className="text-sm font-semibold text-gray-800 dark:text-gray-200">{t('connection.new')} (MySQL)</span>
-          <button onClick={onClose} className="p-1 hover:bg-gray-200 dark:hover:bg-gray-600 rounded">
-            <svg className="w-4 h-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
+        <ConnectionDialogHeader
+          title={`${t('connection.new')} (MySQL)`}
+          onClose={onClose}
+        />
 
         {/* Tabs */}
-        <div className="px-3 pt-3 border-b border-gray-300 dark:border-gray-600">
-          <div className="flex gap-1">
-            {tabs.map(({ id, label }) => (
-              <button
-                key={id}
-                onClick={() => setTab(id)}
-                className={`px-3 py-1.5 text-[13px] border border-gray-300 dark:border-gray-600 rounded-t transition-colors ${
-                  tab === id
-                    ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-b-white dark:border-b-gray-800 -mb-px'
-                    : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
-                }`}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-        </div>
+        <ConnectionDialogTabs
+          tabs={tabs}
+          activeTab={tab}
+          onTabChange={(tabId) => setTab(tabId as Tab)}
+        />
 
         {/* Connection diagram */}
-        <div className="px-4 py-4 flex items-center justify-center gap-8 bg-gray-50 dark:bg-gray-800">
-          <div className="flex flex-col items-center">
-            <CircleDot className="w-12 h-12 text-gray-400 dark:text-gray-500 mb-1" />
-            <span className="text-xs text-gray-600 dark:text-gray-400">Navicat</span>
-          </div>
-          <div className="flex-1 h-px bg-gray-300 dark:bg-gray-600 max-w-[120px]"></div>
-          <div className="flex flex-col items-center">
-            <DatabaseIcon className="w-12 h-12 text-gray-400 dark:text-gray-500 mb-1" />
-            <span className="text-xs text-gray-600 dark:text-gray-400">{t('database.types.mysql')}</span>
-          </div>
-        </div>
+        <ConnectionDiagram
+          leftLabel="Navicat"
+          rightLabel={t('database.types.mysql')}
+          LeftIcon={CircleDot}
+          RightIcon={DatabaseIcon}
+        />
 
         {/* Content */}
-        <div className="px-6 py-4 bg-white dark:bg-gray-800 min-h-[380px]">
+        <ConnectionDialogContent className="min-h-[420px] max-h-[480px] overflow-y-auto">
           {tab === 'general' && (
             <div className="space-y-3">
               <div className="grid grid-cols-[80px_1fr] gap-3 items-center">
@@ -230,7 +240,7 @@ export default function MySQLConnectionDialog({ open, onClose, onSave }: Props) 
                   value={settingsPath}
                   onChange={(e) => setSettingsPath(e.target.value)}
                 />
-                <button className="px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded text-sm hover:bg-gray-50 dark:hover:bg-gray-600 dark:text-gray-200">...</button>
+                <button className="px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded text-sm hover:bg-gray-50 dark:hover:bg-gray-600 dark:text-gray-200" onClick={() => handleBrowseFile('settings')}>...</button>
               </div>
               <div className="grid grid-cols-[100px_1fr] gap-3 items-center">
                 <label className="text-right text-sm text-gray-700 dark:text-gray-300">{t('connection.advanced.driver')}:</label>
@@ -302,7 +312,7 @@ export default function MySQLConnectionDialog({ open, onClose, onSave }: Props) 
               <div className="grid grid-cols-[100px_1fr] gap-3 items-center">
                 <label className="text-right text-sm text-gray-700 dark:text-gray-300">{t('connection.advanced.namedPipe')}:</label>
                 <input
-                  className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1.5 text-sm focus:outline-none focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200"
+                  className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1.5 text-sm focus:outline-none focus:border-blue-500 disabled:bg-gray-100 dark:disabled:bg-gray-600"
                   disabled
                 />
               </div>
@@ -352,7 +362,7 @@ export default function MySQLConnectionDialog({ open, onClose, onSave }: Props) 
                       <th className="text-left px-3 py-2 text-gray-700 dark:text-gray-300 font-normal w-24">{t('connection.dbtab.autoOpen')}</th>
                     </tr>
                   </thead>
-                  <tbody className="h-64">
+                  <tbody className="h-64 overflow-auto">
                     {databases.length === 0 ? (
                       <tr>
                         <td colSpan={2} className="px-3 py-8 text-center text-gray-400 dark:text-gray-500">
@@ -373,10 +383,10 @@ export default function MySQLConnectionDialog({ open, onClose, onSave }: Props) 
                 </table>
               </div>
               <div className="flex gap-2">
-                <button className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded text-gray-600 dark:text-gray-400" disabled>
+                <button className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded text-gray-600 dark:text-gray-400 disabled:opacity-50" disabled>
                   {t('connection.dbtab.add')}
                 </button>
-                <button className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded text-gray-600 dark:text-gray-400" disabled>
+                <button className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded text-gray-600 dark:text-gray-400 disabled:opacity-50" disabled>
                   {t('connection.dbtab.remove')}
                 </button>
               </div>
@@ -414,7 +424,7 @@ export default function MySQLConnectionDialog({ open, onClose, onSave }: Props) 
                       onChange={(e) => setClientKey(e.target.value)}
                       disabled={!useVerify}
                     />
-                    <button className="px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded text-sm hover:bg-gray-50 dark:hover:bg-gray-600 dark:text-gray-200" disabled={!useVerify}>...</button>
+                    <button className="px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded text-sm hover:bg-gray-50 dark:hover:bg-gray-600 dark:text-gray-200" disabled={!useVerify} onClick={() => handleBrowseFile('key')}>...</button>
                   </div>
                   <div className="grid grid-cols-[100px_1fr_auto] gap-3 items-center">
                     <label className="text-right text-sm text-gray-700 dark:text-gray-300">{t('connection.ssl.clientCert')}:</label>
@@ -424,7 +434,7 @@ export default function MySQLConnectionDialog({ open, onClose, onSave }: Props) 
                       onChange={(e) => setClientCert(e.target.value)}
                       disabled={!useVerify}
                     />
-                    <button className="px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded text-sm hover:bg-gray-50 dark:hover:bg-gray-600 dark:text-gray-200" disabled={!useVerify}>...</button>
+                    <button className="px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded text-sm hover:bg-gray-50 dark:hover:bg-gray-600 dark:text-gray-200" disabled={!useVerify} onClick={() => handleBrowseFile('cert')}>...</button>
                   </div>
                   <div className="grid grid-cols-[100px_1fr_auto] gap-3 items-center">
                     <label className="text-right text-sm text-gray-700 dark:text-gray-300">{t('connection.ssl.caCert')}:</label>
@@ -434,7 +444,7 @@ export default function MySQLConnectionDialog({ open, onClose, onSave }: Props) 
                       onChange={(e) => setCaCert(e.target.value)}
                       disabled={!useVerify}
                     />
-                    <button className="px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded text-sm hover:bg-gray-50 dark:hover:bg-gray-600 dark:text-gray-200" disabled={!useVerify}>...</button>
+                    <button className="px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded text-sm hover:bg-gray-50 dark:hover:bg-gray-600 dark:text-gray-200" disabled={!useVerify} onClick={() => handleBrowseFile('ca')}>...</button>
                   </div>
                   <div className="grid grid-cols-[100px_1fr] gap-3 items-center">
                     <label className="text-right text-sm text-gray-700 dark:text-gray-300"></label>
@@ -665,7 +675,7 @@ export default function MySQLConnectionDialog({ open, onClose, onSave }: Props) 
                         onChange={(e) => setHttpClientKey(e.target.value)}
                         disabled={!useHTTP || !httpUseCert}
                       />
-                      <button className="px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded text-sm hover:bg-gray-50 dark:hover:bg-gray-600 dark:text-gray-200" disabled={!useHTTP || !httpUseCert}>...</button>
+                      <button className="px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded text-sm hover:bg-gray-50 dark:hover:bg-gray-600 dark:text-gray-200" disabled={!useHTTP || !httpUseCert} onClick={() => handleBrowseFile('key')}>...</button>
                     </div>
                     <div className="grid grid-cols-[100px_1fr_auto] gap-3 items-center">
                       <label className="text-right text-sm text-gray-700 dark:text-gray-300">{t('connection.http.clientCert')}:</label>
@@ -675,7 +685,7 @@ export default function MySQLConnectionDialog({ open, onClose, onSave }: Props) 
                         onChange={(e) => setHttpClientCert(e.target.value)}
                         disabled={!useHTTP || !httpUseCert}
                       />
-                      <button className="px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded text-sm hover:bg-gray-50 dark:hover:bg-gray-600 dark:text-gray-200" disabled={!useHTTP || !httpUseCert}>...</button>
+                      <button className="px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded text-sm hover:bg-gray-50 dark:hover:bg-gray-600 dark:text-gray-200" disabled={!useHTTP || !httpUseCert} onClick={() => handleBrowseFile('cert')}>...</button>
                     </div>
                     <div className="grid grid-cols-[100px_1fr_auto] gap-3 items-center">
                       <label className="text-right text-sm text-gray-700 dark:text-gray-300">{t('connection.http.caCert')}:</label>
@@ -685,7 +695,7 @@ export default function MySQLConnectionDialog({ open, onClose, onSave }: Props) 
                         onChange={(e) => setHttpCaCert(e.target.value)}
                         disabled={!useHTTP || !httpUseCert}
                       />
-                      <button className="px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded text-sm hover:bg-gray-50 dark:hover:bg-gray-600 dark:text-gray-200" disabled={!useHTTP || !httpUseCert}>...</button>
+                      <button className="px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded text-sm hover:bg-gray-50 dark:hover:bg-gray-600 dark:text-gray-200" disabled={!useHTTP || !httpUseCert} onClick={() => handleBrowseFile('ca')}>...</button>
                     </div>
                     <div className="grid grid-cols-[100px_1fr] gap-3 items-center">
                       <label className="text-right text-sm text-gray-700 dark:text-gray-300">{t('connection.http.passphrase')}:</label>
@@ -701,37 +711,17 @@ export default function MySQLConnectionDialog({ open, onClose, onSave }: Props) 
               </div>
             </div>
           )}
-        </div>
+        </ConnectionDialogContent>
 
         {/* Footer */}
-        <div className="px-4 py-3 border-t border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 flex items-center justify-between">
-          <div className="text-xs text-gray-500 dark:text-gray-400 w-4">
-            {testMsg && (
-              <span className={testMsg.includes('success') ? 'text-green-600' : 'text-red-600'}>{testMsg}</span>
-            )}
-          </div>
-          <div className="flex items-center gap-3">
-            <button
-              onClick={testConnection}
-              disabled={testing}
-              className="px-6 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 disabled:opacity-50"
-            >
-              {testing ? t('connection.testing') : t('connection.testConnection')}
-            </button>
-            <button
-              onClick={handleSave}
-              className="px-6 py-1.5 text-sm border border-blue-500 rounded bg-white dark:bg-gray-800 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30"
-            >
-              {t('connection.ok')}
-            </button>
-            <button
-              onClick={onClose}
-              className="px-6 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200"
-            >
-              {t('connection.cancel')}
-            </button>
-          </div>
-        </div>
+        <ConnectionDialogFooter
+          onTest={testConnection}
+          onSave={handleSave}
+          onCancel={onClose}
+          testing={testing}
+          testMessage={testMsg}
+          t={t}
+        />
       </div>
     </div>
   )

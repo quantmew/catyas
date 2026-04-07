@@ -1,7 +1,7 @@
 import * as Dialog from '@radix-ui/react-dialog'
 import { useTranslation } from 'react-i18next'
 import { useState } from 'react'
-import { X, Globe } from 'lucide-react'
+import { X, Globe, FolderOpen } from 'lucide-react'
 
 type Category = 'environment' | 'tabs' | 'autoComplete' | 'editor' | 'records' | 'autoRecovery' | 'fileLocation' | 'connectivity' | 'advanced'
 
@@ -23,6 +23,11 @@ export default function OptionsDialog({ open, onClose }: OptionsDialogProps) {
   )
   const [language, setLanguage] = useState(i18n.language)
 
+  // Tabs settings
+  const [openNewTabIn, setOpenNewTabIn] = useState<'main' | 'last' | 'lastExceptMain' | 'new'>('main')
+  const [startupView, setStartupView] = useState<'onlyObject' | 'continue' | 'specific'>('onlyObject')
+  const [settingsPath, setSettingsPath] = useState('')
+
   // Behavior states
   const [confirmOnClose, setConfirmOnClose] = useState(true)
   const [autoStart, setAutoStart] = useState(false)
@@ -43,6 +48,23 @@ export default function OptionsDialog({ open, onClose }: OptionsDialogProps) {
   const handleLanguageChange = (lang: string) => {
     setLanguage(lang)
     i18n.changeLanguage(lang)
+  }
+
+  const handleBrowsePath = async () => {
+    try {
+      const result = await window.electronAPI?.openFileDialog({
+        title: 'Select Settings Path',
+        defaultPath: '',
+        filters: [
+          { name: 'All Files', extensions: ['*'] },
+        ],
+      })
+      if (result?.filePath) {
+        setSettingsPath(result.filePath)
+      }
+    } catch (err) {
+      console.error('Failed to open file dialog:', err)
+    }
   }
 
   const handleResetDefaults = () => {
@@ -231,8 +253,120 @@ export default function OptionsDialog({ open, onClose }: OptionsDialogProps) {
                 </div>
               )}
 
+              {/* Tabs category */}
+              {selectedCategory === 'tabs' && (
+                <div className="space-y-6">
+                  {/* Open new tab in */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                      {t('options.tabs.openNewTabIn')}
+                    </label>
+                    <div className="space-y-2.5">
+                      <label className="flex items-center gap-2.5 text-sm text-gray-600 dark:text-gray-300 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="openNewTabIn"
+                          checked={openNewTabIn === 'main'}
+                          onChange={() => setOpenNewTabIn('main')}
+                          className="accent-blue-500"
+                        />
+                        {t('options.tabs.mainWindow')}
+                      </label>
+                      <label className="flex items-center gap-2.5 text-sm text-gray-600 dark:text-gray-300 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="openNewTabIn"
+                          checked={openNewTabIn === 'last'}
+                          onChange={() => setOpenNewTabIn('last')}
+                          className="accent-blue-500"
+                        />
+                        {t('options.tabs.lastWindow')}
+                      </label>
+                      <label className="flex items-center gap-2.5 text-sm text-gray-600 dark:text-gray-300 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="openNewTabIn"
+                          checked={openNewTabIn === 'lastExceptMain'}
+                          onChange={() => setOpenNewTabIn('lastExceptMain')}
+                          className="accent-blue-500"
+                        />
+                        {t('options.tabs.lastExceptMain')}
+                      </label>
+                      <label className="flex items-center gap-2.5 text-sm text-gray-600 dark:text-gray-300 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="openNewTabIn"
+                          checked={openNewTabIn === 'new'}
+                          onChange={() => setOpenNewTabIn('new')}
+                          className="accent-blue-500"
+                        />
+                        {t('options.tabs.newWindow')}
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Startup view */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                      {t('options.tabs.startupView')}
+                    </label>
+                    <div className="space-y-2.5">
+                      <label className="flex items-center gap-2.5 text-sm text-gray-600 dark:text-gray-300 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="startupView"
+                          checked={startupView === 'onlyObject'}
+                          onChange={() => setStartupView('onlyObject')}
+                          className="accent-blue-500"
+                        />
+                        {t('options.tabs.onlyObjectTab')}
+                      </label>
+                      <label className="flex items-center gap-2.5 text-sm text-gray-600 dark:text-gray-300 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="startupView"
+                          checked={startupView === 'continue'}
+                          onChange={() => setStartupView('continue')}
+                          className="accent-blue-500"
+                        />
+                        {t('options.tabs.continueFromLast')}
+                      </label>
+                      <div className="flex items-center gap-2.5">
+                        <input
+                          type="radio"
+                          name="startupView"
+                          checked={startupView === 'specific'}
+                          onChange={() => setStartupView('specific')}
+                          className="accent-blue-500 mt-0.5"
+                        />
+                        <span className="text-sm text-gray-600 dark:text-gray-300">{t('options.tabs.specificTabs')}</span>
+                        <button
+                          onClick={handleBrowsePath}
+                          disabled={startupView !== 'specific'}
+                          className="ml-2 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {t('options.tabs.setTabs')}...
+                        </button>
+                      </div>
+                      {settingsPath && startupView === 'specific' && (
+                        <div className="ml-6 mt-2 text-xs text-gray-500 dark:text-gray-400 flex items-center gap-2">
+                          <FolderOpen className="w-3 h-3" />
+                          <span className="truncate max-w-md">{settingsPath}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="pt-4 mt-6 border-t border-gray-200 dark:border-gray-700">
+                    <p className="text-xs text-gray-500 dark:text-gray-400 italic">
+                      {t('options.tabs.restartNote')}
+                    </p>
+                  </div>
+                </div>
+              )}
+
               {/* Placeholder for other categories */}
-              {selectedCategory !== 'environment' && (
+              {selectedCategory !== 'environment' && selectedCategory !== 'tabs' && (
                 <div className="flex items-center justify-center h-full text-gray-400 dark:text-gray-500">
                   <p>{t('options.comingSoon')}</p>
                 </div>

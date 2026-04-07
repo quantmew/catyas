@@ -1,6 +1,14 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Connection } from '../types'
+import { Database, CircleDot } from 'lucide-react'
+import {
+  ConnectionDialogHeader,
+  ConnectionDiagram,
+  ConnectionDialogTabs,
+  ConnectionDialogContent,
+  ConnectionDialogFooter
+} from './ConnectionDialogBase'
 
 interface Props {
   open: boolean
@@ -8,17 +16,20 @@ interface Props {
   onSave: (conn: Connection) => void
 }
 
+type Tab = 'general' | 'advanced' | 'ssl' | 'ssh'
+
 export default function RedisConnectionDialog({ open, onClose, onSave }: Props) {
   const { t } = useTranslation()
+  const [tab, setTab] = useState<Tab>('general')
+  const [testing, setTesting] = useState(false)
+  const [testMsg, setTestMsg] = useState<string | null>(null)
+
   const [name, setName] = useState('')
   const [host, setHost] = useState('localhost')
   const [port, setPort] = useState(6379)
   const [password, setPassword] = useState('')
   const [database, setDatabase] = useState(0)
   const [remember, setRemember] = useState(true)
-  const [testing, setTesting] = useState(false)
-  const [testMsg, setTestMsg] = useState<string | null>(null)
-  const [tab, setTab] = useState<'general'|'advanced'|'ssl'|'ssh'>('general')
 
   if (!open) return null
 
@@ -50,111 +61,167 @@ export default function RedisConnectionDialog({ open, onClose, onSave }: Props) 
     }
   }
 
+  const tabs = [
+    { id: 'general' as Tab, label: t('connection.tabs.general') },
+    { id: 'advanced' as Tab, label: t('connection.tabs.advanced') },
+    { id: 'ssl' as Tab, label: t('connection.tabs.ssl') },
+    { id: 'ssh' as Tab, label: t('connection.tabs.ssh') },
+  ]
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
-      <div className="w-[680px] bg-white dark:bg-neutral-900 rounded shadow-lg border border-gray-200 dark:border-neutral-700">
-        <div className="px-4 py-2 border-b text-sm font-semibold bg-gray-50 dark:bg-neutral-800 dark:text-neutral-100">{t('connection.new')} (Redis)</div>
-        <div className="px-4 pt-3">
-          <div className="flex gap-2 mb-3">
-            {[
-              {k:'general', t:t('connection.tabs.general')},
-              {k:'advanced', t:t('connection.tabs.advanced')},
-              {k:'ssl', t:t('connection.tabs.ssl')},
-              {k:'ssh', t:t('connection.tabs.ssh')},
-            ].map(({k,t})=> (
-              <button key={k} className={`px-3 py-1 text-sm border rounded-t ${tab===k?'bg-white border-b-0':'bg-gray-100 hover:bg-gray-200'} `} onClick={()=>setTab(k as any)}>{t}</button>
-            ))}
-          </div>
-        </div>
-        <div className="px-5 pb-4">
-          {tab==='general' && (
-          <div className="grid grid-cols-[100px_1fr] gap-y-3 gap-x-4 items-center">
-            <label className="text-right text-sm text-gray-600 dark:text-gray-300">{t('connection.general.name')}:</label>
-            <input className="border rounded px-2 py-1 text-sm w-full" value={name} onChange={(e)=>setName(e.target.value)} />
-
-            <label className="text-right text-sm text-gray-600 dark:text-gray-300">{t('connection.general.host')}:</label>
-            <input className="border rounded px-2 py-1 text-sm" value={host} onChange={(e)=>setHost(e.target.value)} />
-
-            <label className="text-right text-sm text-gray-600 dark:text-gray-300">{t('connection.general.port')}:</label>
-            <input className="border rounded px-2 py-1 text-sm w-24" type="number" value={port} onChange={(e)=>setPort(Number(e.target.value))} />
-
-            <label className="text-right text-sm text-gray-600 dark:text-gray-300">{t('connection.general.password')}:</label>
-            <input className="border rounded px-2 py-1 text-sm" type="password" value={password} onChange={(e)=>setPassword(e.target.value)} placeholder="可选" />
-
-            <label className="text-right text-sm text-gray-600 dark:text-gray-300">{t('connection.databaseIndex')}:</label>
-            <input className="border rounded px-2 py-1 text-sm w-24" type="number" value={database} onChange={(e)=>setDatabase(Number(e.target.value))} min={0} max={15} />
-
-            <div />
-            <label className="inline-flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
-              <input type="checkbox" className="accent-blue-600" checked={remember} onChange={(e)=>setRemember(e.target.checked)} /> {t('connection.general.remember')}
-            </label>
-
-            <div />
-            <div className="text-xs text-gray-500 dark:text-gray-400">
-              提示：Redis 默认有 16 个数据库（索引 0-15）
-            </div>
-          </div>
-          )}
-          {tab==='advanced' && (
-            <div className="grid grid-cols-[140px_1fr] gap-y-3 gap-x-4 items-center">
-              <label className="text-right text-sm">{t('connection.connectionTimeout')}:</label>
-              <input className="border rounded px-2 py-1 text-sm w-24" defaultValue={5} />
-              <label className="text-right text-sm">{t('connection.commandTimeout')}:</label>
-              <input className="border rounded px-2 py-1 text-sm w-24" defaultValue={0} placeholder="0 = 无限制" />
-              <label className="text-right text-sm">{t('connection.poolSize')}:</label>
-              <input className="border rounded px-2 py-1 text-sm w-24" defaultValue={10} />
-              <label className="text-right text-sm">{t('connection.namespaceSeparator')}:</label>
-              <input className="border rounded px-2 py-1 text-sm w-24" defaultValue=":" maxLength={1} />
-              <label className="text-right text-sm"></label>
-              <label className="inline-flex items-center gap-2 text-sm"><input type="checkbox"/> {t('connection.readOnlyMode')}</label>
-              <label className="text-right text-sm"></label>
-              <label className="inline-flex items-center gap-2 text-sm"><input type="checkbox"/> {t('connection.advanced.autoConnect')}</label>
+      <div className="w-[750px] h-[650px] bg-gray-50 dark:bg-gray-800 rounded shadow-xl border border-gray-300 dark:border-gray-600 flex flex-col">
+        <ConnectionDialogHeader title={`${t('connection.new')} (Redis)`} onClose={onClose} />
+        <ConnectionDialogTabs tabs={tabs} activeTab={tab} onTabChange={(id) => setTab(id as Tab)} />
+        <ConnectionDiagram leftLabel="Navicat" rightLabel={t('database.types.redis')} LeftIcon={CircleDot} RightIcon={Database} />
+        <ConnectionDialogContent className="min-h-[420px] max-h-[480px] overflow-y-auto">
+          {tab === 'general' && (
+            <div className="space-y-3">
+              <div className="grid grid-cols-[80px_1fr] gap-3 items-center">
+                <label className="text-right text-sm text-gray-700 dark:text-gray-300">{t('connection.general.name')}:</label>
+                <input className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1.5 text-sm focus:outline-none focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200" value={name} onChange={(e) => setName(e.target.value)} />
+              </div>
+              <div className="grid grid-cols-[80px_1fr] gap-3 items-center">
+                <label className="text-right text-sm text-gray-700 dark:text-gray-300">{t('connection.general.host')}:</label>
+                <input className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1.5 text-sm focus:outline-none focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200" value={host} onChange={(e) => setHost(e.target.value)} />
+              </div>
+              <div className="grid grid-cols-[80px_1fr] gap-3 items-center">
+                <label className="text-right text-sm text-gray-700 dark:text-gray-300">{t('connection.general.port')}:</label>
+                <input type="number" className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1.5 text-sm w-32 focus:outline-none focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200" value={port} onChange={(e) => setPort(Number(e.target.value))} />
+              </div>
+              <div className="grid grid-cols-[80px_1fr] gap-3 items-center">
+                <label className="text-right text-sm text-gray-700 dark:text-gray-300">{t('connection.general.password')}:</label>
+                <input type="password" className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1.5 text-sm focus:outline-none focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200" value={password} onChange={(e) => setPassword(e.target.value)} placeholder={t('common.optional')} />
+              </div>
+              <div className="grid grid-cols-[80px_1fr] gap-3 items-center">
+                <label className="text-right text-sm text-gray-700 dark:text-gray-300">{t('connection.databaseIndex')}:</label>
+                <input type="number" className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1.5 text-sm w-32 focus:outline-none focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200" value={database} onChange={(e) => setDatabase(Number(e.target.value))} min={0} max={15} />
+              </div>
+              <div className="grid grid-cols-[80px_1fr] gap-3 items-center">
+                <div />
+                <label className="inline-flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
+                  <input type="checkbox" className="accent-blue-600" checked={remember} onChange={(e) => setRemember(e.target.checked)} />
+                  {t('connection.general.remember')}
+                </label>
+              </div>
+              <div className="grid grid-cols-[80px_1fr] gap-3 items-center">
+                <div />
+                <div className="text-xs text-gray-500 dark:text-gray-400">
+                  {t('connection.redis.databaseHint')}
+                </div>
+              </div>
             </div>
           )}
-          {tab==='ssl' && (
-            <div className="grid grid-cols-[140px_1fr] gap-y-3 gap-x-4 items-center">
-              <label className="inline-flex items-center gap-2 text-sm col-span-2"><input type="checkbox"/> {t('connection.ssl.useSSL')}</label>
-              <label className="text-right text-sm"></label>
-              <label className="inline-flex items-center gap-2 text-sm"><input type="checkbox"/> {t('connection.ssl.verifyServer')}</label>
-              <label className="text-right text-sm">{t('connection.ssl.caCert')}:</label>
-              <div className="flex gap-2"><input className="border rounded px-2 py-1 text-sm flex-1"/><button className="px-2 py-1 border rounded text-sm">...</button></div>
-              <label className="text-right text-sm">{t('connection.ssl.clientCert')}:</label>
-              <div className="flex gap-2"><input className="border rounded px-2 py-1 text-sm flex-1"/><button className="px-2 py-1 border rounded text-sm">...</button></div>
-              <label className="text-right text-sm">{t('connection.ssl.clientKey')}:</label>
-              <div className="flex gap-2"><input className="border rounded px-2 py-1 text-sm flex-1"/><button className="px-2 py-1 border rounded text-sm">...</button></div>
+          {tab === 'advanced' && (
+            <div className="space-y-3">
+              <div className="grid grid-cols-[120px_1fr] gap-3 items-center">
+                <label className="text-right text-sm text-gray-700 dark:text-gray-300">{t('connection.connectionTimeout')}:</label>
+                <input type="number" className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1.5 text-sm w-24 focus:outline-none focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200" defaultValue={5} />
+              </div>
+              <div className="grid grid-cols-[120px_1fr] gap-3 items-center">
+                <label className="text-right text-sm text-gray-700 dark:text-gray-300">{t('connection.commandTimeout')}:</label>
+                <input type="number" className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1.5 text-sm w-24 focus:outline-none focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200" defaultValue={0} placeholder="0 = 无限制" />
+              </div>
+              <div className="grid grid-cols-[120px_1fr] gap-3 items-center">
+                <label className="text-right text-sm text-gray-700 dark:text-gray-300">{t('connection.poolSize')}:</label>
+                <input type="number" className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1.5 text-sm w-24 focus:outline-none focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200" defaultValue={10} />
+              </div>
+              <div className="grid grid-cols-[120px_1fr] gap-3 items-center">
+                <label className="text-right text-sm text-gray-700 dark:text-gray-300">{t('connection.namespaceSeparator')}:</label>
+                <input className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1.5 text-sm w-24 focus:outline-none focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200" defaultValue=":" maxLength={1} />
+              </div>
+              <div className="grid grid-cols-[120px_1fr] gap-3 items-center">
+                <div />
+                <label className="inline-flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
+                  <input type="checkbox" className="accent-blue-600" />
+                  {t('connection.readOnlyMode')}
+                </label>
+              </div>
+              <div className="grid grid-cols-[120px_1fr] gap-3 items-center">
+                <div />
+                <label className="inline-flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
+                  <input type="checkbox" className="accent-blue-600" />
+                  {t('connection.advanced.autoConnect')}
+                </label>
+              </div>
             </div>
           )}
-          {tab==='ssh' && (
-            <div className="grid grid-cols-[140px_1fr] gap-y-3 gap-x-4 items-center">
-              <label className="inline-flex items-center gap-2 text-sm col-span-2"><input type="checkbox"/> {t('connection.ssh.useTunnel')}</label>
-              <label className="text-right text-sm">{t('connection.ssh.host')}:</label>
-              <input className="border rounded px-2 py-1 text-sm" />
-              <label className="text-right text-sm">{t('connection.ssh.port')}:</label>
-              <input className="border rounded px-2 py-1 text-sm w-24" defaultValue={22} />
-              <label className="text-right text-sm">{t('connection.ssh.username')}:</label>
-              <input className="border rounded px-2 py-1 text-sm" />
-              <label className="text-right text-sm">{t('connection.ssh.authMethod')}:</label>
-              <select className="border rounded px-2 py-1 text-sm"><option>{t('connection.general.password')}</option><option>私钥</option></select>
-              <label className="text-right text-sm">{t('connection.ssh.password')}:</label>
-              <input className="border rounded px-2 py-1 text-sm" type="password" />
-              <label className="text-right text-sm"></label>
-              <label className="inline-flex items-center gap-2 text-sm"><input type="checkbox"/> {t('connection.ssh.remember')}</label>
+          {tab === 'ssl' && (
+            <div className="space-y-3">
+              <label className="inline-flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
+                <input type="checkbox" className="accent-blue-600" />
+                {t('connection.ssl.useSSL')}
+              </label>
+              <div className="grid grid-cols-[120px_1fr] gap-3 items-center">
+                <div />
+                <label className="inline-flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
+                  <input type="checkbox" className="accent-blue-600" />
+                  {t('connection.ssl.verifyServer')}
+                </label>
+              </div>
+              <div className="grid grid-cols-[120px_1fr] gap-3 items-center">
+                <label className="text-right text-sm text-gray-700 dark:text-gray-300">{t('connection.ssl.caCert')}:</label>
+                <div className="flex gap-2">
+                  <input className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1.5 text-sm flex-1 focus:outline-none focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200" />
+                  <button className="px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded text-sm hover:bg-gray-50 dark:hover:bg-gray-600">...</button>
+                </div>
+              </div>
+              <div className="grid grid-cols-[120px_1fr] gap-3 items-center">
+                <label className="text-right text-sm text-gray-700 dark:text-gray-300">{t('connection.ssl.clientCert')}:</label>
+                <div className="flex gap-2">
+                  <input className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1.5 text-sm flex-1 focus:outline-none focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200" />
+                  <button className="px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded text-sm hover:bg-gray-50 dark:hover:bg-gray-600">...</button>
+                </div>
+              </div>
+              <div className="grid grid-cols-[120px_1fr] gap-3 items-center">
+                <label className="text-right text-sm text-gray-700 dark:text-gray-300">{t('connection.ssl.clientKey')}:</label>
+                <div className="flex gap-2">
+                  <input className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1.5 text-sm flex-1 focus:outline-none focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200" />
+                  <button className="px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded text-sm hover:bg-gray-50 dark:hover:bg-gray-600">...</button>
+                </div>
+              </div>
             </div>
           )}
-
-          {testMsg && (
-            <div className="mt-3 text-sm text-gray-700 dark:text-gray-200">{testMsg}</div>
+          {tab === 'ssh' && (
+            <div className="space-y-3">
+              <label className="inline-flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
+                <input type="checkbox" className="accent-blue-600" />
+                {t('connection.ssh.useTunnel')}
+              </label>
+              <div className="grid grid-cols-[120px_1fr] gap-3 items-center">
+                <label className="text-right text-sm text-gray-700 dark:text-gray-300">{t('connection.ssh.host')}:</label>
+                <input className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1.5 text-sm focus:outline-none focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200" />
+              </div>
+              <div className="grid grid-cols-[120px_1fr] gap-3 items-center">
+                <label className="text-right text-sm text-gray-700 dark:text-gray-300">{t('connection.ssh.port')}:</label>
+                <input type="number" className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1.5 text-sm w-32 focus:outline-none focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200" defaultValue={22} />
+              </div>
+              <div className="grid grid-cols-[120px_1fr] gap-3 items-center">
+                <label className="text-right text-sm text-gray-700 dark:text-gray-300">{t('connection.ssh.username')}:</label>
+                <input className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1.5 text-sm focus:outline-none focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200" />
+              </div>
+              <div className="grid grid-cols-[120px_1fr] gap-3 items-center">
+                <label className="text-right text-sm text-gray-700 dark:text-gray-300">{t('connection.ssh.authMethod')}:</label>
+                <select className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1.5 text-sm focus:outline-none focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200">
+                  <option>{t('connection.general.password')}</option>
+                  <option>{t('connection.ssh.privateKey')}</option>
+                </select>
+              </div>
+              <div className="grid grid-cols-[120px_1fr] gap-3 items-center">
+                <label className="text-right text-sm text-gray-700 dark:text-gray-300">{t('connection.ssh.password')}:</label>
+                <input type="password" className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1.5 text-sm focus:outline-none focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200" />
+              </div>
+              <div className="grid grid-cols-[120px_1fr] gap-3 items-center">
+                <div />
+                <label className="inline-flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
+                  <input type="checkbox" className="accent-blue-600" />
+                  {t('connection.ssh.remember')}
+                </label>
+              </div>
+            </div>
           )}
-        </div>
-        <div className="px-4 py-3 border-t flex items-center justify-between bg-gray-50 dark:bg-neutral-800">
-          <button className="px-3 py-1.5 text-sm border rounded bg-white hover:bg-gray-50" onClick={testConnection} disabled={testing}>
-            {testing ? t('connection.testing') : t('connection.testConnection')}
-          </button>
-          <div className="space-x-2">
-            <button className="px-3 py-1.5 text-sm border rounded" onClick={onClose}>{t('connection.cancel')}</button>
-            <button className="px-3 py-1.5 text-sm border rounded bg-blue-600 text-white" onClick={save}>{t('connection.ok')}</button>
-          </div>
-        </div>
+        </ConnectionDialogContent>
+        <ConnectionDialogFooter onTest={testConnection} onSave={save} onCancel={onClose} testing={testing} testMessage={testMsg} t={t} />
       </div>
     </div>
   )

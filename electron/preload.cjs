@@ -18,4 +18,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   saveConnection: (config) => ipcRenderer.invoke('connection:save', config),
   getConnections: () => ipcRenderer.invoke('connection:get-all'),
   deleteConnection: (id) => ipcRenderer.invoke('connection:delete', id),
+
+  // File dialog
+  openFileDialog: (options) => ipcRenderer.invoke('dialog:open-file', options),
 })

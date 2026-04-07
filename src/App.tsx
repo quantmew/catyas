@@ -3,6 +3,7 @@ import Titlebar from './components/Titlebar'
 import Sidebar from './components/Sidebar'
 import MainContent from './components/MainContent'
 import TopRibbon from './components/TopRibbon'
+import RightInfo from './components/RightInfo'
 import MySQLConnectionDialog from './components/MySQLConnectionDialog'
 import PostgreSQLConnectionDialog from './components/PostgreSQLConnectionDialog'
 import OracleConnectionDialog from './components/OracleConnectionDialog'
@@ -16,6 +17,12 @@ import { Connection } from './types'
 
 type DatabaseType = 'mysql' | 'postgresql' | 'oracle' | 'sqlite' | 'sqlserver' | 'mariadb' | 'mongodb' | 'redis' | null
 
+type InfoPanelTarget =
+  | { type: 'connection'; connection: Connection }
+  | { type: 'table'; connection: Connection; database: string; table: string }
+  | { type: 'view'; connection: Connection; database: string; view: string }
+  | null
+
 function App() {
   const [connections, setConnections] = useState<Connection[]>([])
   const [selectedConnection, setSelectedConnection] = useState<Connection | null>(null)
@@ -23,6 +30,7 @@ function App() {
   const [selectedDatabase, setSelectedDatabase] = useState<string | null>(null)
   const [activeDialog, setActiveDialog] = useState<DatabaseType>(null)
   const [optionsOpen, setOptionsOpen] = useState(false)
+  const [infoPanelTarget, setInfoPanelTarget] = useState<InfoPanelTarget>(null)
 
   // Load saved connections on mount
   useEffect(() => {
@@ -62,6 +70,7 @@ function App() {
 
   const handleSelectConnection = async (conn: Connection) => {
     setSelectedConnection(conn)
+    setInfoPanelTarget({ type: 'connection', connection: conn })
 
     // Toggle expansion and load databases if not already loaded
     const updatedConnections = connections.map(c => {
@@ -179,6 +188,14 @@ function App() {
   const handleSelectTable = (_connectionId: string, databaseName: string, tableName: string) => {
     setSelectedTable(tableName)
     setSelectedDatabase(databaseName)
+    if (selectedConnection) {
+      setInfoPanelTarget({
+        type: 'table',
+        connection: selectedConnection,
+        database: databaseName,
+        table: tableName
+      })
+    }
   }
 
   const handleCloseDialog = () => {
@@ -205,6 +222,11 @@ function App() {
             connection={selectedConnection}
             selectedTable={selectedTable}
             selectedDatabase={selectedDatabase}
+          />
+          <RightInfo
+            connection={infoPanelTarget?.type === 'connection' ? infoPanelTarget.connection : infoPanelTarget?.type === 'table' ? infoPanelTarget.connection : null}
+            database={infoPanelTarget?.type === 'table' ? infoPanelTarget.database : null}
+            tableName={infoPanelTarget?.type === 'table' ? infoPanelTarget.table : null}
           />
         </div>
       </div>

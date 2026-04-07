@@ -15,6 +15,27 @@ export interface Database {
   expanded?: boolean
 }
 
+export interface AttachedDatabase {
+  id: string
+  name: string
+  file: string
+  encrypted: boolean
+}
+
+export interface HttpTunnelConfig {
+  url: string
+  useBase64?: boolean
+  auth?: {
+    type: 'password' | 'certificate'
+    username?: string
+    password?: string
+    clientKey?: string
+    clientCert?: string
+    caCert?: string
+    passphrase?: string
+  }
+}
+
 export interface Connection {
   id: string
   name: string
@@ -27,6 +48,13 @@ export interface Connection {
   ssl?: boolean
   databases?: Database[]
   expanded?: boolean
+  // SQLite specific
+  settingsPath?: string
+  autoConnect?: boolean
+  encrypted?: boolean
+  encryptPassword?: string
+  attachedDatabases?: AttachedDatabase[]
+  httpTunnel?: HttpTunnelConfig
 }
 
 export interface Table {

@@ -5,7 +5,6 @@ import { createMenuBarConfig, MenuBarActions, MenuItem, MenuSeparator } from './
 import { useMemo } from 'react'
 import {
   Database,
-  FolderPlus,
   Table,
   Eye,
   FileCode,
@@ -16,7 +15,8 @@ import {
   Bot,
   GitBranch,
   BarChart3,
-  ChevronDown
+  ChevronDown,
+  FileText
 } from 'lucide-react'
 
 const isSeparator = (item: MenuItem | MenuSeparator): item is MenuSeparator => {
@@ -75,9 +75,9 @@ function RibbonButtonWithDropdown({ icon: Icon, label, onClick, active }: Ribbon
               : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200'
           }`}
         >
-          <div className="relative inline-flex items-center justify-center">
+          <div className="flex items-center gap-1">
             <Icon className="w-6 h-6" />
-            <ChevronDown className="w-2.5 h-2.5 absolute -bottom-0.5 -right-2 text-gray-400" />
+            <ChevronDown className="w-4 h-4 text-gray-400" />
           </div>
           <span className="text-[12px] leading-none whitespace-nowrap mt-0.5">{label}</span>
         </button>
@@ -277,9 +277,9 @@ export default function TopRibbon({ onNewConnection, onOpenOptions }: TopRibbonP
         {/* New Query button */}
         <div className="flex items-center">
           <RibbonButton
-            icon={FolderPlus}
-            label={t('ribbon.new')}
-            onClick={() => onNewConnection?.('mysql')}
+            icon={FileText}
+            label={t('ribbon.newQuery')}
+            onClick={actions.newQuery}
           />
         </div>
 

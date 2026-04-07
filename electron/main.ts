@@ -1,8 +1,9 @@
-import { app, BrowserWindow, ipcMain } from 'electron'
+import { app, BrowserWindow, ipcMain, dialog, OpenDialogOptions } from 'electron'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import fs from 'fs'
 import mysql from 'mysql2/promise'
+import sqlite3 from 'better-sqlite3'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -98,6 +99,29 @@ function saveConnectionsToFile(connections: any[]): void {
   }
 }
 
+// File dialog handler
+ipcMain.handle('dialog:open-file', async (_event, options?: OpenDialogOptions) => {
+  try {
+    const result = await dialog.showOpenDialog({
+      title: '选择文件',
+      filters: options?.filters || [
+        { name: 'SQLite Database', extensions: ['db', 'sqlite', 'sqlite3'] },
+        { name: 'All Files', extensions: ['*'] }
+      ],
+      properties: ['openFile'],
+      ...options
+    })
+
+    if (!result.canceled && result.filePaths.length > 0) {
+      return { success: true, filePath: result.filePaths[0] }
+    }
+    return { success: false, filePath: null }
+  } catch (err) {
+    console.error('Failed to open file dialog:', err)
+    return { success: false, filePath: null }
+  }
+})
+
 // Connection persistence IPC handlers
 ipcMain.handle('connection:save', async (_event, config) => {
   try {
@@ -136,6 +160,7 @@ ipcMain.handle('connection:delete', async (_event, id) => {
 
 // Database connection cache
 const connectionPool = new Map<string, mysql.Pool>()
+const sqliteConnections = new Map<string, sqlite3.Database>()
 
 // Identifier whitelist validation to prevent SQL injection
 function isValidIdentifier(name: string): boolean {
@@ -163,10 +188,82 @@ function getConnectionPool(config: any, database?: string): mysql.Pool {
   return connectionPool.get(key)!
 }
 
+// Helper function to get or create SQLite connection
+function getSqliteConnection(config: any): sqlite3.Database {
+  const filePath = config.host || config.filePath
+  const key = `sqlite:${filePath}`
+
+  if (!sqliteConnections.has(key)) {
+    // Create directory if it doesn't exist
+    const dir = path.dirname(filePath)
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true })
+    }
+
+    let db: sqlite3.Database
+
+    // Open with encryption if provided
+    if (config.encrypted && config.encryptPassword) {
+      db = new sqlite3(filePath)
+      db.pragma(`key='${config.encryptPassword}'`)
+    } else {
+      db = new sqlite3(filePath)
+    }
+
+    // Apply settings if provided
+    if (config.settingsPath && fs.existsSync(config.settingsPath)) {
+      // Read and apply SQLite configuration
+      const settings = fs.readFileSync(config.settingsPath, 'utf-8')
+      // Settings file format: PRAGMA commands, one per line
+      settings.split('\n').forEach((line: string) => {
+        if (line.trim().startsWith('PRAGMA')) {
+          try {
+            db.exec(line)
+          } catch (e) {
+            console.error('Failed to apply setting:', line, e)
+          }
+        }
+      })
+    }
+
+    sqliteConnections.set(key, db)
+  }
+
+  return sqliteConnections.get(key)!
+}
+
 // IPC Handlers
 ipcMain.handle('db:test-connection', async (_event, config) => {
-  console.log('[Main] Testing connection to:', config.host, config.port, config.username)
+  console.log('[Main] Testing connection to:', config)
+
   try {
+    // SQLite connection test
+    if (config.type === 'sqlite') {
+      const filePath = config.host || config.filePath
+      if (!filePath) {
+        return { success: false, message: 'Database file path required' }
+      }
+
+      // Check if file exists (for existing databases)
+      if (config.dbType === 'existing' && !fs.existsSync(filePath)) {
+        return { success: false, message: 'Database file does not exist' }
+      }
+
+      // Try to open the database
+      const dir = path.dirname(filePath)
+      if (!fs.existsSync(dir)) {
+        return { success: false, message: 'Directory does not exist' }
+      }
+
+      // Test connection by opening and running a simple query
+      const db = new sqlite3(filePath)
+      db.exec('SELECT 1')
+      db.close()
+
+      return { success: true, message: 'Connection successful!' }
+    }
+
+    // MySQL connection test
     const connection = await mysql.createConnection({
       host: config.host,
       port: config.port,
@@ -189,6 +286,12 @@ ipcMain.handle('db:test-connection', async (_event, config) => {
 
 ipcMain.handle('db:get-databases', async (_event, config) => {
   try {
+    // SQLite doesn't have multiple databases in the same way as MySQL
+    // For SQLite, we return the main database file
+    if (config.type === 'sqlite') {
+      return { success: true, databases: [{ Database: 'main' }] }
+    }
+
     const pool = getConnectionPool(config)
     const [rows] = await pool.query('SHOW DATABASES')
     return { success: true, databases: rows }
@@ -199,6 +302,13 @@ ipcMain.handle('db:get-databases', async (_event, config) => {
 
 ipcMain.handle('db:get-tables', async (_event, config, database) => {
   try {
+    // SQLite handler
+    if (config.type === 'sqlite') {
+      const db = getSqliteConnection(config)
+      const rows = db.prepare("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name").all()
+      return { success: true, tables: rows.map((r: any) => ({ [r.name]: r.name })) }
+    }
+
     if (!isValidIdentifier(database)) {
       return { success: false, message: `Invalid database name: ${database}` }
     }
@@ -213,6 +323,13 @@ ipcMain.handle('db:get-tables', async (_event, config, database) => {
 // MySQL/MariaDB: fetch views for a database
 ipcMain.handle('db:get-views', async (_event, config, database) => {
   try {
+    // SQLite handler
+    if (config.type === 'sqlite') {
+      const db = getSqliteConnection(config)
+      const rows = db.prepare("SELECT name FROM sqlite_master WHERE type='view' ORDER BY name").all()
+      return { success: true, views: rows.map((r: any) => ({ TABLE_NAME: r.name })) }
+    }
+
     const pool = getConnectionPool(config)
     const [rows] = await pool.query(
       `SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA = ? AND TABLE_TYPE = 'VIEW'`,
@@ -226,6 +343,14 @@ ipcMain.handle('db:get-views', async (_event, config, database) => {
 
 ipcMain.handle('db:execute-query', async (_event, config, query, database) => {
   try {
+    // SQLite handler
+    if (config.type === 'sqlite') {
+      const db = getSqliteConnection(config)
+      const stmt = db.prepare(query)
+      const rows = stmt.all()
+      return { success: true, data: rows }
+    }
+
     const pool = getConnectionPool(config, database)
     const [rows] = await pool.query(query)
     return { success: true, data: rows }
@@ -236,6 +361,13 @@ ipcMain.handle('db:execute-query', async (_event, config, query, database) => {
 
 ipcMain.handle('db:get-table-structure', async (_event, config, database, tableName) => {
   try {
+    // SQLite handler
+    if (config.type === 'sqlite') {
+      const db = getSqliteConnection(config)
+      const rows = db.prepare(`PRAGMA table_info("${tableName}")`).all()
+      return { success: true, structure: rows }
+    }
+
     if (!isValidIdentifier(database) || !isValidIdentifier(tableName)) {
       return { success: false, message: 'Invalid database or table name' }
     }
@@ -249,6 +381,15 @@ ipcMain.handle('db:get-table-structure', async (_event, config, database, tableN
 
 ipcMain.handle('db:get-table-data', async (_event, config, database, tableName, limit = 1000, offset = 0) => {
   try {
+    // SQLite handler
+    if (config.type === 'sqlite') {
+      const db = getSqliteConnection(config)
+      const safeLimit = Math.max(1, Math.floor(Number(limit) || 1000))
+      const safeOffset = Math.max(0, Math.floor(Number(offset) || 0))
+      const rows = db.prepare(`SELECT * FROM "${tableName}" LIMIT ? OFFSET ?`).all(safeLimit, safeOffset)
+      return { success: true, data: rows }
+    }
+
     if (!isValidIdentifier(database) || !isValidIdentifier(tableName)) {
       return { success: false, message: 'Invalid database or table name' }
     }
@@ -264,6 +405,25 @@ ipcMain.handle('db:get-table-data', async (_event, config, database, tableName, 
 
 ipcMain.handle('db:get-table-info', async (_event, config, database, tableName) => {
   try {
+    // SQLite handler
+    if (config.type === 'sqlite') {
+      const db = getSqliteConnection(config)
+      // SQLite doesn't have the same metadata as MySQL, so we provide basic info
+      db.prepare(`PRAGMA table_info("${tableName}")`).all()
+      const countResult = db.prepare(`SELECT COUNT(*) as count FROM "${tableName}"`).get() as any
+      return {
+        success: true,
+        info: {
+          ENGINE: 'SQLite',
+          TABLE_ROWS: countResult?.count || 0,
+          CREATE_TIME: null,
+          UPDATE_TIME: null,
+          TABLE_COLLATION: null,
+          ROW_FORMAT: null
+        }
+      }
+    }
+
     const pool = getConnectionPool(config)
     const [rows] = await pool.query(
       `SELECT ENGINE, ROW_FORMAT, TABLE_ROWS, CREATE_TIME, UPDATE_TIME, TABLE_COLLATION
@@ -288,11 +448,21 @@ app.whenReady().then(() => {
 })
 
 app.on('window-all-closed', () => {
-  // Clean up connection pools
+  // Clean up MySQL connection pools
   connectionPool.forEach(pool => {
     pool.end().catch(err => console.error('Error closing pool:', err))
   })
   connectionPool.clear()
+
+  // Clean up SQLite connections
+  sqliteConnections.forEach(db => {
+    try {
+      db.close()
+    } catch (err) {
+      console.error('Error closing SQLite connection:', err)
+    }
+  })
+  sqliteConnections.clear()
 
   if (process.platform !== 'darwin') {
     app.quit()
@@ -306,4 +476,14 @@ app.on('before-quit', () => {
     pool.end().catch(err => console.error('Error closing pool:', err))
   })
   connectionPool.clear()
+
+  // Close all SQLite connections
+  sqliteConnections.forEach(db => {
+    try {
+      db.close()
+    } catch (err) {
+      console.error('Error closing SQLite connection:', err)
+    }
+  })
+  sqliteConnections.clear()
 })

@@ -52,6 +52,57 @@
       "confirmOnClose": "Beim Schließen bestätigen", "autoStart": "Beim Start ausführen", "minimizeToTray": "In den Systemtray minimieren",
       "showHiddenFiles": "Versteckte Dateien anzeigen", "sendUsageData": "Anonyme Nutzungsauswertung senden, um Catyas zu verbessern",
       "restartNote": "* Änderungen werden nach einem Neustart wirksam"
+    },
+    "tabs": {
+      "openNewTabIn": "Neuen Tab öffnen in", "mainWindow": "Hauptfenster", "lastWindow": "Fenster des zuletzt geöffneten Tabs",
+      "lastExceptMain": "Fenster des zuletzt geöffneten Tabs (außer Hauptfenster)", "newWindow": "Neues Fenster",
+      "startupView": "Startansicht", "onlyObjectTab": "Nur Objekt-Tab öffnen", "continueFromLast": "Von letzter Sitzung fortsetzen",
+      "specificTabs": "Bestimmte Tabs oder Tab-Gruppe öffnen", "setTabs": "Tabs festlegen",
+      "restartNote": "* Änderungen werden nach einem Neustart wirksam"
+    },
+    "autoComplete": {
+      "useAutoComplete": "Autovervollständigung verwenden", "autoUpdateInfo": "Autovervollständigungsinformationen automatisch aktualisieren",
+      "autoSelectFirst": "Ersten Vorschlag automatisch auswählen", "clearInfo": "Autovervollständigungsinformationen löschen", "clear": "Löschen"
+    },
+    "editor": {
+      "codeCompletion": "Codevervollständigung", "useAutoCompletion": "Autovervollständigung verwenden",
+      "keywordCase": "Schlüsselwort-Groß-/Kleinschreibung", "keywordUppercase": "GROSSBUCHSTABEN", "keywordLowercase": "kleinbuchstaben",
+      "autoUpdate": "Vervollständigungsinformationen automatisch aktualisieren",
+      "autoSelectFirst": "Ersten Vorschlag automatisch auswählen",
+      "editorFont": "Editor-Schriftart", "fontSize": "Schriftgröße", "tabSize": "Tab-Größe",
+      "wordWrap": "Zeilenumbruch", "wordWrapOn": "An", "wordWrapOff": "Aus",
+      "showLineNumbers": "Zeilennummern anzeigen", "highlightCurrentLine": "Aktuelle Zeile hervorheben",
+      "highlightMatchingBrackets": "Übereinstimmende Klammern hervorheben", "minimap": "Minimap anzeigen",
+      "cursorStyle": "Cursor-Stil", "cursorLine": "Linie", "cursorBlock": "Block", "cursorUnderline": "Unterstrichen"
+    },
+    "records": {
+      "records": "Datensätze", "limitRecords": "Datensätze begrenzen", "recordsPerPage": "Datensätze pro Seite",
+      "autoStartTransaction": "Transaktion automatisch starten", "grid": "Raster", "gridFont": "Raster-Schriftart",
+      "fontSize": "Schriftgröße", "rowStripes": "Zeilenstreifen", "everyRow": "Alle {n} Zeilen", "none": "Keine",
+      "displayFormat": "Anzeigeformat", "dateFormat": "Datumsformat", "timeFormat": "Zeitformat",
+      "datetimeFormat": "Datums-/Zeitformat", "example": "Beispiel", "output": "Ausgabe",
+      "showThousandsSeparator": "Tausendertrennzeichen anzeigen", "showNullAsText": "NULL als Text anzeigen"
+    },
+    "autoRecovery": {
+      "title": "Automatische Wiederherstellung", "query": "Abfrage", "model": "Modell", "chart": "Diagramm",
+      "autoSaveInterval": "Automatisches Speicher-Intervall (Sekunden)"
+    },
+    "fileLocation": {
+      "title": "Dateispeicherort", "logLocation": "Protokollspeicherort", "configLocation": "Konfigurationsdateispeicherort",
+      "exportWizard": "Export-Assistent", "mysql": "MySQL", "postgresql": "PostgreSQL",
+      "oracle": "Oracle", "sqlite": "SQLite", "sqlserver": "SQL Server", "mariadb": "MariaDB",
+      "mongodb": "MongoDB", "redis": "Redis", "default": "Standard", "browse": "Durchsuchen...",
+      "restartNote": "* Änderungen werden nach einem Neustart von Navicat wirksam"
+    },
+    "connectivity": {
+      "title": "Verbindung", "notice": "Diese Option gilt nur für Aktivierung, Abonnement, Navicat-Aktualisierungsprogramm und Navicat Cloud.",
+      "regular": "Regulär", "verifyServerCert": "Serverzertifikat anhand der Zertifizierungsstelle überprüfen",
+      "proxyServer": "Proxy-Server", "useProxy": "Proxy-Server verwenden",
+      "proxyType": "Proxy-Server-Typ", "http": "HTTP", "socks4": "SOCKS4", "socks5": "SOCKS5",
+      "host": "Host", "port": "Port", "username": "Benutzername", "password": "Passwort",
+      "connectionDiagnosis": "Verbindungsdiagnose", "testConnection": "Verbindung testen",
+      "baidu": "Baidu (https://www.baidu.com)", "navicatWebsite": "Navicat-Website (https://www.navicat.com)",
+      "navicatWebService": "Navicat-Webdienst"
     }
   }
 }

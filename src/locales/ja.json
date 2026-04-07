@@ -51,6 +51,54 @@
       "confirmOnClose": "閉じる時に確認", "autoStart": "起動時に開始", "minimizeToTray": "タスクトレイに最小化",
       "showHiddenFiles": "隠しファイルを表示", "sendUsageData": "Catyasの改善のための匿名の使用データを送信します",
       "restartNote": "* 変更は再起動後に有効になります"
+    },
+    "tabs": {
+      "openNewTabIn": "新しいタブを開く場所", "mainWindow": "メインウィンドウ", "lastWindow": "最後に開いたタブのウィンドウ",
+      "lastExceptMain": "最後に開いたタブのウィンドウ（メインを除く）", "newWindow": "新しいウィンドウ",
+      "startupView": "起動時の表示", "onlyObjectTab": "オブジェクトタブのみ開く", "continueFromLast": "前回のセッションから続行",
+      "specificTabs": "特定のタブまたはタブグループを開く", "setTabs": "タブを設定", "restartNote": "* 変更は再起動後に有効になります"
+    },
+    "autoComplete": {
+      "useAutoComplete": "自動補完を使用する", "autoUpdateInfo": "自動補完情報を自動更新する",
+      "autoSelectFirst": "最初の候補を自動選択する", "clearInfo": "自動補完情報をクリア", "clear": "クリア"
+    },
+    "editor": {
+      "codeCompletion": "コード補完", "useAutoCompletion": "自動補完を使用する", "keywordCase": "キーワードの大文字小文字",
+      "keywordUppercase": "大文字", "keywordLowercase": "小文字", "autoUpdate": "補完情報を自動更新",
+      "autoSelectFirst": "最初の候補を自動選択", "editorFont": "エディターフォント", "fontSize": "フォントサイズ",
+      "tabSize": "タブサイズ", "wordWrap": "折り返し", "wordWrapOn": "オン", "wordWrapOff": "オフ",
+      "showLineNumbers": "行番号を表示", "highlightCurrentLine": "現在の行をハイライト",
+      "highlightMatchingBrackets": "一致する括弧をハイライト", "minimap": "ミニマップを表示",
+      "cursorStyle": "カーソルスタイル", "cursorLine": "ライン", "cursorBlock": "ブロック", "cursorUnderline": "アンダーライン"
+    },
+    "records": {
+      "records": "レコード", "limitRecords": "レコードを制限", "recordsPerPage": "件/ページ",
+      "autoStartTransaction": "トランザクションを自動開始", "grid": "グリッド", "gridFont": "グリッドフォント",
+      "fontSize": "フォントサイズ", "rowStripes": "行のストライプ", "everyRow": "{n}行ごと", "none": "なし",
+      "displayFormat": "表示形式", "dateFormat": "日付形式", "timeFormat": "時刻形式",
+      "datetimeFormat": "日時形式", "example": "例", "output": "出力",
+      "showThousandsSeparator": "千単位の区切り記号を表示", "showNullAsText": "NULLをテキストとして表示"
+    },
+    "autoRecovery": {
+      "title": "自動復元", "query": "クエリ", "model": "モデル", "chart": "チャート",
+      "autoSaveInterval": "自動保存間隔 (秒)"
+    },
+    "fileLocation": {
+      "title": "ファイルの場所", "logLocation": "ログの場所", "configLocation": "設定ファイルの場所",
+      "exportWizard": "エクスポートウィザード", "mysql": "MySQL", "postgresql": "PostgreSQL",
+      "oracle": "Oracle", "sqlite": "SQLite", "sqlserver": "SQL Server", "mariadb": "MariaDB",
+      "mongodb": "MongoDB", "redis": "Redis", "default": "デフォルト", "browse": "参照...",
+      "restartNote": "* 変更は Navicat の再起動後に有効になります"
+    },
+    "connectivity": {
+      "title": "接続性", "notice": "このオプションは、アクティベーション、サブスクリプション、Navicat アップデーター、Navicat Cloud にのみ適用されます。",
+      "regular": "通常", "verifyServerCert": "CAに対してサーバー証明書を検証",
+      "proxyServer": "プロキシサーバー", "useProxy": "プロキシサーバーを使用する",
+      "proxyType": "プロキシサーバーの種類", "http": "HTTP", "socks4": "SOCKS4", "socks5": "SOCKS5",
+      "host": "ホスト", "port": "ポート", "username": "ユーザー名", "password": "パスワード",
+      "connectionDiagnosis": "接続診断", "testConnection": "接続性をテスト",
+      "baidu": "Baidu (https://www.baidu.com)", "navicatWebsite": "Navicat 公式サイト (https://www.navicat.com)",
+      "navicatWebService": "Navicat Web サービス"
     }
   }
 }

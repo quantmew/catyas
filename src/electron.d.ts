@@ -19,6 +19,8 @@ export interface ElectronAPI {
 
   // File dialog
   openFileDialog: (options?: any) => Promise<{ success: boolean; filePath?: string }>
+  saveFileDialog: (options?: any) => Promise<{ success: boolean; filePath?: string }>
+  createSqliteDatabase: (filePath: string) => Promise<{ success: boolean; filePath?: string; message?: string }>
 }
 
 declare global {

@@ -69,7 +69,25 @@ export default function SQLiteConnectionDialog({ open, onClose, onSave }: Props)
 
   const handleBrowseFile = async (field: 'db' | 'settings' | 'key' | 'cert' | 'ca') => {
     try {
-      const result = await window.electronAPI?.openFileDialog()
+      let result
+      if (field === 'db' && dbType !== 'existing') {
+        // For new databases, use save dialog
+        result = await window.electronAPI?.saveFileDialog({
+          title: '新建 SQLite 数据库',
+          filters: [
+            { name: 'SQLite Database', extensions: ['db', 'sqlite3'] },
+            { name: 'All Files', extensions: ['*'] }
+          ]
+        })
+      } else {
+        // For existing databases and other fields, use open dialog
+        result = await window.electronAPI?.openFileDialog({
+          filters: field === 'db' ? [
+            { name: 'SQLite Database', extensions: ['db', 'sqlite', 'sqlite3'] },
+            { name: 'All Files', extensions: ['*'] }
+          ] : undefined
+        })
+      }
       if (result?.success && result.filePath) {
         switch (field) {
           case 'db':
@@ -142,7 +160,18 @@ export default function SQLiteConnectionDialog({ open, onClose, onSave }: Props)
     }
   }
 
-  const save = () => {
+  const save = async () => {
+    if (!dbFilePath) return
+
+    // For new databases, create the SQLite file
+    if (dbType !== 'existing' && dbFilePath) {
+      try {
+        await window.electronAPI?.createSqliteDatabase(dbFilePath)
+      } catch (err) {
+        console.error('Failed to create SQLite database:', err)
+      }
+    }
+
     const conn: Connection = {
       id: `sqlite-${Date.now()}`,
       name: connectionName || dbFilePath || 'SQLite Connection',

@@ -52,6 +52,57 @@
       "confirmOnClose": "Confirmar al cerrar", "autoStart": "Iniciar al arranque", "minimizeToTray": "Minimizar a la bandeja del sistema",
       "showHiddenFiles": "Mostrar archivos ocultos", "sendUsageData": "Enviar datos anónimos de uso para ayudar a mejorar Catyas",
       "restartNote": "* Los cambios surten efecto después de reiniciar"
+    },
+    "tabs": {
+      "openNewTabIn": "Abrir nueva pestaña en", "mainWindow": "Ventana principal", "lastWindow": "Ventana de la última pestaña abierta",
+      "lastExceptMain": "Ventana de la última pestaña (excepto principal)", "newWindow": "Nueva ventana",
+      "startupView": "Vista de inicio", "onlyObjectTab": "Solo abrir pestaña de objeto",
+      "continueFromLast": "Continuar desde la última sesión", "specificTabs": "Abrir pestañas específicas o un grupo de pestañas",
+      "setTabs": "Establecer pestañas", "restartNote": "* Los cambios surten efecto después de reiniciar"
+    },
+    "autoComplete": {
+      "useAutoComplete": "Usar autocompletado", "autoUpdateInfo": "Actualizar automáticamente la información de autocompletado",
+      "autoSelectFirst": "Seleccionar automáticamente la primera sugerencia", "clearInfo": "Limpiar información de autocompletado", "clear": "Limpiar"
+    },
+    "editor": {
+      "codeCompletion": "Completado de código", "useAutoCompletion": "Usar autocompletado",
+      "keywordCase": "Mayúsculas/minúsculas de palabras clave", "keywordUppercase": "MAYÚSCULAS", "keywordLowercase": "minúsculas",
+      "autoUpdate": "Actualizar automáticamente información de completado",
+      "autoSelectFirst": "Seleccionar automáticamente la primera sugerencia",
+      "editorFont": "Fuente del editor", "fontSize": "Tamaño de fuente", "tabSize": "Tamaño de tabulación",
+      "wordWrap": "Ajuste de línea", "wordWrapOn": "Activado", "wordWrapOff": "Desactivado",
+      "showLineNumbers": "Mostrar números de línea", "highlightCurrentLine": "Resaltar línea actual",
+      "highlightMatchingBrackets": "Resaltar corchetes coincidentes", "minimap": "Mostrar minimapa",
+      "cursorStyle": "Estilo del cursor", "cursorLine": "Línea", "cursorBlock": "Bloque", "cursorUnderline": "Subrayado"
+    },
+    "records": {
+      "records": "Registros", "limitRecords": "Limitar registros", "recordsPerPage": "registros por página",
+      "autoStartTransaction": "Iniciar transacción automáticamente", "grid": "Cuadrícula", "gridFont": "Fuente de cuadrícula",
+      "fontSize": "Tamaño de fuente", "rowStripes": "Franjas de filas", "everyRow": "Cada {n} filas", "none": "Ninguno",
+      "displayFormat": "Formato de visualización", "dateFormat": "Formato de fecha", "timeFormat": "Formato de hora",
+      "datetimeFormat": "Formato de fecha y hora", "example": "Ejemplo", "output": "Salida",
+      "showThousandsSeparator": "Mostrar separador de miles", "showNullAsText": "Mostrar NULL como texto"
+    },
+    "autoRecovery": {
+      "title": "Recuperación automática", "query": "Consulta", "model": "Modelo", "chart": "Gráfico",
+      "autoSaveInterval": "Intervalo de guardado automático (segundos)"
+    },
+    "fileLocation": {
+      "title": "Ubicación de archivos", "logLocation": "Ubicación de registros", "configLocation": "Ubicación de archivos de configuración",
+      "exportWizard": "Asistente de exportación", "mysql": "MySQL", "postgresql": "PostgreSQL",
+      "oracle": "Oracle", "sqlite": "SQLite", "sqlserver": "SQL Server", "mariadb": "MariaDB",
+      "mongodb": "MongoDB", "redis": "Redis", "default": "Predeterminado", "browse": "Examinar...",
+      "restartNote": "* Los cambios surten efecto después de reiniciar Navicat"
+    },
+    "connectivity": {
+      "title": "Conectividad", "notice": "Esta opción solo se aplica a la activación, suscripción, el actualizador de Navicat y Navicat Cloud.",
+      "regular": "Regular", "verifyServerCert": "Verificar certificado del servidor contra la CA",
+      "proxyServer": "Servidor proxy", "useProxy": "Usar servidor proxy",
+      "proxyType": "Tipo de servidor proxy", "http": "HTTP", "socks4": "SOCKS4", "socks5": "SOCKS5",
+      "host": "Host", "port": "Puerto", "username": "Usuario", "password": "Contraseña",
+      "connectionDiagnosis": "Diagnóstico de conexión", "testConnection": "Probar conectividad",
+      "baidu": "Baidu (https://www.baidu.com)", "navicatWebsite": "Sitio oficial de Navicat (https://www.navicat.com)",
+      "navicatWebService": "Servicio web de Navicat"
     }
   }
 }

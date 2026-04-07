@@ -52,6 +52,58 @@
       "confirmOnClose": "Подтверждать при закрытии", "autoStart": "Запускать при старте системы", "minimizeToTray": "Сворачивать в системный трей",
       "showHiddenFiles": "Показывать скрытые файлы", "sendUsageData": "Отправлять анонимные данные об использовании для улучшения Catyas",
       "restartNote": "* Изменения вступят в силу после перезапуска"
+    },
+    "tabs": {
+      "openNewTabIn": "Открывать новую вкладку в", "mainWindow": "Главном окне", "lastWindow": "Окне последней открытой вкладки",
+      "lastExceptMain": "Окне последней вкладки (кроме главного)", "newWindow": "Новом окне",
+      "startupView": "Вид при запуске", "onlyObjectTab": "Открывать только вкладку объекта",
+      "continueFromLast": "Продолжить с последнего сеанса", "specificTabs": "Открыть определенные вкладки или группу вкладок",
+      "setTabs": "Настроить вкладки", "restartNote": "* Изменения вступят в силу после перезапуска"
+    },
+    "autoComplete": {
+      "useAutoComplete": "Использовать автодополнение", "autoUpdateInfo": "Автоматически обновлять информацию автодополнения",
+      "autoSelectFirst": "Автоматически выбирать первый вариант",
+      "clearInfo": "Очистить информацию автодополнения", "clear": "Очистить"
+    },
+    "editor": {
+      "codeCompletion": "Автодополнение кода", "useAutoCompletion": "Использовать автодополнение",
+      "keywordCase": "Регистр ключевых слов", "keywordUppercase": "ВЕРХНИЙ РЕГИСТР", "keywordLowercase": "нижний регистр",
+      "autoUpdate": "Автоматически обновлять информацию дополнения",
+      "autoSelectFirst": "Автоматически выбирать первый вариант",
+      "editorFont": "Шрифт редактора", "fontSize": "Размер шрифта", "tabSize": "Размер табуляции",
+      "wordWrap": "Перенос слов", "wordWrapOn": "Вкл", "wordWrapOff": "Выкл",
+      "showLineNumbers": "Показывать номера строк", "highlightCurrentLine": "Подсвечивать текущую строку",
+      "highlightMatchingBrackets": "Подсвечивать парные скобки", "minimap": "Показывать мини-карту",
+      "cursorStyle": "Стиль курсора", "cursorLine": "Линия", "cursorBlock": "Блок", "cursorUnderline": "Подчёркивание"
+    },
+    "records": {
+      "records": "Записи", "limitRecords": "Ограничить записи", "recordsPerPage": "записей на страницу",
+      "autoStartTransaction": "Автоматически начинать транзакцию", "grid": "Сетка", "gridFont": "Шрифт сетки",
+      "fontSize": "Размер шрифта", "rowStripes": "Чередование строк", "everyRow": "Каждые {n} строк", "none": "Нет",
+      "displayFormat": "Формат отображения", "dateFormat": "Формат даты", "timeFormat": "Формат времени",
+      "datetimeFormat": "Формат даты/времени", "example": "Пример", "output": "Вывод",
+      "showThousandsSeparator": "Показывать разделитель тысяч", "showNullAsText": "Показывать NULL как текст"
+    },
+    "autoRecovery": {
+      "title": "Автовосстановление", "query": "Запрос", "model": "Модель", "chart": "Диаграмма",
+      "autoSaveInterval": "Интервал автосохранения (секунды)"
+    },
+    "fileLocation": {
+      "title": "Расположение файлов", "logLocation": "Расположение журналов", "configLocation": "Расположение файлов конфигурации",
+      "exportWizard": "Мастер экспорта", "mysql": "MySQL", "postgresql": "PostgreSQL",
+      "oracle": "Oracle", "sqlite": "SQLite", "sqlserver": "SQL Server", "mariadb": "MariaDB",
+      "mongodb": "MongoDB", "redis": "Redis", "default": "По умолчанию", "browse": "Обзор...",
+      "restartNote": "* Изменения вступят в силу после перезапуска Navicat"
+    },
+    "connectivity": {
+      "title": "Подключение", "notice": "Эта опция применяется только к активации, подписке, программе обновления Navicat и Navicat Cloud.",
+      "regular": "Обычное", "verifyServerCert": "Проверять сертификат сервера по центру сертификации",
+      "proxyServer": "Прокси-сервер", "useProxy": "Использовать прокси-сервер",
+      "proxyType": "Тип прокси-сервера", "http": "HTTP", "socks4": "SOCKS4", "socks5": "SOCKS5",
+      "host": "Хост", "port": "Порт", "username": "Имя пользователя", "password": "Пароль",
+      "connectionDiagnosis": "Диагностика подключения", "testConnection": "Проверить подключение",
+      "baidu": "Baidu (https://www.baidu.com)", "navicatWebsite": "Официальный сайт Navicat (https://www.navicat.com)",
+      "navicatWebService": "Веб-сервис Navicat"
     }
   }
 }

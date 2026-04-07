@@ -102,15 +102,18 @@ function saveConnectionsToFile(connections: any[]): void {
 // File dialog handler
 ipcMain.handle('dialog:open-file', async (_event, options?: OpenDialogOptions) => {
   try {
-    const result = await dialog.showOpenDialog({
+    const win = mainWindow
+    const dialogOptions: OpenDialogOptions = {
       title: '选择文件',
       filters: options?.filters || [
         { name: 'SQLite Database', extensions: ['db', 'sqlite', 'sqlite3'] },
         { name: 'All Files', extensions: ['*'] }
       ],
-      properties: ['openFile'],
-      ...options
-    })
+      properties: ['openFile']
+    }
+    const result = win
+      ? await dialog.showOpenDialog(win, dialogOptions)
+      : await dialog.showOpenDialog(dialogOptions)
 
     if (!result.canceled && result.filePaths.length > 0) {
       return { success: true, filePath: result.filePaths[0] }
@@ -119,6 +122,52 @@ ipcMain.handle('dialog:open-file', async (_event, options?: OpenDialogOptions) =
   } catch (err) {
     console.error('Failed to open file dialog:', err)
     return { success: false, filePath: null }
+  }
+})
+
+// Save file dialog handler (for creating new files)
+ipcMain.handle('dialog:save-file', async (_event, options?: {
+  title?: string
+  defaultPath?: string
+  filters?: { name: string; extensions: string[] }[]
+}) => {
+  try {
+    const win = mainWindow
+    const dialogOptions: Electron.SaveDialogOptions = {
+      title: options?.title || '保存文件',
+      defaultPath: options?.defaultPath,
+      filters: options?.filters || [
+        { name: 'SQLite Database', extensions: ['db', 'sqlite3'] },
+        { name: 'All Files', extensions: ['*'] }
+      ]
+    }
+    const result = win
+      ? await dialog.showSaveDialog(win, dialogOptions)
+      : await dialog.showSaveDialog(dialogOptions)
+
+    if (!result.canceled && result.filePath) {
+      return { success: true, filePath: result.filePath }
+    }
+    return { success: false, filePath: null }
+  } catch (err) {
+    console.error('Failed to open save dialog:', err)
+    return { success: false, filePath: null }
+  }
+})
+
+// Create SQLite database file
+ipcMain.handle('sqlite:create-database', async (_event, filePath: string) => {
+  try {
+    if (!filePath) {
+      return { success: false, message: 'No file path specified' }
+    }
+    // better-sqlite3 automatically creates the file when opening
+    const db = new sqlite3(filePath)
+    db.close()
+    return { success: true, filePath }
+  } catch (err: any) {
+    console.error('Failed to create SQLite database:', err)
+    return { success: false, message: err.message }
   }
 })
 

@@ -21,4 +21,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
   // File dialog
   openFileDialog: (options) => ipcRenderer.invoke('dialog:open-file', options),
+  saveFileDialog: (options) => ipcRenderer.invoke('dialog:save-file', options),
+  createSqliteDatabase: (filePath) => ipcRenderer.invoke('sqlite:create-database', filePath),
 })

@@ -1,6 +1,7 @@
-import { Database, Plus, ChevronRight, ChevronDown, Folder, Table2, Layers } from 'lucide-react'
+import { Database, Plus, ChevronRight, ChevronDown, Folder, Table2, Layers, Trash2 } from 'lucide-react'
 import { Connection } from '../types'
 import { useTranslation } from 'react-i18next'
+import * as ContextMenu from '@radix-ui/react-context-menu'
 
 interface SidebarProps {
   connections: Connection[]
@@ -9,6 +10,7 @@ interface SidebarProps {
   onAddConnection: () => void
   onToggleDatabase: (connectionId: string, databaseName: string) => void
   onSelectTable: (connectionId: string, databaseName: string, tableName: string) => void
+  onDeleteConnection?: (connectionId: string) => void
 }
 
 export default function Sidebar({
@@ -18,6 +20,7 @@ export default function Sidebar({
   onAddConnection,
   onToggleDatabase,
   onSelectTable,
+  onDeleteConnection,
 }: SidebarProps) {
   const { t } = useTranslation()
 
@@ -51,26 +54,47 @@ export default function Sidebar({
             {connections.map((connection) => (
               <div key={connection.id}>
                 {/* Connection Level */}
-                <div
-                  className={`
-                    flex items-center gap-2 px-3 py-1.5 cursor-pointer
-                    hover:bg-gray-100 dark:hover:bg-gray-700
-                    ${selectedConnection?.id === connection.id ? 'bg-blue-50 dark:bg-blue-900/20' : ''}
-                  `}
-                  onClick={() => {
-                    onSelectConnection(connection)
-                  }}
-                >
-                  {connection.expanded ? (
-                    <ChevronDown className="w-4 h-4 text-gray-500" />
-                  ) : (
-                    <ChevronRight className="w-4 h-4 text-gray-500" />
-                  )}
-                  {getDatabaseIcon(connection.type)}
-                  <span className="text-sm text-gray-700 dark:text-gray-200 truncate flex-1">
-                    {connection.name}
-                  </span>
-                </div>
+                <ContextMenu.Root>
+                  <ContextMenu.Trigger asChild>
+                    <div
+                      className={`
+                        flex items-center gap-2 px-3 py-1.5 cursor-pointer
+                        hover:bg-gray-100 dark:hover:bg-gray-700
+                        ${selectedConnection?.id === connection.id ? 'bg-blue-50 dark:bg-blue-900/20' : ''}
+                      `}
+                      onClick={() => {
+                        onSelectConnection(connection)
+                      }}
+                    >
+                      {connection.expanded ? (
+                        <ChevronDown className="w-4 h-4 text-gray-500" />
+                      ) : (
+                        <ChevronRight className="w-4 h-4 text-gray-500" />
+                      )}
+                      {getDatabaseIcon(connection.type)}
+                      <span className="text-sm text-gray-700 dark:text-gray-200 truncate flex-1">
+                        {connection.name}
+                      </span>
+                    </div>
+                  </ContextMenu.Trigger>
+                  <ContextMenu.Portal>
+                    <ContextMenu.Content
+                      className="min-w-[160px] bg-white dark:bg-gray-800 shadow-lg border border-gray-200 dark:border-gray-700 py-1 rounded z-50"
+                    >
+                      <ContextMenu.Item
+                        className="outline-none px-3 py-1.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 cursor-default flex items-center gap-2"
+                        onSelect={() => {
+                          if (confirm(t('sidebar.confirmDelete'))) {
+                            onDeleteConnection?.(connection.id)
+                          }
+                        }}
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        {t('sidebar.deleteConnection')}
+                      </ContextMenu.Item>
+                    </ContextMenu.Content>
+                  </ContextMenu.Portal>
+                </ContextMenu.Root>
 
                 {/* Databases Level */}
                 {connection.expanded && connection.databases && (

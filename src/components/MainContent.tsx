@@ -8,12 +8,14 @@ interface MainContentProps {
   connection: Connection | null
   selectedTable: string | null
   selectedDatabase: string | null
+  queryEditorOpen?: boolean
 }
 
 export default function MainContent({
   connection,
   selectedTable,
   selectedDatabase,
+  queryEditorOpen,
 }: MainContentProps) {
   const { t } = useTranslation()
   if (!connection) {
@@ -34,6 +36,10 @@ export default function MainContent({
   // Find the currently selected database and its tables
   const currentDb = connection.databases?.find(db => db.name === selectedDatabase)
   const tables: Table[] = currentDb?.tables || []
+
+  if (queryEditorOpen) {
+    return null
+  }
 
   return (
     <div className="flex-1 flex min-h-0">

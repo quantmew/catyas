@@ -81,7 +81,9 @@
     "connections": "Connections",
     "addConnection": "Add Connection",
     "noConnections": "No connections yet",
-    "clickToAdd": "Click + to add one."
+    "clickToAdd": "Click + to add one.",
+    "deleteConnection": "Delete Connection",
+    "confirmDelete": "Are you sure you want to delete this connection?"
   },
   "welcome": {
     "title": "Welcome to Catyas",
@@ -149,20 +151,42 @@
     "result": "Result",
     "noResult": "No results",
     "error": "Error",
-    "success": "Query executed successfully"
+    "success": "Query executed successfully",
+    "welcome": "Welcome",
+    "welcomeMessage": "Query Editor",
+    "untitledQuery": "Untitled Query",
+    "newQuery": "New Query",
+    "close": "Close",
+    "selectConnection": "Select a connection to start querying",
+    "createConnection": "Or create a new connection from the sidebar",
+    "notConnected": "Not Connected",
+    "save": "Save",
+    "queryBuilder": "Query Builder",
+    "beautifySQL": "Beautify SQL",
+    "snippets": "Snippets",
+    "createChart": "Create Chart",
+    "run": "Run",
+    "stop": "Stop",
+    "explain": "Explain",
+    "queryResult": "Query Result",
+    "noResults": "No results yet. Run a query to see results."
   },
   "table": {
     "name": "Table Name",
     "structure": "Structure",
     "data": "Data",
     "column": "Column",
+    "columnName": "Column Name",
     "type": "Type",
+    "dataType": "Data Type",
+    "value": "Value",
     "nullable": "Nullable",
     "key": "Key",
     "default": "Default",
     "extra": "Extra",
     "rows": "Rows",
-    "noData": "No data available"
+    "noData": "No data available",
+    "loading": "Loading..."
   },
   "ribbon": {
     "newConnection": "New Connection",
@@ -174,6 +198,10 @@
     "query": "Query",
     "import": "Import",
     "settings": "Settings"
+  },
+  "dataTransfer": {
+    "title": "Data Transfer",
+    "step": "Step {{current}} / {{total}}"
   },
   "common": {
     "search": "Search",

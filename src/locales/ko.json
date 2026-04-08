@@ -81,7 +81,9 @@
     "connections": "연결",
     "addConnection": "연결 추가",
     "noConnections": "연결 없음",
-    "clickToAdd": "+ 를 클릭하여 추가하세요."
+    "clickToAdd": "+ 를 클릭하여 추가하세요.",
+    "deleteConnection": "연결 삭제",
+    "confirmDelete": "이 연결을 삭제하시겠습니까?"
   },
   "welcome": {
     "title": "Catyas 에 오신 것을 환영합니다",
@@ -187,20 +189,42 @@
     "result": "결과",
     "noResult": "결과 없음",
     "error": "오류",
-    "success": "쿼리가 성공적으로 실행됨"
+    "success": "쿼리가 성공적으로 실행됨",
+    "welcome": "환영합니다",
+    "welcomeMessage": "쿼리 편집기",
+    "untitledQuery": "제목 없는 쿼리",
+    "newQuery": "새 쿼리",
+    "close": "닫기",
+    "selectConnection": "쿼리를 시작하려면 연결을 선택하세요",
+    "createConnection": "또는 사이드바에서 새 연결을 만드세요",
+    "notConnected": "연결되지 않음",
+    "save": "저장",
+    "queryBuilder": "쿼리 빌더",
+    "beautifySQL": "SQL 정렬",
+    "snippets": "스니펫",
+    "createChart": "차트 만들기",
+    "run": "실행",
+    "stop": "중지",
+    "explain": "실행 계획",
+    "queryResult": "쿼리 결과",
+    "noResults": "아직 결과가 없습니다. 쿼리를 실행하여 결과를 확인하세요."
   },
   "table": {
     "name": "테이블 이름",
     "structure": "구조",
     "data": "데이터",
     "column": "열",
+    "columnName": "열 이름",
     "type": "유형",
+    "dataType": "데이터 유형",
+    "value": "값",
     "nullable": "Null 허용",
     "key": "키",
     "default": "기본값",
     "extra": "추가",
     "rows": "행",
-    "noData": "데이터 없음"
+    "noData": "데이터 없음",
+    "loading": "로딩 중..."
   },
   "ribbon": {
     "newConnection": "새 연결",

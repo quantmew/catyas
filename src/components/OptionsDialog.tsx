@@ -1,7 +1,150 @@
 import * as Dialog from '@radix-ui/react-dialog'
 import { useTranslation } from 'react-i18next'
-import { useState } from 'react'
-import { X, Globe, FolderOpen } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { X, Globe, FolderOpen, Folder } from 'lucide-react'
+import { useTheme } from '../contexts/ThemeContext'
+
+const SETTINGS_KEY = 'catyas-options'
+
+type OpenNewTabIn = 'main' | 'last' | 'lastExceptMain' | 'new'
+type StartupView = 'onlyObject' | 'continue' | 'specific'
+type CursorStyle = 'line' | 'block' | 'underline'
+type KeywordCase = 'upper' | 'lower'
+type ProxyType = 'HTTP' | 'SOCKS4' | 'SOCKS5'
+
+interface AppSettings {
+  language: string
+  openNewTabIn: OpenNewTabIn
+  startupView: StartupView
+  settingsPath: string
+  confirmOnClose: boolean
+  autoStart: boolean
+  minimizeToTray: boolean
+  showHiddenFiles: boolean
+  sendUsageData: boolean
+  useAutoComplete: boolean
+  autoUpdateInfo: boolean
+  autoSelectFirst: boolean
+  editorFont: string
+  editorFontSize: number
+  tabSize: number
+  wordWrap: boolean
+  showLineNumbers: boolean
+  highlightCurrentLine: boolean
+  highlightMatchingBrackets: boolean
+  showMinimap: boolean
+  cursorStyle: CursorStyle
+  keywordCase: KeywordCase
+  limitRecords: boolean
+  recordsPerPage: number
+  autoStartTransaction: boolean
+  gridFont: string
+  gridFontSize: number
+  rowStripes: number
+  dateFormat: string
+  timeFormat: string
+  datetimeFormat: string
+  showThousandsSeparator: boolean
+  showNullAsText: boolean
+  autoRecoverQuery: boolean
+  autoRecoverModel: boolean
+  autoRecoverChart: boolean
+  querySaveInterval: number
+  modelSaveInterval: number
+  chartSaveInterval: number
+  logLocation: string
+  mysqlConfigLocation: string
+  postgresqlConfigLocation: string
+  oracleConfigLocation: string
+  sqliteConfigLocation: string
+  sqlserverConfigLocation: string
+  mariadbConfigLocation: string
+  mongodbConfigLocation: string
+  redisConfigLocation: string
+  defaultConfigLocation: string
+  exportWizardLocation: string
+  verifyServerCert: boolean
+  useProxy: boolean
+  proxyType: ProxyType
+  proxyHost: string
+  proxyPort: string
+  proxyUsername: string
+  proxyPassword: string
+}
+
+const defaultSettings: AppSettings = {
+  language: 'en',
+  openNewTabIn: 'main',
+  startupView: 'onlyObject',
+  settingsPath: '',
+  confirmOnClose: true,
+  autoStart: false,
+  minimizeToTray: false,
+  showHiddenFiles: false,
+  sendUsageData: false,
+  useAutoComplete: true,
+  autoUpdateInfo: true,
+  autoSelectFirst: true,
+  editorFont: 'Consolas',
+  editorFontSize: 14,
+  tabSize: 4,
+  wordWrap: false,
+  showLineNumbers: true,
+  highlightCurrentLine: true,
+  highlightMatchingBrackets: true,
+  showMinimap: false,
+  cursorStyle: 'line',
+  keywordCase: 'upper',
+  limitRecords: true,
+  recordsPerPage: 1000,
+  autoStartTransaction: false,
+  gridFont: 'Segoe UI',
+  gridFontSize: 9,
+  rowStripes: 3,
+  dateFormat: 'YYYY-MM-DD',
+  timeFormat: 'HH:mm:ss',
+  datetimeFormat: 'YYYY-MM-DD HH:mm:ss',
+  showThousandsSeparator: false,
+  showNullAsText: false,
+  autoRecoverQuery: true,
+  autoRecoverModel: true,
+  autoRecoverChart: true,
+  querySaveInterval: 30,
+  modelSaveInterval: 180,
+  chartSaveInterval: 180,
+  logLocation: '',
+  mysqlConfigLocation: '',
+  postgresqlConfigLocation: '',
+  oracleConfigLocation: '',
+  sqliteConfigLocation: '',
+  sqlserverConfigLocation: '',
+  mariadbConfigLocation: '',
+  mongodbConfigLocation: '',
+  redisConfigLocation: '',
+  defaultConfigLocation: '',
+  exportWizardLocation: '',
+  verifyServerCert: true,
+  useProxy: true,
+  proxyType: 'HTTP',
+  proxyHost: '127.0.0.1',
+  proxyPort: '10806',
+  proxyUsername: '',
+  proxyPassword: '',
+}
+
+function loadSettings(): AppSettings {
+  try {
+    const saved = localStorage.getItem(SETTINGS_KEY)
+    if (saved) return { ...defaultSettings, ...JSON.parse(saved) }
+  } catch { /* ignore */ }
+  return { ...defaultSettings }
+}
+
+function saveSettings(settings: Partial<AppSettings>) {
+  try {
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings))
+  } catch { /* ignore */ }
+}
 
 type Category = 'environment' | 'tabs' | 'autoComplete' | 'editor' | 'records' | 'autoRecovery' | 'fileLocation' | 'connectivity' | 'advanced'
 
@@ -17,92 +160,123 @@ interface OptionsDialogProps {
 
 export default function OptionsDialog({ open, onClose }: OptionsDialogProps) {
   const { t, i18n } = useTranslation()
+  const { theme, setTheme } = useTheme()
   const [selectedCategory, setSelectedCategory] = useState<Category>('environment')
-  const [theme, setTheme] = useState<'light' | 'dark'>(() =>
-    document.documentElement.classList.contains('dark') ? 'dark' : 'light'
-  )
-  const [language, setLanguage] = useState(i18n.language)
+
+  const saved = useState(loadSettings)[0]
+  const [language, setLanguage] = useState(saved.language ?? i18n.language)
 
   // Tabs settings
-  const [openNewTabIn, setOpenNewTabIn] = useState<'main' | 'last' | 'lastExceptMain' | 'new'>('main')
-  const [startupView, setStartupView] = useState<'onlyObject' | 'continue' | 'specific'>('onlyObject')
-  const [settingsPath, setSettingsPath] = useState('')
+  const [openNewTabIn, setOpenNewTabIn] = useState<OpenNewTabIn>(saved.openNewTabIn ?? 'main')
+  const [startupView, setStartupView] = useState<StartupView>(saved.startupView ?? 'onlyObject')
+  const [settingsPath, setSettingsPath] = useState(saved.settingsPath ?? '')
 
   // Behavior states
-  const [confirmOnClose, setConfirmOnClose] = useState(true)
-  const [autoStart, setAutoStart] = useState(false)
-  const [minimizeToTray, setMinimizeToTray] = useState(false)
-  const [showHiddenFiles, setShowHiddenFiles] = useState(false)
-  const [sendUsageData, setSendUsageData] = useState(false)
+  const [confirmOnClose, setConfirmOnClose] = useState(saved.confirmOnClose ?? true)
+  const [autoStart, setAutoStart] = useState(saved.autoStart ?? false)
+  const [minimizeToTray, setMinimizeToTray] = useState(saved.minimizeToTray ?? false)
+  const [showHiddenFiles, setShowHiddenFiles] = useState(saved.showHiddenFiles ?? false)
+  const [sendUsageData, setSendUsageData] = useState(saved.sendUsageData ?? false)
 
   // Auto Completion states
-  const [useAutoComplete, setUseAutoComplete] = useState(true)
-  const [autoUpdateInfo, setAutoUpdateInfo] = useState(true)
-  const [autoSelectFirst, setAutoSelectFirst] = useState(true)
+  const [useAutoComplete, setUseAutoComplete] = useState(saved.useAutoComplete ?? true)
+  const [autoUpdateInfo, setAutoUpdateInfo] = useState(saved.autoUpdateInfo ?? true)
+  const [autoSelectFirst, setAutoSelectFirst] = useState(saved.autoSelectFirst ?? true)
 
   // Editor states
-  const [editorFont, setEditorFont] = useState('Consolas')
-  const [editorFontSize, setEditorFontSize] = useState(14)
-  const [tabSize, setTabSize] = useState(4)
-  const [wordWrap, setWordWrap] = useState(false)
-  const [showLineNumbers, setShowLineNumbers] = useState(true)
-  const [highlightCurrentLine, setHighlightCurrentLine] = useState(true)
-  const [highlightMatchingBrackets, setHighlightMatchingBrackets] = useState(true)
-  const [showMinimap, setShowMinimap] = useState(false)
-  const [cursorStyle, setCursorStyle] = useState<'line' | 'block' | 'underline'>('line')
-  const [keywordCase, setKeywordCase] = useState<'upper' | 'lower'>('upper')
+  const [editorFont, setEditorFont] = useState(saved.editorFont ?? 'Consolas')
+  const [editorFontSize, setEditorFontSize] = useState(saved.editorFontSize ?? 14)
+  const [tabSize, setTabSize] = useState(saved.tabSize ?? 4)
+  const [wordWrap, setWordWrap] = useState(saved.wordWrap ?? false)
+  const [showLineNumbers, setShowLineNumbers] = useState(saved.showLineNumbers ?? true)
+  const [highlightCurrentLine, setHighlightCurrentLine] = useState(saved.highlightCurrentLine ?? true)
+  const [highlightMatchingBrackets, setHighlightMatchingBrackets] = useState(saved.highlightMatchingBrackets ?? true)
+  const [showMinimap, setShowMinimap] = useState(saved.showMinimap ?? false)
+  const [cursorStyle, setCursorStyle] = useState<CursorStyle>(saved.cursorStyle ?? 'line')
+  const [keywordCase, setKeywordCase] = useState<KeywordCase>(saved.keywordCase ?? 'upper')
 
   // Records states
-  const [limitRecords, setLimitRecords] = useState(true)
-  const [recordsPerPage, setRecordsPerPage] = useState(1000)
-  const [autoStartTransaction, setAutoStartTransaction] = useState(false)
-  const [gridFont, setGridFont] = useState('Segoe UI')
-  const [gridFontSize, setGridFontSize] = useState(9)
-  const [rowStripes, setRowStripes] = useState(3)
-  const [dateFormat, setDateFormat] = useState('YYYY-MM-DD')
-  const [timeFormat, setTimeFormat] = useState('HH:mm:ss')
-  const [datetimeFormat, setDatetimeFormat] = useState('YYYY-MM-DD HH:mm:ss')
-  const [showThousandsSeparator, setShowThousandsSeparator] = useState(false)
-  const [showNullAsText, setShowNullAsText] = useState(false)
+  const [limitRecords, setLimitRecords] = useState(saved.limitRecords ?? true)
+  const [recordsPerPage, setRecordsPerPage] = useState(saved.recordsPerPage ?? 1000)
+  const [autoStartTransaction, setAutoStartTransaction] = useState(saved.autoStartTransaction ?? false)
+  const [gridFont, setGridFont] = useState(saved.gridFont ?? 'Segoe UI')
+  const [gridFontSize, setGridFontSize] = useState(saved.gridFontSize ?? 9)
+  const [rowStripes, setRowStripes] = useState(saved.rowStripes ?? 3)
+  const [dateFormat, setDateFormat] = useState(saved.dateFormat ?? 'YYYY-MM-DD')
+  const [timeFormat, setTimeFormat] = useState(saved.timeFormat ?? 'HH:mm:ss')
+  const [datetimeFormat, setDatetimeFormat] = useState(saved.datetimeFormat ?? 'YYYY-MM-DD HH:mm:ss')
+  const [showThousandsSeparator, setShowThousandsSeparator] = useState(saved.showThousandsSeparator ?? false)
+  const [showNullAsText, setShowNullAsText] = useState(saved.showNullAsText ?? false)
 
   // Auto Recovery states
-  const [autoRecoverQuery, setAutoRecoverQuery] = useState(true)
-  const [autoRecoverModel, setAutoRecoverModel] = useState(true)
-  const [autoRecoverChart, setAutoRecoverChart] = useState(true)
-  const [querySaveInterval, setQuerySaveInterval] = useState(30)
-  const [modelSaveInterval, setModelSaveInterval] = useState(180)
-  const [chartSaveInterval, setChartSaveInterval] = useState(180)
+  const [autoRecoverQuery, setAutoRecoverQuery] = useState(saved.autoRecoverQuery ?? true)
+  const [autoRecoverModel, setAutoRecoverModel] = useState(saved.autoRecoverModel ?? true)
+  const [autoRecoverChart, setAutoRecoverChart] = useState(saved.autoRecoverChart ?? true)
+  const [querySaveInterval, setQuerySaveInterval] = useState(saved.querySaveInterval ?? 30)
+  const [modelSaveInterval, setModelSaveInterval] = useState(saved.modelSaveInterval ?? 180)
+  const [chartSaveInterval, setChartSaveInterval] = useState(saved.chartSaveInterval ?? 180)
 
   // File Location states
-  const [logLocation, setLogLocation] = useState('')
-  const [mysqlConfigLocation, setMysqlConfigLocation] = useState('')
-  const [postgresqlConfigLocation, setPostgresqlConfigLocation] = useState('')
-  const [oracleConfigLocation, setOracleConfigLocation] = useState('')
-  const [sqliteConfigLocation, setSqliteConfigLocation] = useState('')
-  const [sqlserverConfigLocation, setSqlserverConfigLocation] = useState('')
-  const [mariadbConfigLocation, setMariadbConfigLocation] = useState('')
-  const [mongodbConfigLocation, setMongodbConfigLocation] = useState('')
-  const [redisConfigLocation, setRedisConfigLocation] = useState('')
-  const [defaultConfigLocation, setDefaultConfigLocation] = useState('')
-  const [exportWizardLocation, setExportWizardLocation] = useState('')
+  const [logLocation, setLogLocation] = useState(saved.logLocation ?? '')
+  const [mysqlConfigLocation, setMysqlConfigLocation] = useState(saved.mysqlConfigLocation ?? '')
+  const [postgresqlConfigLocation, setPostgresqlConfigLocation] = useState(saved.postgresqlConfigLocation ?? '')
+  const [oracleConfigLocation, setOracleConfigLocation] = useState(saved.oracleConfigLocation ?? '')
+  const [sqliteConfigLocation, setSqliteConfigLocation] = useState(saved.sqliteConfigLocation ?? '')
+  const [sqlserverConfigLocation, setSqlserverConfigLocation] = useState(saved.sqlserverConfigLocation ?? '')
+  const [mariadbConfigLocation, setMariadbConfigLocation] = useState(saved.mariadbConfigLocation ?? '')
+  const [mongodbConfigLocation, setMongodbConfigLocation] = useState(saved.mongodbConfigLocation ?? '')
+  const [redisConfigLocation, setRedisConfigLocation] = useState(saved.redisConfigLocation ?? '')
+  const [defaultConfigLocation, setDefaultConfigLocation] = useState(saved.defaultConfigLocation ?? '')
+  const [exportWizardLocation, setExportWizardLocation] = useState(saved.exportWizardLocation ?? '')
 
   // Connectivity states
-  const [verifyServerCert, setVerifyServerCert] = useState(true)
-  const [useProxy, setUseProxy] = useState(true)
-  const [proxyType, setProxyType] = useState<'HTTP' | 'SOCKS4' | 'SOCKS5'>('HTTP')
-  const [proxyHost, setProxyHost] = useState('127.0.0.1')
-  const [proxyPort, setProxyPort] = useState('10806')
-  const [proxyUsername, setProxyUsername] = useState('')
-  const [proxyPassword, setProxyPassword] = useState('')
+  const [verifyServerCert, setVerifyServerCert] = useState(saved.verifyServerCert ?? true)
+  const [useProxy, setUseProxy] = useState(saved.useProxy ?? true)
+  const [proxyType, setProxyType] = useState<ProxyType>(saved.proxyType ?? 'HTTP')
+  const [proxyHost, setProxyHost] = useState(saved.proxyHost ?? '127.0.0.1')
+  const [proxyPort, setProxyPort] = useState(saved.proxyPort ?? '10806')
+  const [proxyUsername, setProxyUsername] = useState(saved.proxyUsername ?? '')
+  const [proxyPassword, setProxyPassword] = useState(saved.proxyPassword ?? '')
+
+  // Persist settings on any change
+  useEffect(() => {
+    saveSettings({
+      language, openNewTabIn, startupView, settingsPath,
+      confirmOnClose, autoStart, minimizeToTray, showHiddenFiles, sendUsageData,
+      useAutoComplete, autoUpdateInfo, autoSelectFirst,
+      editorFont, editorFontSize, tabSize, wordWrap,
+      showLineNumbers, highlightCurrentLine, highlightMatchingBrackets, showMinimap,
+      cursorStyle, keywordCase,
+      limitRecords, recordsPerPage, autoStartTransaction,
+      gridFont, gridFontSize, rowStripes,
+      dateFormat, timeFormat, datetimeFormat, showThousandsSeparator, showNullAsText,
+      autoRecoverQuery, autoRecoverModel, autoRecoverChart,
+      querySaveInterval, modelSaveInterval, chartSaveInterval,
+      logLocation, mysqlConfigLocation, postgresqlConfigLocation,
+      oracleConfigLocation, sqliteConfigLocation, sqlserverConfigLocation,
+      mariadbConfigLocation, mongodbConfigLocation, redisConfigLocation,
+      defaultConfigLocation, exportWizardLocation,
+      verifyServerCert, useProxy, proxyType, proxyHost, proxyPort, proxyUsername, proxyPassword,
+    })
+  }, [language, openNewTabIn, startupView, settingsPath,
+    confirmOnClose, autoStart, minimizeToTray, showHiddenFiles, sendUsageData,
+    useAutoComplete, autoUpdateInfo, autoSelectFirst,
+    editorFont, editorFontSize, tabSize, wordWrap,
+    showLineNumbers, highlightCurrentLine, highlightMatchingBrackets, showMinimap,
+    cursorStyle, keywordCase,
+    limitRecords, recordsPerPage, autoStartTransaction,
+    gridFont, gridFontSize, rowStripes,
+    dateFormat, timeFormat, datetimeFormat, showThousandsSeparator, showNullAsText,
+    autoRecoverQuery, autoRecoverModel, autoRecoverChart,
+    querySaveInterval, modelSaveInterval, chartSaveInterval,
+    logLocation, mysqlConfigLocation, postgresqlConfigLocation,
+    oracleConfigLocation, sqliteConfigLocation, sqlserverConfigLocation,
+    mariadbConfigLocation, mongodbConfigLocation, redisConfigLocation,
+    defaultConfigLocation, exportWizardLocation,
+    verifyServerCert, useProxy, proxyType, proxyHost, proxyPort, proxyUsername, proxyPassword])
 
   const handleThemeChange = (newTheme: 'light' | 'dark') => {
     setTheme(newTheme)
-    if (newTheme === 'dark') {
-      document.documentElement.classList.add('dark')
-    } else {
-      document.documentElement.classList.remove('dark')
-    }
-    localStorage.setItem('catyas-theme', newTheme)
   }
 
   const handleLanguageChange = (lang: string) => {
@@ -128,6 +302,21 @@ export default function OptionsDialog({ open, onClose }: OptionsDialogProps) {
       }
     } catch (err) {
       console.error('Failed to open file dialog:', err)
+    }
+  }
+
+  const handleBrowseDirectory = async (setter?: (path: string) => void) => {
+    try {
+      const result = await window.electronAPI?.openDirectoryDialog({
+        title: 'Select Folder',
+      })
+      if (result?.filePath) {
+        if (setter) {
+          setter(result.filePath)
+        }
+      }
+    } catch (err) {
+      console.error('Failed to open directory dialog:', err)
     }
   }
 
@@ -636,7 +825,7 @@ export default function OptionsDialog({ open, onClose }: OptionsDialogProps) {
                       <label className="block text-sm text-gray-600 dark:text-gray-300 mb-1.5">{t('options.editor.cursorStyle')}</label>
                       <select
                         value={cursorStyle}
-                        onChange={(e) => setCursorStyle(e.target.value as 'line' | 'block' | 'underline')}
+                        onChange={(e) => setCursorStyle(e.target.value as CursorStyle)}
                         className="w-full max-w-xs px-2 py-1.5 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700 dark:text-gray-200"
                       >
                         <option value="line">{t('options.editor.cursorLine')}</option>
@@ -882,10 +1071,10 @@ export default function OptionsDialog({ open, onClose }: OptionsDialogProps) {
                       className="flex-1 px-2 py-1.5 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700 dark:text-gray-200"
                     />
                     <button
-                      onClick={() => handleBrowsePath(setLogLocation)}
-                      className="px-3 py-1.5 text-sm bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 rounded transition-colors border border-gray-300 dark:border-gray-600"
+                      onClick={() => handleBrowseDirectory(setLogLocation)}
+                      className="px-3 py-1.5 text-sm bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 rounded transition-colors border border-gray-300 dark:border-gray-600 flex items-center gap-1"
                     >
-                      ...
+                      <Folder className="w-3 h-3" />...
                     </button>
                   </div>
                   {[
@@ -907,10 +1096,10 @@ export default function OptionsDialog({ open, onClose }: OptionsDialogProps) {
                         className="flex-1 px-2 py-1.5 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700 dark:text-gray-200"
                       />
                       <button
-                        onClick={() => handleBrowsePath(item.setter)}
-                        className="px-3 py-1.5 text-sm bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 rounded transition-colors border border-gray-300 dark:border-gray-600"
+                        onClick={() => handleBrowseDirectory(item.setter)}
+                        className="px-3 py-1.5 text-sm bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 rounded transition-colors border border-gray-300 dark:border-gray-600 flex items-center gap-1"
                       >
-                        ...
+                        <Folder className="w-3 h-3" />...
                       </button>
                     </div>
                   ))}
@@ -923,10 +1112,10 @@ export default function OptionsDialog({ open, onClose }: OptionsDialogProps) {
                       className="flex-1 px-2 py-1.5 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700 dark:text-gray-200"
                     />
                     <button
-                      onClick={() => handleBrowsePath(setDefaultConfigLocation)}
-                      className="px-3 py-1.5 text-sm bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 rounded transition-colors border border-gray-300 dark:border-gray-600"
+                      onClick={() => handleBrowseDirectory(setDefaultConfigLocation)}
+                      className="px-3 py-1.5 text-sm bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 rounded transition-colors border border-gray-300 dark:border-gray-600 flex items-center gap-1"
                     >
-                      ...
+                      <Folder className="w-3 h-3" />...
                     </button>
                   </div>
                   <div className="flex items-center gap-3">
@@ -938,10 +1127,10 @@ export default function OptionsDialog({ open, onClose }: OptionsDialogProps) {
                       className="flex-1 px-2 py-1.5 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700 dark:text-gray-200"
                     />
                     <button
-                      onClick={() => handleBrowsePath(setExportWizardLocation)}
-                      className="px-3 py-1.5 text-sm bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 rounded transition-colors border border-gray-300 dark:border-gray-600"
+                      onClick={() => handleBrowseDirectory(setExportWizardLocation)}
+                      className="px-3 py-1.5 text-sm bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 rounded transition-colors border border-gray-300 dark:border-gray-600 flex items-center gap-1"
                     >
-                      ...
+                      <Folder className="w-3 h-3" />...
                     </button>
                   </div>
                   <div className="pt-4 mt-4 border-t border-gray-200 dark:border-gray-700">
@@ -994,7 +1183,7 @@ export default function OptionsDialog({ open, onClose }: OptionsDialogProps) {
                         <label className="text-sm text-gray-600 dark:text-gray-300">{t('options.connectivity.proxyType')}</label>
                         <select
                           value={proxyType}
-                          onChange={(e) => setProxyType(e.target.value as 'HTTP' | 'SOCKS4' | 'SOCKS5')}
+                          onChange={(e) => setProxyType(e.target.value as ProxyType)}
                           className="px-2 py-1.5 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700 dark:text-gray-200"
                         >
                           <option value="HTTP">HTTP</option>
@@ -1040,7 +1229,17 @@ export default function OptionsDialog({ open, onClose }: OptionsDialogProps) {
                     </label>
                     <div className="space-y-3">
                       <button
-                        onClick={() => console.log('Test connectivity')}
+                        onClick={async () => {
+                          try {
+                            const results = await Promise.all([
+                              fetch('https://www.baidu.com', { method: 'HEAD', mode: 'no-cors' }).then(() => true).catch(() => false),
+                              fetch('https://www.navicat.com', { method: 'HEAD', mode: 'no-cors' }).then(() => true).catch(() => false),
+                            ])
+                            alert(`Connectivity Test Results:\n- Baidu: ${results[0] ? 'Connected' : 'Failed'}\n- Navicat Website: ${results[1] ? 'Connected' : 'Failed'}`)
+                          } catch (err) {
+                            alert(`Connection test failed: ${err}`)
+                          }
+                        }}
                         className="px-4 py-1.5 text-sm bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 rounded transition-colors border border-gray-300 dark:border-gray-600"
                       >
                         {t('options.connectivity.testConnection')}

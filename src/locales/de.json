@@ -24,7 +24,7 @@
     "list": "Liste", "details": "Details", "erDiagram": "ER-Diagramm", "hideObjectGroup": "Objektgruppe ausblenden",
     "sort": "Sortieren", "selectColumns": "Spalten auswählen", "showHiddenItems": "Verborgene Elemente anzeigen"
   },
-  "sidebar": {"connections": "Verbindungen", "addConnection": "Verbindung hinzufügen", "noConnections": "Keine Verbindungen", "clickToAdd": "Klicken Sie auf +, um eine hinzuzufügen."},
+  "sidebar": {"connections": "Verbindungen", "addConnection": "Verbindung hinzufügen", "noConnections": "Keine Verbindungen", "clickToAdd": "Klicken Sie auf +, um eine hinzuzufügen.", "deleteConnection": "Verbindung löschen", "confirmDelete": "Möchten Sie diese Verbindung wirklich löschen?"},
   "welcome": {"title": "Willkommen bei Catyas", "selectConnection": "Wählen Sie eine Verbindung in der Seitenleiste aus, um zu beginnen", "selectTable": "Wählen Sie eine Tabelle aus, um den Inhalt anzuzeigen"},
   "connection": {
     "new": "Neue Verbindung", "edit": "Verbindung bearbeiten", "delete": "Verbindung löschen", "test": "Verbindung testen", "save": "Speichern", "cancel": "Abbrechen",
@@ -40,8 +40,8 @@
     "http": {"useTunnel":"HTTP-Tunnel verwenden", "url":"Tunnel-URL", "useBase64":"Ausgehende Abfragen mit Base64 kodieren", "auth":"Authentifizierung", "usePassword":"Passwortauthentifizierung verwenden", "proxy":"Proxy-Server", "clientKey":"Client-Schlüssel", "clientCert":"Client-Zertifikat", "caCert":"CA-Zertifikat", "passphrase":"Passphrase"}
   },
   "database": {"types": {"mysql": "MySQL", "postgresql": "PostgreSQL", "mongodb": "MongoDB", "redis": "Redis", "sqlite": "SQLite", "sqlserver": "SQL Server", "oracle": "Oracle", "mariadb": "MariaDB"}},
-  "query": {"editor": "Abfrage-Editor", "execute": "Ausführen", "clear": "Leeren", "result": "Ergebnis", "noResult": "Keine Ergebnisse", "error": "Fehler", "success": "Abfrage erfolgreich ausgeführt"},
-  "table": {"name": "Tabellenname", "structure": "Struktur", "data": "Daten", "column": "Spalte", "type": "Typ", "nullable": "Nullable", "key": "Schlüssel", "default": "Standard", "extra": "Extra", "rows": "Zeilen", "noData": "Keine Daten verfügbar"},
+  "query": {"editor": "Abfrage-Editor", "execute": "Ausführen", "clear": "Leeren", "result": "Ergebnis", "noResult": "Keine Ergebnisse", "error": "Fehler", "success": "Abfrage erfolgreich ausgeführt", "welcome": "Willkommen", "welcomeMessage": "Abfrage-Editor", "untitledQuery": "Unbenannte Abfrage", "newQuery": "Neue Abfrage", "close": "Schließen", "selectConnection": "Wählen Sie eine Verbindung aus, um mit der Abfrage zu beginnen", "createConnection": "Oder erstellen Sie eine neue Verbindung in der Seitenleiste", "notConnected": "Nicht verbunden", "save": "Speichern", "queryBuilder": "Abfrage-Generator", "beautifySQL": "SQL formatieren", "snippets": "Snippets", "createChart": "Diagramm erstellen", "run": "Ausführen", "stop": "Stoppen", "explain": "Erklären", "queryResult": "Abfrageergebnis", "noResults": "Noch keine Ergebnisse. Führen Sie eine Abfrage aus, um Ergebnisse zu sehen."},
+  "table": {"name": "Tabellenname", "structure": "Struktur", "data": "Daten", "column": "Spalte", "columnName": "Spaltenname", "type": "Typ", "dataType": "Datentyp", "value": "Wert", "nullable": "Nullable", "key": "Schlüssel", "default": "Standard", "extra": "Extra", "rows": "Zeilen", "noData": "Keine Daten verfügbar", "loading": "Laden..."},
   "ribbon": {"newConnection": "Neue Verbindung", "new": "Neu", "refresh": "Aktualisieren", "table": "Tabelle", "users": "Benutzer", "query": "Abfrage", "import": "Importieren", "settings": "Einstellungen"},
   "common": {"search": "Suchen", "filter": "Filtern", "refresh": "Aktualisieren", "loading": "Laden...", "error": "Fehler", "success": "Erfolg", "confirm": "Bestätigen", "yes": "Ja", "no": "Nein", "close": "Schließen", "ok": "OK", "cancel": "Abbrechen"},
   "options": {

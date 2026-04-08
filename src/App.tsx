@@ -3,7 +3,8 @@ import Titlebar from './components/Titlebar'
 import Sidebar from './components/Sidebar'
 import MainContent from './components/MainContent'
 import TopRibbon from './components/TopRibbon'
-import RightInfo from './components/RightInfo'
+import TabbedView from './components/TabbedView'
+import DataTransferWizard from './components/DataTransferWizard'
 import MySQLConnectionDialog from './components/MySQLConnectionDialog'
 import PostgreSQLConnectionDialog from './components/PostgreSQLConnectionDialog'
 import OracleConnectionDialog from './components/OracleConnectionDialog'
@@ -17,12 +18,6 @@ import { Connection } from './types'
 
 type DatabaseType = 'mysql' | 'postgresql' | 'oracle' | 'sqlite' | 'sqlserver' | 'mariadb' | 'mongodb' | 'redis' | null
 
-type InfoPanelTarget =
-  | { type: 'connection'; connection: Connection }
-  | { type: 'table'; connection: Connection; database: string; table: string }
-  | { type: 'view'; connection: Connection; database: string; view: string }
-  | null
-
 function App() {
   const [connections, setConnections] = useState<Connection[]>([])
   const [selectedConnection, setSelectedConnection] = useState<Connection | null>(null)
@@ -30,7 +25,21 @@ function App() {
   const [selectedDatabase, setSelectedDatabase] = useState<string | null>(null)
   const [activeDialog, setActiveDialog] = useState<DatabaseType>(null)
   const [optionsOpen, setOptionsOpen] = useState(false)
-  const [infoPanelTarget, setInfoPanelTarget] = useState<InfoPanelTarget>(null)
+  const [queryEditorOpen, setQueryEditorOpen] = useState(false)
+  const [dataTransferOpen, setDataTransferOpen] = useState(false)
+
+  const handleNewQuery = () => {
+    setQueryEditorOpen(true)
+  }
+
+  const handleRefresh = () => {
+    // Reload connections and refresh current database tree
+    window.electronAPI?.getConnections().then(result => {
+      if (result?.success && result.connections) {
+        setConnections(result.connections)
+      }
+    })
+  }
 
   // Load saved connections on mount
   useEffect(() => {
@@ -42,8 +51,8 @@ function App() {
   }, [])
 
   const handleSaveConnection = async (conn: Connection) => {
-    // Fetch databases for MySQL/MariaDB
-    if (conn.type === 'mysql' || conn.type === 'mariadb') {
+    // Fetch databases for all supported types
+    if (['mysql', 'mariadb', 'sqlite', 'postgresql', 'oracle', 'sqlserver', 'mongodb', 'redis'].includes(conn.type)) {
       try {
         const result = await window.electronAPI?.getDatabases(conn)
         if (result?.success && result.databases) {
@@ -70,15 +79,14 @@ function App() {
 
   const handleSelectConnection = async (conn: Connection) => {
     setSelectedConnection(conn)
-    setInfoPanelTarget({ type: 'connection', connection: conn })
 
     // Toggle expansion and load databases if not already loaded
     const updatedConnections = connections.map(c => {
       if (c.id === conn.id) {
         const newExpanded = !c.expanded
 
-        // Load databases on first expansion if MySQL/MariaDB
-        if (newExpanded && !c.databases && (c.type === 'mysql' || c.type === 'mariadb')) {
+        // Load databases on first expansion if MySQL/MariaDB/SQLite
+        if (newExpanded && !c.databases && ['mysql', 'mariadb', 'sqlite', 'postgresql', 'oracle', 'sqlserver', 'mongodb', 'redis'].includes(c.type)) {
           window.electronAPI?.getDatabases(c).then(result => {
             if (result?.success && result.databases != null) {
               setConnections(prev => prev.map(prevConn => {
@@ -188,18 +196,20 @@ function App() {
   const handleSelectTable = (_connectionId: string, databaseName: string, tableName: string) => {
     setSelectedTable(tableName)
     setSelectedDatabase(databaseName)
-    if (selectedConnection) {
-      setInfoPanelTarget({
-        type: 'table',
-        connection: selectedConnection,
-        database: databaseName,
-        table: tableName
-      })
-    }
   }
 
   const handleCloseDialog = () => {
     setActiveDialog(null)
+  }
+
+  const handleDeleteConnection = (connectionId: string) => {
+    setConnections(prev => prev.filter(c => c.id !== connectionId))
+    if (selectedConnection?.id === connectionId) {
+      setSelectedConnection(null)
+      setSelectedTable(null)
+      setSelectedDatabase(null)
+    }
+    window.electronAPI?.deleteConnection(connectionId)
   }
 
   return (
@@ -208,7 +218,7 @@ function App() {
       <div className="flex flex-col flex-1 min-h-0" style={{ marginTop: '32px' }}>
         <TopRibbon onNewConnection={(dbType: string) => {
           setActiveDialog(dbType as DatabaseType)
-        }} onOpenOptions={() => setOptionsOpen(true)} />
+        }} onOpenOptions={() => setOptionsOpen(true)} onNewQuery={handleNewQuery} onRefresh={handleRefresh} onDataTransfer={() => setDataTransferOpen(true)} />
         <div className="flex flex-1 min-h-0">
           <Sidebar
             connections={connections}
@@ -217,17 +227,23 @@ function App() {
             onAddConnection={() => setActiveDialog('mysql')}
             onToggleDatabase={handleToggleDatabase}
             onSelectTable={handleSelectTable}
+            onDeleteConnection={handleDeleteConnection}
           />
           <MainContent
             connection={selectedConnection}
             selectedTable={selectedTable}
             selectedDatabase={selectedDatabase}
+            queryEditorOpen={queryEditorOpen}
           />
-          <RightInfo
-            connection={infoPanelTarget?.type === 'connection' ? infoPanelTarget.connection : infoPanelTarget?.type === 'table' ? infoPanelTarget.connection : null}
-            database={infoPanelTarget?.type === 'table' ? infoPanelTarget.database : null}
-            tableName={infoPanelTarget?.type === 'table' ? infoPanelTarget.table : null}
-          />
+          {queryEditorOpen && (
+            <div className="flex-1 flex min-h-0">
+              <TabbedView
+                selectedTable={selectedTable}
+                connection={selectedConnection}
+                onClose={() => setQueryEditorOpen(false)}
+              />
+            </div>
+          )}
         </div>
       </div>
 
@@ -274,6 +290,11 @@ function App() {
       <OptionsDialog
         open={optionsOpen}
         onClose={() => setOptionsOpen(false)}
+      />
+      <DataTransferWizard
+        open={dataTransferOpen}
+        onClose={() => setDataTransferOpen(false)}
+        connections={connections}
       />
     </div>
   )

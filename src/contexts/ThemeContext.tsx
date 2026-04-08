@@ -13,7 +13,7 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<Theme>(() => {
     // Check localStorage first
-    const savedTheme = localStorage.getItem('theme') as Theme | null
+    const savedTheme = localStorage.getItem('catyas-theme') as Theme | null
     if (savedTheme) {
       return savedTheme
     }
@@ -36,7 +36,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     }
 
     // Save to localStorage
-    localStorage.setItem('theme', theme)
+    localStorage.setItem('catyas-theme', theme)
   }, [theme])
 
   const setTheme = (newTheme: Theme) => {

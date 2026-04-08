@@ -23,7 +23,7 @@
     "hideObjectGroup": "オブジェクトグループを非表示", "sort": "並べ替え", "selectColumns": "列を選択",
     "showHiddenItems": "隠し項目を表示"
   },
-  "sidebar": {"connections": "接続", "addConnection": "接続を追加", "noConnections": "接続がありません", "clickToAdd": "＋をクリックして追加"},
+  "sidebar": {"connections": "接続", "addConnection": "接続を追加", "noConnections": "接続がありません", "clickToAdd": "＋をクリックして追加", "deleteConnection": "接続を削除", "confirmDelete": "この接続を削除してもよろしいですか？"},
   "welcome": {"title": "Catyas へようこそ", "selectConnection": "サイドバーから接続を選択して開始", "selectTable": "テーブルを選択して内容を表示"},
   "connection": {
     "new": "新規接続", "edit": "接続を編集", "delete": "接続を削除", "test": "接続をテスト", "save": "保存", "cancel": "キャンセル",
@@ -39,8 +39,8 @@
     "http": {"useTunnel":"HTTPトンネルを使用", "url":"トンネルURL", "useBase64":"base64で送信クエリをエンコード", "auth":"認証", "usePassword":"パスワード認証を使用", "proxy":"プロキシサーバー", "clientKey":"クライアントキー", "clientCert":"クライアント証明書", "caCert":"CA証明書", "passphrase":"パスフレーズ"}
   },
   "database": {"types": {"mysql": "MySQL", "postgresql": "PostgreSQL", "mongodb": "MongoDB", "redis": "Redis", "sqlite": "SQLite", "sqlserver": "SQL Server", "oracle": "Oracle", "mariadb": "MariaDB"}},
-  "query": {"editor": "クエリエディター", "execute": "実行", "clear": "クリア", "result": "結果", "noResult": "結果なし", "error": "エラー", "success": "クエリが正常に実行されました"},
-  "table": {"name": "テーブル名", "structure": "構造", "data": "データ", "column": "列", "type": "型", "nullable": "NULL可能", "key": "キー", "default": "デフォルト", "extra": "追加", "rows": "行", "noData": "データが利用できません"},
+  "query": {"editor": "クエリエディター", "execute": "実行", "clear": "クリア", "result": "結果", "noResult": "結果なし", "error": "エラー", "success": "クエリが正常に実行されました", "welcome": "ようこそ", "welcomeMessage": "クエリエディター", "untitledQuery": "無題のクエリ", "newQuery": "新しいクエリ", "close": "閉じる", "selectConnection": "クエリを開始するには接続を選択してください", "createConnection": "またはサイドバーから新しい接続を作成してください", "notConnected": "未接続", "save": "保存", "queryBuilder": "クエリビルダー", "beautifySQL": "SQLを整形", "snippets": "スニペット", "createChart": "チャートを作成", "run": "実行", "stop": "停止", "explain": "実行計画", "queryResult": "クエリ結果", "noResults": "結果はまだありません。クエリを実行して結果を確認してください。"},
+  "table": {"name": "テーブル名", "structure": "構造", "data": "データ", "column": "列", "columnName": "列名", "type": "型", "dataType": "データ型", "value": "値", "nullable": "NULL可能", "key": "キー", "default": "デフォルト", "extra": "追加", "rows": "行", "noData": "データが利用できません", "loading": "読み込み中..."},
   "ribbon": {"newConnection": "新規接続", "new": "新規", "refresh": "更新", "table": "テーブル", "users": "ユーザー", "query": "クエリ", "import": "インポート", "settings": "設定"},
   "common": {"search": "検索", "filter": "フィルター", "refresh": "更新", "loading": "読み込み中...", "error": "エラー", "success": "成功", "confirm": "確認", "yes": "はい", "no": "いいえ", "close": "閉じる", "ok": "OK", "cancel": "キャンセル"},
   "options": {

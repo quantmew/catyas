@@ -81,7 +81,9 @@
     "connections": "连接",
     "addConnection": "添加连接",
     "noConnections": "暂无连接",
-    "clickToAdd": "点击 + 添加一个。"
+    "clickToAdd": "点击 + 添加一个。",
+    "deleteConnection": "删除连接",
+    "confirmDelete": "确定要删除此连接吗？"
   },
   "welcome": {
     "title": "欢迎来到 Catyas",
@@ -149,20 +151,42 @@
     "result": "结果",
     "noResult": "无结果",
     "error": "错误",
-    "success": "查询执行成功"
+    "success": "查询执行成功",
+    "welcome": "欢迎",
+    "welcomeMessage": "查询编辑器",
+    "untitledQuery": "未命名查询",
+    "newQuery": "新建查询",
+    "close": "关闭",
+    "selectConnection": "选择一个连接开始查询",
+    "createConnection": "或从侧边栏创建新连接",
+    "notConnected": "未连接",
+    "save": "保存",
+    "queryBuilder": "查询构建器",
+    "beautifySQL": "美化SQL",
+    "snippets": "代码片段",
+    "createChart": "创建图表",
+    "run": "运行",
+    "stop": "停止",
+    "explain": "解释",
+    "queryResult": "查询结果",
+    "noResults": "暂无结果，请运行查询查看结果。"
   },
   "table": {
     "name": "表名",
     "structure": "结构",
     "data": "数据",
     "column": "列名",
+    "columnName": "列名",
     "type": "类型",
+    "dataType": "数据类型",
+    "value": "值",
     "nullable": "可为空",
     "key": "键",
     "default": "默认值",
     "extra": "额外",
     "rows": "行数",
-    "noData": "暂无数据"
+    "noData": "暂无数据",
+    "loading": "加载中..."
   },
   "ribbon": {
     "newConnection": "新建连接",
@@ -174,6 +198,10 @@
     "query": "查询",
     "import": "导入",
     "settings": "设置"
+  },
+  "dataTransfer": {
+    "title": "数据传输",
+    "step": "步骤 {{current}} / {{total}}"
   },
   "common": {
     "search": "搜索",

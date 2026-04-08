@@ -55,10 +55,22 @@ export default function MongoDBConnectionDialog({ open, onClose, onSave }: Props
     setTesting(true)
     setTestMsg(null)
     try {
-      await new Promise((r) => setTimeout(r, 500))
       if (!useConnectionString && !host) throw new Error('Host required')
       if (useConnectionString && !connectionString) throw new Error('Connection string required')
-      setTestMsg(t('connection.connectionSuccess'))
+      const res = await window.electronAPI?.testConnection({
+        type: 'mongodb',
+        host: useConnectionString ? connectionString : host,
+        port: useConnectionString ? 0 : Number(port),
+        username,
+        password: remember ? password : undefined,
+        database,
+        connectionString: useConnectionString ? connectionString : undefined,
+      })
+      if (res?.success) {
+        setTestMsg(t('connection.connectionSuccess'))
+      } else {
+        setTestMsg(`${t('connection.testFailed')}: ${res?.message || 'Unknown error'}`)
+      }
     } catch (e: any) {
       setTestMsg(`${t('connection.testFailed')}: ${e.message || e}`)
     } finally {

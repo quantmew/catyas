@@ -20,7 +20,20 @@ export interface ElectronAPI {
   // File dialog
   openFileDialog: (options?: any) => Promise<{ success: boolean; filePath?: string }>
   saveFileDialog: (options?: any) => Promise<{ success: boolean; filePath?: string }>
+  openDirectoryDialog: (options?: any) => Promise<{ success: boolean; filePath?: string }>
   createSqliteDatabase: (filePath: string) => Promise<{ success: boolean; filePath?: string; message?: string }>
+
+  // Window control
+  minimizeWindow: () => Promise<void>
+  maximizeWindow: () => Promise<void>
+  setAlwaysOnTop: (alwaysOnTop: boolean) => Promise<void>
+  closeWindow: () => Promise<void>
+
+  // External shell
+  openExternal: (url: string) => Promise<{ success: boolean }>
+
+  // App info
+  getAppInfo: () => Promise<{ name: string; version: string; description: string }>
 }
 
 declare global {

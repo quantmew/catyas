@@ -51,9 +51,20 @@ export default function RedisConnectionDialog({ open, onClose, onSave }: Props) 
     setTesting(true)
     setTestMsg(null)
     try {
-      await new Promise((r) => setTimeout(r, 500))
       if (!host) throw new Error('Host required')
-      setTestMsg(t('connection.connectionSuccess'))
+      const res = await window.electronAPI?.testConnection({
+        type: 'redis',
+        host,
+        port: Number(port),
+        username: '',
+        password: remember ? password : undefined,
+        databaseIndex: Number(database),
+      })
+      if (res?.success) {
+        setTestMsg(t('connection.connectionSuccess'))
+      } else {
+        setTestMsg(`${t('connection.testFailed')}: ${res?.message || 'Unknown error'}`)
+      }
     } catch (e: any) {
       setTestMsg(`${t('connection.testFailed')}: ${e.message || e}`)
     } finally {

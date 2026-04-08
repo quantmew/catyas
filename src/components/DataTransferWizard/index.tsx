@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Connection } from '../../types'
 import Step1SelectSource from './Step1SelectSource'
 import WizardFooter from './WizardFooter'
 import Step2SelectObjects, { ObjectTree } from './Step2SelectObjects'
+import { useTranslation } from 'react-i18next'
 
 interface Props {
   open: boolean
@@ -11,6 +12,7 @@ interface Props {
 }
 
 export default function DataTransferWizard({ open, onClose, connections }: Props) {
+  const { t } = useTranslation()
   const [step, setStep] = useState(1)
   const [sourceConnId, setSourceConnId] = useState<string>('')
   const [sourceDb, setSourceDb] = useState<string>('')
@@ -18,21 +20,34 @@ export default function DataTransferWizard({ open, onClose, connections }: Props
   const [targetConnId, setTargetConnId] = useState<string>('')
   const [targetDb, setTargetDb] = useState<string>('')
   const [objects, setObjects] = useState<ObjectTree>({
-    tables: {
-      BOND_BASIC_INFO: false,
-      BOND_COUPON: false,
-      BOND_INTEREST_PAYMENT: false,
-      CONBOND_BASIC_INFO: false,
-      CONBOND_CONVERT_PRICE_ADJUST: false,
-      CONBOND_DAILY_CONVERT: false,
-      CONBOND_DAILY_CONVERT_OLD: false,
-      CONBOND_DAILY_PRICE: false,
-      REPO_DAILY_PRICE: false,
-    },
+    tables: {},
     views: {},
     functions: {},
     events: {},
   })
+
+  // Load tables from source connection when moving to step 2
+  useEffect(() => {
+    if (step === 2 && sourceConnId && sourceDb) {
+      const conn = connections.find(c => c.id === sourceConnId)
+      if (conn) {
+        window.electronAPI?.getTables(conn, sourceDb).then(result => {
+          if (result?.success && result.tables) {
+            const tableMap: Record<string, boolean> = {}
+            result.tables.forEach((t: any) => { tableMap[Object.values(t)[0] as string] = false })
+            setObjects(prev => ({ ...prev, tables: tableMap }))
+          }
+        })
+        window.electronAPI?.getViews(conn, sourceDb).then(result => {
+          if (result?.success && result.views) {
+            const viewMap: Record<string, boolean> = {}
+            result.views.forEach((v: any) => { viewMap[v.TABLE_NAME || Object.values(v)[0]] = false })
+            setObjects(prev => ({ ...prev, views: viewMap }))
+          }
+        })
+      }
+    }
+  }, [step, sourceConnId, sourceDb, connections])
 
   if (!open) return null
 
@@ -59,12 +74,12 @@ export default function DataTransferWizard({ open, onClose, connections }: Props
       <div className="w-[960px] my-6 bg-white dark:bg-neutral-900 rounded shadow-lg border border-gray-200 dark:border-neutral-700 flex flex-col">
         {/* Header */}
         <div className="px-4 py-2 border-b border-gray-200 dark:border-gray-700 text-sm font-semibold bg-gray-50 dark:bg-neutral-800 dark:text-neutral-100">
-          数据传输
+          {t('dataTransfer.title')}
         </div>
 
         {/* Step indicator */}
         <div className="px-5 py-3 text-xs text-gray-500 dark:text-gray-400">
-          步骤 {step} / 3
+          {t('dataTransfer.step', { current: step, total: 3 })}
         </div>
 
         {/* Content */}

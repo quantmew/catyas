@@ -24,7 +24,7 @@
     "list": "Lista", "details": "Detalles", "erDiagram": "Diagrama ER", "hideObjectGroup": "Ocultar grupo de objetos",
     "sort": "Ordenar", "selectColumns": "Seleccionar columnas", "showHiddenItems": "Mostrar elementos ocultos"
   },
-  "sidebar": {"connections": "Conexiones", "addConnection": "Añadir conexión", "noConnections": "No hay conexiones", "clickToAdd": "Haga clic en + para agregar una."},
+  "sidebar": {"connections": "Conexiones", "addConnection": "Añadir conexión", "noConnections": "No hay conexiones", "clickToAdd": "Haga clic en + para agregar una.", "deleteConnection": "Eliminar conexión", "confirmDelete": "¿Está seguro de que desea eliminar esta conexión?"},
   "welcome": {"title": "Bienvenido a Catyas", "selectConnection": "Seleccione una conexión de la barra lateral para comenzar", "selectTable": "Seleccione una tabla para ver su contenido"},
   "connection": {
     "new": "Nueva conexión", "edit": "Editar conexión", "delete": "Eliminar conexión", "test": "Probar conexión", "save": "Guardar", "cancel": "Cancelar",
@@ -40,8 +40,8 @@
     "http": {"useTunnel":"Usar túnel HTTP", "url":"URL del túnel", "useBase64":"Codificar consultas salientes en base64", "auth":"Autenticación", "usePassword":"Usar autenticación por contraseña", "proxy":"Servidor proxy", "clientKey":"Clave de cliente", "clientCert":"Certificado de cliente", "caCert":"Certificado CA", "passphrase":"Frase de contraseña"}
   },
   "database": {"types": {"mysql": "MySQL", "postgresql": "PostgreSQL", "mongodb": "MongoDB", "redis": "Redis", "sqlite": "SQLite", "sqlserver": "SQL Server", "oracle": "Oracle", "mariadb": "MariaDB"}},
-  "query": {"editor": "Editor de consultas", "execute": "Ejecutar", "clear": "Limpiar", "result": "Resultado", "noResult": "Sin resultados", "error": "Error", "success": "Consulta ejecutada exitosamente"},
-  "table": {"name": "Nombre de la tabla", "structure": "Estructura", "data": "Datos", "column": "Columna", "type": "Tipo", "nullable": "Nullable", "key": "Clave", "default": "Predeterminado", "extra": "Extra", "rows": "Filas", "noData": "No hay datos disponibles"},
+  "query": {"editor": "Editor de consultas", "execute": "Ejecutar", "clear": "Limpiar", "result": "Resultado", "noResult": "Sin resultados", "error": "Error", "success": "Consulta ejecutada exitosamente", "welcome": "Bienvenido", "welcomeMessage": "Editor de consultas", "untitledQuery": "Consulta sin título", "newQuery": "Nueva consulta", "close": "Cerrar", "selectConnection": "Seleccione una conexión para comenzar a consultar", "createConnection": "O cree una nueva conexión desde la barra lateral", "notConnected": "No conectado", "save": "Guardar", "queryBuilder": "Constructor de consultas", "beautifySQL": "Formatear SQL", "snippets": "Fragmentos", "createChart": "Crear gráfico", "run": "Ejecutar", "stop": "Detener", "explain": "Explicar", "queryResult": "Resultado de la consulta", "noResults": "Aún no hay resultados. Ejecute una consulta para ver los resultados."},
+  "table": {"name": "Nombre de la tabla", "structure": "Estructura", "data": "Datos", "column": "Columna", "columnName": "Nombre de la columna", "type": "Tipo", "dataType": "Tipo de datos", "value": "Valor", "nullable": "Nullable", "key": "Clave", "default": "Predeterminado", "extra": "Extra", "rows": "Filas", "noData": "No hay datos disponibles", "loading": "Cargando..."},
   "ribbon": {"newConnection": "Nueva conexión", "new": "Nuevo", "refresh": "Actualizar", "table": "Tabla", "users": "Usuarios", "query": "Consulta", "import": "Importar", "settings": "Configuración"},
   "common": {"search": "Buscar", "filter": "Filtrar", "refresh": "Actualizar", "loading": "Cargando...", "error": "Error", "success": "Éxito", "confirm": "Confirmar", "yes": "Sí", "no": "No", "close": "Cerrar", "ok": "Aceptar", "cancel": "Cancelar"},
   "options": {

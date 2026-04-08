@@ -13,9 +13,10 @@ interface Tab {
 interface TabbedViewProps {
   selectedTable?: string | null
   connection?: any
+  onClose?: () => void
 }
 
-export default function TabbedView({ selectedTable: _selectedTable, connection }: TabbedViewProps) {
+export default function TabbedView({ selectedTable: _selectedTable, connection, onClose }: TabbedViewProps) {
   const { t } = useTranslation()
   const [tabs, setTabs] = useState<Tab[]>([
     { id: 'welcome', title: t('query.welcome'), type: 'query' }
@@ -88,6 +89,18 @@ export default function TabbedView({ selectedTable: _selectedTable, connection }
         >
           +
         </button>
+        {onClose && (
+          <div className="flex-1" />
+        )}
+        {onClose && (
+          <button
+            onClick={onClose}
+            className="px-3 py-2 mr-1 text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded"
+            title={t('query.close')}
+          >
+            {t('query.close')}
+          </button>
+        )}
       </div>
 
       {/* Tab Content */}

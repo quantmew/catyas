@@ -24,7 +24,7 @@
     "list": "Список", "details": "Подробности", "erDiagram": "ER-диаграмма", "hideObjectGroup": "Скрыть группу объектов",
     "sort": "Сортировать", "selectColumns": "Выбрать столбцы", "showHiddenItems": "Показать скрытые элементы"
   },
-  "sidebar": {"connections": "Подключения", "addConnection": "Добавить подключение", "noConnections": "Нет подключений", "clickToAdd": "Нажмите +, чтобы добавить."},
+  "sidebar": {"connections": "Подключения", "addConnection": "Добавить подключение", "noConnections": "Нет подключений", "clickToAdd": "Нажмите +, чтобы добавить.", "deleteConnection": "Удалить подключение", "confirmDelete": "Вы уверены, что хотите удалить это подключение?"},
   "welcome": {"title": "Добро пожаловать в Catyas", "selectConnection": "Выберите подключение на боковой панели, чтобы начать", "selectTable": "Выберите таблицу, чтобы просмотреть её содержимое"},
   "connection": {
     "new": "Новое подключение", "edit": "Изменить подключение", "delete": "Удалить подключение", "test": "Проверить подключение", "save": "Сохранить", "cancel": "Отмена",
@@ -40,8 +40,8 @@
     "http": {"useTunnel":"Использовать HTTP-туннель", "url":"URL туннеля", "useBase64":"Кодировать исходящие запросы в base64", "auth":"Аутентификация", "usePassword":"Использовать аутентификацию по паролю", "proxy":"Прокси-сервер", "clientKey":"Ключ клиента", "clientCert":"Сертификат клиента", "caCert":"Сертификат ЦС", "passphrase":"Ключевая фраза"}
   },
   "database": {"types": {"mysql": "MySQL", "postgresql": "PostgreSQL", "mongodb": "MongoDB", "redis": "Redis", "sqlite": "SQLite", "sqlserver": "SQL Server", "oracle": "Oracle", "mariadb": "MariaDB"}},
-  "query": {"editor": "Редактор запросов", "execute": "Выполнить", "clear": "Очистить", "result": "Результат", "noResult": "Нет результатов", "error": "Ошибка", "success": "Запрос выполнен успешно"},
-  "table": {"name": "Имя таблицы", "structure": "Структура", "data": "Данные", "column": "Столбец", "type": "Тип", "nullable": "Nullable", "key": "Ключ", "default": "По умолчанию", "extra": "Дополнительно", "rows": "Строки", "noData": "Нет данных"},
+  "query": {"editor": "Редактор запросов", "execute": "Выполнить", "clear": "Очистить", "result": "Результат", "noResult": "Нет результатов", "error": "Ошибка", "success": "Запрос выполнен успешно", "welcome": "Добро пожаловать", "welcomeMessage": "Редактор запросов", "untitledQuery": "Безымянный запрос", "newQuery": "Новый запрос", "close": "Закрыть", "selectConnection": "Выберите подключение, чтобы начать выполнение запросов", "createConnection": "Или создайте новое подключение на боковой панели", "notConnected": "Не подключено", "save": "Сохранить", "queryBuilder": "Конструктор запросов", "beautifySQL": "Форматировать SQL", "snippets": "Сниппеты", "createChart": "Создать диаграмму", "run": "Выполнить", "stop": "Остановить", "explain": "Объяснить", "queryResult": "Результат запроса", "noResults": "Результатов пока нет. Выполните запрос, чтобы увидеть результаты."},
+  "table": {"name": "Имя таблицы", "structure": "Структура", "data": "Данные", "column": "Столбец", "columnName": "Имя столбца", "type": "Тип", "dataType": "Тип данных", "value": "Значение", "nullable": "Nullable", "key": "Ключ", "default": "По умолчанию", "extra": "Дополнительно", "rows": "Строки", "noData": "Нет данных", "loading": "Загрузка..."},
   "ribbon": {"newConnection": "Новое подключение", "new": "Новый", "refresh": "Обновить", "table": "Таблица", "users": "Пользователи", "query": "Запрос", "import": "Импорт", "settings": "Настройки"},
   "common": {"search": "Поиск", "filter": "Фильтр", "refresh": "Обновить", "loading": "Загрузка...", "error": "Ошибка", "success": "Успех", "confirm": "Подтвердить", "yes": "Да", "no": "Нет", "close": "Закрыть", "ok": "ОК", "cancel": "Отмена"},
   "options": {

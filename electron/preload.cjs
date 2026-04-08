@@ -22,5 +22,18 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // File dialog
   openFileDialog: (options) => ipcRenderer.invoke('dialog:open-file', options),
   saveFileDialog: (options) => ipcRenderer.invoke('dialog:save-file', options),
+  openDirectoryDialog: (options) => ipcRenderer.invoke('dialog:open-directory', options),
   createSqliteDatabase: (filePath) => ipcRenderer.invoke('sqlite:create-database', filePath),
+
+  // Window control
+  minimizeWindow: () => ipcRenderer.invoke('window:minimize'),
+  maximizeWindow: () => ipcRenderer.invoke('window:maximize'),
+  setAlwaysOnTop: (alwaysOnTop) => ipcRenderer.invoke('window:alwaysOnTop', alwaysOnTop),
+  closeWindow: () => ipcRenderer.invoke('window:close'),
+
+  // External shell
+  openExternal: (url) => ipcRenderer.invoke('shell:open-external', url),
+
+  // App info
+  getAppInfo: () => ipcRenderer.invoke('app:about'),
 })

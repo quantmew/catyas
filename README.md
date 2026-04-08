@@ -126,23 +126,28 @@ npm run lint:fix
 - 自动语言检测
 - 本地化存储设置
 
-## 📁 项目结构（当前脚手架）
+## 📁 项目结构
 
 ```
 catyas/
+├── electron/                      # Electron 主进程 + 预加载
+│   ├── main.ts                    # 主进程入口，IPC 处理器
+│   └── preload.cjs                # 预加载脚本，暴露 window.electronAPI
 ├── src/
-│   ├── main/                      # Electron 主进程 + 预加载
-│   │   ├── database/DatabaseManager.ts  # 连接管理（当前为演示桩）
-│   │   ├── preload/index.ts       # 预加载，暴露 window.catyas API
-│   │   ├── ipc.ts                 # IPC 常量与类型
-│   │   └── main.ts                # 主进程入口
-│   └── renderer/                  # React 渲染进程（Vite）
-│       ├── ui/App.tsx
-│       ├── ui/components/{Topbar,Sidebar,DataTable,SQLEditor,StatusBar}.tsx
-│       ├── ui/styles.css
-│       └── main.tsx
+│   ├── components/                # React 组件
+│   │   ├── ConnectionDialog*.tsx  # 各数据库连接对话框
+│   │   ├── Sidebar.tsx            # 左侧连接树
+│   │   ├── TopRibbon.tsx          # 顶部菜单栏
+│   │   ├── OptionsDialog.tsx      # 设置对话框
+│   │   ├── TabbedView.tsx         # 查询编辑器标签页
+│   │   └── DataTransferWizard/    # 数据传输向导
+│   ├── types/                     # TypeScript 类型定义
+│   ├── locales/                   # 国际化文件 (9 种语言)
+│   ├── contexts/                  # React Context (Theme, I18n)
+│   ├── electron.d.ts              # Electron API 类型声明
+│   ├── App.tsx                    # 根组件
+│   └── main.tsx                   # React 入口
 ├── index.html                     # Vite 入口
-├── scripts/dev.js                 # 一键本地开发脚本
 ├── tsconfig.json
 ├── tsconfig.main.json
 ├── vite.config.ts

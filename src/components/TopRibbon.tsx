@@ -106,90 +106,94 @@ function RibbonButtonWithDropdown({ icon: Icon, label, onClick, active }: Ribbon
 interface TopRibbonProps {
   onNewConnection?: (dbType: string) => void
   onOpenOptions?: () => void
+  onNewQuery?: () => void
+  onRefresh?: () => void
+  onDataTransfer?: () => void
 }
 
-export default function TopRibbon({ onNewConnection, onOpenOptions }: TopRibbonProps) {
+export default function TopRibbon({ onNewConnection, onOpenOptions, onNewQuery, onRefresh, onDataTransfer }: TopRibbonProps) {
   const { t } = useTranslation()
 
   const actions: MenuBarActions = useMemo(() => ({
     // File
     newProject: () => {
-      console.log('[Ribbon] New Connection')
       onNewConnection?.('mysql')
     },
     newConnection: (dbType: string) => {
-      console.log('[Menu] New Connection -', dbType.toUpperCase())
       onNewConnection?.(dbType)
     },
-    new: () => console.log('[Menu] New'),
-    newTable: () => console.log('[Menu] New Table'),
-    newView: () => console.log('[Menu] New View'),
-    newFunction: () => console.log('[Menu] New Function'),
-    newUser: () => console.log('[Menu] New User'),
-    newOther: () => console.log('[Menu] New Other'),
-    newQuery: () => console.log('[Menu] New Query'),
-    newBackup: () => console.log('[Menu] New Backup'),
-    newAutoRun: () => console.log('[Menu] New Auto Run'),
-    newModel: () => console.log('[Menu] New Model'),
-    newChartWorkspace: () => console.log('[Menu] New Chart Workspace'),
-    openExternal: () => console.log('[Menu] Open External'),
-    openRecent: () => console.log('[Menu] Open Recent'),
-    closeConnection: () => console.log('[Menu] Close Connection'),
-    closeWindow: () => console.log('[Menu] Close Window'),
-    closeTab: () => console.log('[Menu] Close Tab'),
-    importConnection: () => console.log('[Menu] Import Connection'),
-    exportConnection: () => console.log('[Menu] Export Connection'),
-    exitCatyas: () => window.close(),
+    new: () => onNewConnection?.('mysql'),
+    newTable: () => alert(t('ribbon.table')),
+    newView: () => alert(t('menu.newView')),
+    newFunction: () => alert(t('menu.newFunction')),
+    newUser: () => alert(t('menu.newUser')),
+    newOther: () => alert(t('menu.newOther')),
+    newQuery: () => onNewQuery?.(),
+    newBackup: () => alert(t('menu.newBackup')),
+    newAutoRun: () => alert(t('menu.newAutoRun')),
+    newModel: () => alert(t('menu.newModel')),
+    newChartWorkspace: () => alert(t('menu.newChartWorkspace')),
+    openExternal: () => alert(t('menu.openExternal')),
+    openRecent: () => alert(t('menu.openRecent')),
+    closeConnection: () => alert(t('menu.closeConnection')),
+    closeWindow: () => window.electronAPI?.closeWindow(),
+    closeTab: () => alert(t('menu.closeTab')),
+    importConnection: () => alert(t('menu.importConnection')),
+    exportConnection: () => alert(t('menu.exportConnection')),
+    exitCatyas: () => window.electronAPI?.closeWindow(),
 
-    // Edit
-    copy: () => console.log('[Edit] Copy'),
-    paste: () => console.log('[Edit] Paste'),
-    selectAll: () => console.log('[Edit] Select All'),
+    // Edit - use browser native functionality
+    copy: () => document.execCommand('copy'),
+    paste: () => document.execCommand('paste'),
+    selectAll: () => document.execCommand('selectAll'),
 
     // View
-    navigationPane: () => console.log('[View] Navigation Pane'),
-    informationPane: () => console.log('[View] Information Pane'),
-    list: () => console.log('[View] List'),
-    details: () => console.log('[View] Details'),
-    erDiagram: () => console.log('[View] ER Diagram'),
-    hideObjectGroup: () => console.log('[View] Hide Object Group'),
-    sort: () => console.log('[View] Sort'),
-    selectColumns: () => console.log('[View] Select Columns'),
-    showHiddenItems: () => console.log('[View] Show Hidden Items'),
+    navigationPane: () => alert(t('menu.navigationPane')),
+    informationPane: () => alert(t('menu.informationPane')),
+    list: () => alert(t('menu.list')),
+    details: () => alert(t('menu.details')),
+    erDiagram: () => alert(t('menu.erDiagram')),
+    hideObjectGroup: () => alert(t('menu.hideObjectGroup')),
+    sort: () => alert(t('menu.sort')),
+    selectColumns: () => alert(t('menu.selectColumns')),
+    showHiddenItems: () => alert(t('menu.showHiddenItems')),
 
     // Favorites
-    addToFavorites: () => console.log('[Favorites] Add to Favorites'),
-    manageFavorites: () => console.log('[Favorites] Manage Favorites'),
+    addToFavorites: () => alert(t('menu.addToFavorites')),
+    manageFavorites: () => alert(t('menu.manageFavorites')),
 
     // Tools
-    dataTransfer: () => console.log('[Tools] Data Transfer'),
-    dataGeneration: () => console.log('[Tools] Data Generation'),
-    dataSynchronization: () => console.log('[Tools] Data Synchronization'),
-    structureSynchronization: () => console.log('[Tools] Structure Synchronization'),
-    commandLineInterface: () => console.log('[Tools] Command Line Interface'),
-    serverMonitor: () => console.log('[Tools] Server Monitor'),
-    findInDatabaseOrSchema: () => console.log('[Tools] Find in Database or Schema'),
-    historyLog: () => console.log('[Tools] History Log'),
+    dataTransfer: () => onDataTransfer?.(),
+    dataGeneration: () => alert(t('menu.dataGeneration')),
+    dataSynchronization: () => alert(t('menu.dataSynchronization')),
+    structureSynchronization: () => alert(t('menu.structureSynchronization')),
+    commandLineInterface: () => alert(t('menu.commandLineInterface')),
+    serverMonitor: () => alert(t('menu.serverMonitor')),
+    findInDatabaseOrSchema: () => alert(t('menu.findInDatabaseOrSchema')),
+    historyLog: () => alert(t('menu.historyLog')),
     options: () => onOpenOptions?.(),
 
     // Window
-    minimize: () => console.log('[Window] Minimize (native)'),
-    maximize: () => console.log('[Window] Maximize (native)'),
-    alwaysOnTop: () => console.log('[Window] Always on Top'),
+    minimize: () => window.electronAPI?.minimizeWindow(),
+    maximize: () => window.electronAPI?.maximizeWindow(),
+    alwaysOnTop: () => window.electronAPI?.setAlwaysOnTop(true),
 
     // Help
-    onlineDocumentation: () => console.log('[Help] Online Documentation'),
-    releaseNotes: () => console.log('[Help] Release Notes'),
-    about: () => console.log('[Help] About'),
+    onlineDocumentation: () => window.electronAPI?.openExternal('https://github.com/catyas/catyas'),
+    releaseNotes: () => window.electronAPI?.openExternal('https://github.com/catyas/catyas/releases'),
+    about: async () => {
+      const info = await window.electronAPI?.getAppInfo()
+      alert(`Catyas\nVersion: ${info?.version}\n\nA modern database connection manager`)
+    },
 
     // Ribbon buttons
-    refresh: () => console.log('[Ribbon] Refresh'),
-    table: () => console.log('[Ribbon] Table'),
-    users: () => console.log('[Ribbon] Users'),
-    query: () => console.log('[Ribbon] Query'),
-    import: () => console.log('[Ribbon] Import'),
+    refresh: () => onRefresh?.(),
+    table: () => alert(t('ribbon.table')),
+    users: () => alert(t('ribbon.users')),
+    query: () => onNewQuery?.(),
+    import: () => alert(t('menu.importConnection')),
     settings: () => onOpenOptions?.()
-  }), [onNewConnection, onOpenOptions])
+  }), [onNewConnection, onOpenOptions, onNewQuery, onRefresh, onDataTransfer, t])
 
   const menuBarConfig = useMemo(() => createMenuBarConfig(actions), [actions])
 

@@ -112,8 +112,8 @@ export default function MonacoSqlEditor({ value, onChange }: MonacoSqlEditorProp
 
     // 配置编辑器快捷键
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () => {
-      // Ctrl/Cmd + Enter 执行查询（这里可以触发运行按钮）
-      console.log('Execute query shortcut triggered')
+      // Ctrl/Cmd + Enter 执行查询（由父组件通过 onExecuteQuery prop 处理）
+      // TODO: 通过 callback 或 context 与父组件通信来执行查询
     })
   }
 

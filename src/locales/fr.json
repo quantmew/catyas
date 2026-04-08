@@ -81,7 +81,9 @@
     "connections": "Connexions",
     "addConnection": "Ajouter une connexion",
     "noConnections": "Aucune connexion",
-    "clickToAdd": "Cliquez sur + pour en ajouter une."
+    "clickToAdd": "Cliquez sur + pour en ajouter une.",
+    "deleteConnection": "Supprimer la connexion",
+    "confirmDelete": "Voulez-vous vraiment supprimer cette connexion ?"
   },
   "welcome": {
     "title": "Bienvenue sur Catyas",
@@ -187,20 +189,42 @@
     "result": "Résultat",
     "noResult": "Aucun résultat",
     "error": "Erreur",
-    "success": "Requête exécutée avec succès"
+    "success": "Requête exécutée avec succès",
+    "welcome": "Bienvenue",
+    "welcomeMessage": "Éditeur de requêtes",
+    "untitledQuery": "Requête sans titre",
+    "newQuery": "Nouvelle requête",
+    "close": "Fermer",
+    "selectConnection": "Sélectionnez une connexion pour commencer à interroger",
+    "createConnection": "Ou créez une nouvelle connexion depuis la barre latérale",
+    "notConnected": "Non connecté",
+    "save": "Enregistrer",
+    "queryBuilder": "Constructeur de requêtes",
+    "beautifySQL": "Formater SQL",
+    "snippets": "Extraits",
+    "createChart": "Créer un graphique",
+    "run": "Exécuter",
+    "stop": "Arrêter",
+    "explain": "Expliquer",
+    "queryResult": "Résultat de la requête",
+    "noResults": "Aucun résultat pour le moment. Exécutez une requête pour voir les résultats."
   },
   "table": {
     "name": "Nom de la table",
     "structure": "Structure",
     "data": "Données",
     "column": "Colonne",
+    "columnName": "Nom de la colonne",
     "type": "Type",
+    "dataType": "Type de données",
+    "value": "Valeur",
     "nullable": "Nullable",
     "key": "Clé",
     "default": "Par défaut",
     "extra": "Extra",
     "rows": "Lignes",
-    "noData": "Aucune donnée disponible"
+    "noData": "Aucune donnée disponible",
+    "loading": "Chargement..."
   },
   "ribbon": {
     "newConnection": "Nouvelle connexion",
